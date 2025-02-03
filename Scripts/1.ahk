@@ -1203,7 +1203,7 @@ resetWindows(){
             Title := winTitle
             rowHeight := 533  ; Height of each row
 			
-			if(friendIDs) {
+			if(FriendID) {
 				; Calculate currentRow
 				if (winTitle <= Columns - 1) {
 					currentRow := 0  ; First row has (Columns - 1) windows
