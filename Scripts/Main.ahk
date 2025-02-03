@@ -113,7 +113,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	
 	pToken := Gdip_Startup()
 	
-	
+	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 60)
 Loop {
 	FormatTime, CurrentTime,, HHmm
 
