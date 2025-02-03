@@ -405,7 +405,6 @@ resetWindows(Title, SelectedMonitorIndex){
 			x := Mod((Title - 1), Columns) * scaleParam
 			if(FriendID)
 				Title := Title - 1
-			MsgBox %Title%
 			WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
 			break
 		}
