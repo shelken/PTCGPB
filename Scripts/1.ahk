@@ -934,9 +934,12 @@ AddFriends() {
 			KeepSync(120, 500, 155, 530, , "Social", 143, 518, 500)
 			KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
 			KeepSync(205, 430, 255, 475, , "Search", 240, 120, 1500)
+			savedClipboard := Clipboard
 			adbClick(210, 342)
-			KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
+			Sleep, %Delay%
 			friendCode := Clipboard
+			Clipboard := savedClipboard
+			KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
 			if(!friendIDs) {
 				friendIDs := [FriendID]
 				Sleep, %Delay%
