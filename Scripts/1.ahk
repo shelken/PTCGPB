@@ -14,7 +14,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode
 
 	scriptName := StrReplace(A_ScriptName, ".ahk")
 	winTitle := scriptName
@@ -144,6 +144,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	
 	pToken := Gdip_Startup()
 Loop {
+	friendIDs := ReadFile("ids")
 	packs := 0
 	FormatTime, CurrentTime,, HHmm
 
@@ -367,7 +368,9 @@ Loop {
 	adbClick(139, 254)
 	Sleep, %Delay%
 	length := StrLen(name) ; in case it lags and misses inputting name
-	Loop 20 {
+	Loop {
+		CheckInstances(15, 500, 68, 520, , "Erase", 0)
+			break
 		adbShell.StdIn.WriteLine("input keyevent 67")	
 		Sleep, 10
 	}
@@ -637,7 +640,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 		if(godPack < 3)
 			killGodPackInstance()
 		else if(godPack = 3)
-			restartGameInstance("God Pack found. Continuing...") ; restarts to backup and delete xml file with account info.
+			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
 	}
 	
 	KeepSync(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
@@ -646,18 +649,15 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	failSafeTime := 0
 	Loop {
 		Sleep, %Delay%
-		if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
+		if(CheckInstances(233, 486, 272, 519, , "Skip", 0)) {
+			adbClick(239, 497)
+		} else if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
 			adbClick(146, 494) ;146, 494
-			Sleep, %Delay%
-			adbClick(146, 494) ;146, 494=
-		}
-		if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
+		} else if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
 			adbClick(146, 494) ;146, 494
-			Sleep, %Delay%
-			adbClick(146, 494) ;146, 494=
-		}
-		if(KeepSync(20, 500, 55, 530, , "Home", 239, 497, , 1)) ;click on next until skip button appearsstop at hourglasses tutorial
+		} else if(CheckInstances(20, 500, 55, 530, , "Home", 0)) {
 			break
+		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
 		CreateStatusMessage("In failsafe for Home. It's been: " . failSafeTime "s ")
 		LogToFile("In failsafe for Home. It's been: " . failSafeTime "s ")
@@ -719,7 +719,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 		if(godPack < 3)
 			killGodPackInstance()
 		else if(godPack = 3)
-			restartGameInstance("God Pack found. Continuing...") ; restarts to backup and delete xml file with account info.
+			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
 	}
 			
 	KeepSync(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
@@ -728,18 +728,15 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	failSafeTime := 0
 	Loop {
 		Sleep, %Delay%
-		if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
+		if(CheckInstances(233, 486, 272, 519, , "Skip", 0)) {
+			adbClick(239, 497)
+		} else if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
 			adbClick(146, 494) ;146, 494
-			Sleep, %Delay%
+		} else if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
 			adbClick(146, 494) ;146, 494
-		}
-		if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
-			adbClick(146, 494) ;146, 494
-			Sleep, %Delay%
-			adbClick(146, 494) ;146, 494=
-		}
-		if(KeepSync(178, 193, 251, 282, , "Hourglass", 239, 497, , 1)) ;click on next until skip button appearsstop at hourglasses tutorial
+		} else if(CheckInstances(178, 193, 251, 282, , "Hourglass", 0)) {
 			break
+		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
 		CreateStatusMessage("In failsafe for Hourglass. It's been: " . failSafeTime "s ")
 		LogToFile("In failsafe for Hourglass. It's been: " . failSafeTime "s ")
@@ -829,7 +826,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 		if(godPack < 3)
 			killGodPackInstance()
 		else if(godPack = 3)
-			restartGameInstance("God Pack found. Continuing...") ; restarts to backup and delete xml file with account info.
+			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
 	}
 	
 	KeepSync(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
@@ -838,18 +835,15 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	failSafeTime := 0
 	Loop {
 		Sleep, %Delay%
-		if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
+		if(CheckInstances(233, 486, 272, 519, , "Skip", 0)) {
+			adbClick(239, 497)
+		} else if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
 			adbClick(146, 494) ;146, 494
-			Sleep, %Delay%
-			adbClick(146, 494) ;146, 494=
-		}
-		if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
+		} else if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
 			adbClick(146, 494) ;146, 494
-			Sleep, %Delay%
-			adbClick(146, 494) ;146, 494=
-		}
-		if(KeepSync(20, 500, 55, 530, , "Home", 239, 497, , 1)) ;click on next until skip button appearsstop at hourglasses tutorial
+		} else if(CheckInstances(20, 500, 55, 530, , "Home", 0)) {
 			break
+		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
 		CreateStatusMessage("In failsafe for Home. It's been: " . failSafeTime "s ")
 		LogToFile("In failsafe for Home. It's been: " . failSafeTime "s ")
@@ -899,7 +893,7 @@ SelectPack(f := false) {
 		}
 		KeepSync(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
 	}
-	else if(openPack = "Dialgia") { ;Dialgia
+	else if(openPack = "Dialga") { ;Dialga
 		KeepSync(233, 400, 264, 428, , "Points", 145, 196) ;Genetic apex
 		if(f = true) {
 			KeepSync(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
@@ -918,16 +912,19 @@ RemoveFriends() {
 	KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
 	
 	for index, value in friendIDs {
-		if(KeepSync(75, 400, 105, 420, , "Friend", 138, 174, 500, 3)) {
-			KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500, 3)
-			KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500, 3)
+		if(KeepSync(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
+			KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500)
+			KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500)
+			Sleep, %Delay%
 			adbClick(143, 503)
+			Sleep, %Delay%
+			Sleep, %Delay%
 		}
 	}
 }
 
 AddFriends() {
-	global FriendID, friendIds, waitTime
+	global FriendID, friendIds, waitTime, friendCode
 	count := 0
 	Loop {
 		if(count > waitTime) {
@@ -937,8 +934,9 @@ AddFriends() {
 			KeepSync(120, 500, 155, 530, , "Social", 143, 518, 500)
 			KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
 			KeepSync(205, 430, 255, 475, , "Search", 240, 120, 1500)
+			adbClick(210, 342)
 			KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
-			friendIDs := ReadFile("ids")
+			friendCode := Clipboard
 			if(!friendIDs) {
 				friendIDs := [FriendID]
 				Sleep, %Delay%
@@ -954,8 +952,12 @@ AddFriends() {
 						adbClick(193, 258)
 						break
 					}
-					if(CheckInstances(165, 240, 255, 270, , "Withdraw", 0))
+					else if(CheckInstances(165, 240, 255, 270, , "Withdraw", 0)) {
 						break
+					}
+					else if(CheckInstances(165, 250, 190, 275, , "Accepted", 0)) {
+						break
+					}
 					Sleep, 750
 				}
 			}
@@ -972,16 +974,25 @@ AddFriends() {
 							adbClick(193, 258)
 							break
 						}
-						if(CheckInstances(165, 240, 255, 270, , "Withdraw", 0))
+						else if(CheckInstances(165, 240, 255, 270, , "Withdraw", 0)) {
 							break
+						}
+						else if(CheckInstances(165, 250, 190, 275, , "Accepted", 0)) {
+							break
+						}
 						Sleep, 750
 					}
 					if(index != friendIDs.maxIndex()) {
 						KeepSync(205, 430, 255, 475, , "Search2", 150, 50, 1500)
 						KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
-						Loop 20 {
-							adbShell.StdIn.WriteLine("input keyevent 67")	
-							Sleep, 10
+						Loop {
+							CreateStatusMessage("Removing friend ID")
+							Loop 20 {
+								adbShell.StdIn.WriteLine("input keyevent 67")	
+								Sleep, 10
+							}
+							if(CheckInstances(15, 500, 68, 520, , "Erase", 0))
+								break
 						}
 					}
 				}
@@ -1179,7 +1190,7 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 
 
 resetWindows(){
-    global Columns, winTitle, SelectedMonitorIndex, scaleParam
+    global Columns, winTitle, SelectedMonitorIndex, scaleParam, FriendID
     CreateStatusMessage("Arranging window positions and sizes")
     RetryCount := 0
     MaxRetries := 10
@@ -1191,23 +1202,28 @@ resetWindows(){
             SysGet, Monitor, Monitor, %SelectedMonitorIndex%
             Title := winTitle
             rowHeight := 533  ; Height of each row
+			
+			if(friendIDs) {
+				; Calculate currentRow
+				if (winTitle <= Columns - 1) {
+					currentRow := 0  ; First row has (Columns - 1) windows
+				} else {
+					; For rows after the first, adjust calculation
+					adjustedWinTitle := winTitle - (Columns - 1)
+					currentRow := Floor((adjustedWinTitle - 1) / Columns) + 1
+				}
 
-            ; Calculate currentRow
-            if (winTitle <= Columns - 1) {
-                currentRow := 0  ; First row has (Columns - 1) windows
-            } else {
-                ; For rows after the first, adjust calculation
-                adjustedWinTitle := winTitle - (Columns - 1)
-                currentRow := Floor((adjustedWinTitle - 1) / Columns) + 1
-            }
-
-            ; Calculate x position
-            if (currentRow == 0) {
-                x := winTitle * scaleParam  ; First row uses (Columns - 1) columns
-            } else {
-                adjustedWinTitle := winTitle - (Columns - 1)
-                x := Mod(adjustedWinTitle - 1, Columns) * scaleParam  ; Subsequent rows use full Columns
-            }
+				; Calculate x position
+				if (currentRow == 0) {
+					x := winTitle * scaleParam  ; First row uses (Columns - 1) columns
+				} else {
+					adjustedWinTitle := winTitle - (Columns - 1)
+					x := Mod(adjustedWinTitle - 1, Columns) * scaleParam  ; Subsequent rows use full Columns
+				}
+			} else {
+				currentRow := Floor((winTitle - 1) / Columns)
+				x := Mod((winTitle - 1), Columns) * scaleParam
+			}
 
             y := currentRow * rowHeight
 
@@ -1246,15 +1262,21 @@ restartGameInstance(reason, RL := true){
 	initializeAdbShell()
 	CreateStatusMessage("Restarting game reason: " reason)
 	
-	adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
-	if(!RL)
-		adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
-	;adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
-	Sleep, 1500
-	adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
+	if(!RL || RL != "GodPack") {
+		adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
+		if(!RL)
+			adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
+		;adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
+		Sleep, 1500
+		adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
+	}
 
 	Sleep, 4500
-	if(RL) {
+	
+	if(RL = "GodPack") {
+		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
+		Reload
+	} else if(RL) {
 		if(!packs) {
 			KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
 			if(setSpeed = 3)
@@ -1397,7 +1419,7 @@ checkBorder() {
 					Randmax := Condemn.Length()
 					Random, rand, 1, Randmax
 					Interjection := Condemn[rand]
-					logMessage := Interjection . " " . username . " found an invalid pack in instance: " . scriptName . " (" . packs . " packs) Backed up to the Accounts folder. Continuing..."
+					logMessage := Interjection . "\n" . username . "(" . friendCode . ")\nFound an invalid pack in instance: " . scriptName . " (" . packs . " packs)\nBacking up to the Accounts folder and continuing..."
 					CreateStatusMessage(logMessage)
 					godPackLog = GPlog.txt
 					LogToFile(logMessage, godPackLog)
@@ -1405,16 +1427,16 @@ checkBorder() {
 					break
 				}
 				else {
-					Praise := ["Congrats!", "Congratulations!", "GG!", "Whoa!", "Praise Helix! ༼ つ ◕_◕ ༽つ", "Way to go!", "You did it!", "Awesome!", "Nice!", "Cool!", "You deserve it!", "Keep going!", "This one has to be live!", "No duds, no duds, no duds!", "Fantastic!", "Bravo!", "Excellent work!", "Impressive!", "Youre amazing!", "Well done!", "Youre crushing it!", "Keep up the great work!", "Youre unstoppable!", "Exceptional!", "You nailed it!", "Hats off to you!", "Sweet!", "Kudos!", "Phenomenal!", "Boom! Nailed it!", "Marvelous!", "Outstanding!", "Legendary!", "Youre a rock star!", "Unbelievable!", "Keep shining!", "Way to crush it!", "Youre on fire!", "Killing it!", "Top-notch!", "Superb!", "Epic!", "Cheers to you!", "Thats the spirit!", "Magnificent!", "Youre a natural!", "Gold star for you!", "You crushed it!", "Incredible!", "Shazam!", "Youre a genius!", "Top-tier effort!", "This is your moment!", "Powerful stuff!", "Wicked awesome!", "Props to you!", "Big win!", "Yesss!", "Champion vibes!", "Spectacular!"]
+					Praise := ["Congrats!", "Congratulations!", "GG!", "Whoa!", "Praise Helix! ༼ つ ◕_◕ ༽つ", "Way to go!", "You did it!", "Awesome!", "Nice!", "Cool!", "You deserve it!", "Keep going!", "This one has to be live!", "No duds, no duds, no duds!", "Fantastic!", "Bravo!", "Excellent work!", "Impressive!", "You're amazing!", "Well done!", "You're crushing it!", "Keep up the great work!", "You're unstoppable!", "Exceptional!", "You nailed it!", "Hats off to you!", "Sweet!", "Kudos!", "Phenomenal!", "Boom! Nailed it!", "Marvelous!", "Outstanding!", "Legendary!", "Youre a rock star!", "Unbelievable!", "Keep shining!", "Way to crush it!", "You're on fire!", "Killing it!", "Top-notch!", "Superb!", "Epic!", "Cheers to you!", "Thats the spirit!", "Magnificent!", "Youre a natural!", "Gold star for you!", "You crushed it!", "Incredible!", "Shazam!", "You're a genius!", "Top-tier effort!", "This is your moment!", "Powerful stuff!", "Wicked awesome!", "Props to you!", "Big win!", "Yesss!", "Champion vibes!", "Spectacular!"]
 
 					Randmax := Praise.Length()
 					Random, rand, 1, Randmax
 					Interjection := Praise[rand]
 					
 					if(godPack < 3)
-						logMessage := Interjection . " " . username . " found a God pack found in instance: " . scriptName . " (" . packs . " packs) Instance is stopping."
+						logMessage := Interjection . "\n" . username . "(" . friendCode . ")\nFound a God pack found in instance: " . scriptName . " (" . packs . " packs)\nInstance is stopping."
 					else if(godPack = 3)
-						logMessage := Interjection . " " . username . " found a God Pack found in instance: " . scriptName . " (" . packs . " packs) Backed up to the Accounts folder. Continuing..."
+						logMessage := Interjection . "\n" . username . "(" . friendCode . ")\nFound a God Pack found in instance: " . scriptName . " (" . packs . " packs)\nBacking up to the Accounts folder and continuing..."
 					CreateStatusMessage(logMessage)
 					godPackLog = GPlog.txt
 					LogToFile(logMessage, godPackLog)
@@ -1505,22 +1527,21 @@ ControlClick(X, Y) {
 	ControlClick, x%X% y%Y%, %winTitle%
 }
 
-ReadFile(filename) {
+ReadFile(filename, numbers := false) {
     FileRead, content, %A_ScriptDir%\..\%filename%.txt
 
-    ; If the file is empty or reading failed, return false
     if (!content)
         return false
 
-    values := StrSplit(Trim(content), "`r`n")
+    values := []
+    for _, val in StrSplit(Trim(content), "`r`n") {
+        cleanVal := RegExReplace(val, "[^a-zA-Z0-9]") ; Remove non-alphanumeric characters
+        if (cleanVal != "")
+            values.Push(cleanVal)
+    }
 
-    ; If there are no values after splitting, return false
-    if (values.MaxIndex() = 0)
-        return false
-
-    return values
+    return values.MaxIndex() ? values : false
 }
-
 
 adbInput(name) {
 	global adbShell, adbPath, adbPort
@@ -1583,31 +1604,34 @@ Screenshot(filename := "Valid") {
 }
 
 LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
-	global discordUserId, discordWebhookURL
+	global discordUserId, discordWebhookURL, friendCode
+	discordPing := "<@" . discordUserId . "> "
+	discordFriends := ReadFile("discord")
+	
+	if(discordFriends) {
+		for index, value in discordFriends {
+			if(value = discordUserID)
+				continue
+			discordPing .= "<@" . value . "> "
+		}
+	}
+		
 	if (discordWebhookURL != "") {
 		MaxRetries := 10
 		RetryCount := 0
 		Loop {
 			try {
-				; Prepare the message data
-				if (ping && discordUserId != "") {
-					data := "{""content"": ""<@" discordUserId "> " message """}"
-				} else {
-					data := "{""content"": """ message """}"
-				}
-
-				; Create the HTTP request object
-				whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-				whr.Open("POST", discordWebhookURL, false)
-				whr.SetRequestHeader("Content-Type", "application/json")
-				whr.Send(data)
-
 				; If an image file is provided, send it
 				if (screenshotFile != "") {
 					; Check if the file exists
 					if (FileExist(screenshotFile)) {
 						; Send the image using curl
-						RunWait, curl -k -F "file=@%screenshotFile%" %discordWebhookURL%,, Hide
+						curlCommand := "curl -k "
+    . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
+    . "-F ""file=@" . screenshotFile . """ "
+    . discordWebhookURL
+						msgbox %curlCommand%
+						RunWait, %curlCommand%,, Hide
 					}
 				}
 				break
