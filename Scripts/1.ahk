@@ -1633,7 +1633,6 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
     . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
     . "-F ""file=@" . screenshotFile . """ "
     . discordWebhookURL
-						msgbox %curlCommand%
 						RunWait, %curlCommand%,, Hide
 					}
 				}
