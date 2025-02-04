@@ -942,6 +942,7 @@ AddFriends() {
 			Clipboard := savedClipboard
 			KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
 			if(!friendIDs) {
+				friendIDs := [FriendID] ; needed for remove friend function
 				Loop {
 					adbInput(FriendID)
 					if(CheckInstances(205, 430, 255, 475, , "Search", 0)) {
