@@ -113,29 +113,20 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	
 	pToken := Gdip_Startup()
 	
-	
+	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
+	firstRun := true
 Loop {
-	FormatTime, CurrentTime,, HHmm
-
-	StartTime := changeDate - 45 ; 12:55 AM2355
-	EndTime := changeDate + 5 ; 1:01 AM
-
-	; Adjust for crossing midnight
-	if (StartTime < 0)
-		StartTime += 2400
-	if (EndTime >= 2400)
-		EndTime -= 2400
-		
-	While(((CurrentTime - StartTime >= 0) && (CurrentTime - StartTime <= 5)) || ((EndTime - CurrentTime >= 0) && (EndTime - CurrentTime <= 5)))
-	{
-		CreateStatusMessage("I need a break... Sleeping until " . changeDate + 5 . " `nto avoid being kicked out from the date change")
-		FormatTime, CurrentTime,, HHmm ; Update the current time after sleep
-		Sleep, 5000
-	}
 	Sleep, %Delay%
 	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 30)
 	KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
 	KeepSync(170, 450, 195, 480, , "Approve", 228, 464)
+	if(firstRun) {
+		Sleep, 1000
+		adbClick(205, 510)
+		Sleep, 1000
+		adbClick(210, 372)
+		firstRun := false
+	}
 	done := false
 	Loop 3 {
 		Sleep, 250
@@ -673,6 +664,8 @@ SumVariablesInJsonFile() {
 	return sum
 }
 
+
+
 from_window(ByRef image) {
   ; Thanks tic - https://www.autohotkey.com/boards/viewtopic.php?t=6517
 
@@ -691,12 +684,14 @@ from_window(ByRef image) {
 
   ; struct BITMAPINFOHEADER - https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
   hdc := DllCall("CreateCompatibleDC", "ptr", 0, "ptr")
-  VarSetCapacity(bi, 40, 0)				; sizeof(bi) = 40
-	 , NumPut(	   40, bi,  0,   "uint") ; Size
-	 , NumPut(	width, bi,  4,   "uint") ; Width
-	 , NumPut(  -height, bi,  8,	"int") ; Height - Negative so (0, 0) is top-left.
-	 , NumPut(		1, bi, 12, "ushort") ; Planes
-	 , NumPut(	   32, bi, 14, "ushort") ; BitCount / BitsPerPixel
+  VarSetCapacity(bi, 40, 0)                ; sizeof(bi) = 40
+ , NumPut(       40, bi,  0,   "uint") ; Size
+ , NumPut(    width, bi,  4,   "uint") ; Width
+ , NumPut(  -height, bi,  8,    "int") ; Height - Negative so (0, 0) is top-left.
+ , NumPut(        1, bi, 12, "ushort") ; Planes
+ , NumPut(       32, bi, 14, "ushort") ; BitCount / BitsPerPixel
+ , NumPut(        0, bi, 16,   "uint") ; Compression = BI_RGB
+     , NumPut(        3, bi, 20,   "uint") ; Quality setting (3 = low quality, no anti-aliasing) 
   hbm := DllCall("CreateDIBSection", "ptr", hdc, "ptr", &bi, "uint", 0, "ptr*", pBits:=0, "ptr", 0, "uint", 0, "ptr")
   obm := DllCall("SelectObject", "ptr", hdc, "ptr", hbm, "ptr")
 

@@ -32,7 +32,7 @@ if FileExist(packsFile) ; Check if the file exists
 		MsgBox, Failed to create %backupFile%. Ensure permissions and paths are correct.
 }
 InitializeJsonFile() ; Create or open the JSON file
-
+global FriendID
 ; Create the main GUI for selecting number of instances
 	IniRead, FriendID, Settings.ini, UserSettings, FriendID
 	IniRead, waitTime, Settings.ini, UserSettings, waitTime, 5
@@ -85,13 +85,13 @@ Gui, Add, Edit, vColumns x348 y95 w72 Center, %Columns%
 ; Pack selection logic
 if (openPack = "Palkia") {
 	defaultPack := 1
-} else if (openPack = "Dialgia") {
+} else if (openPack = "Dialga") {
 	defaultPack := 2
 } else if (openPack = "Mew") {
 	defaultPack := 3
 } 
 
-Gui, Add, DropDownList, x80 y166 w145 vopenPack choose%defaultPack% Center, Palkia|Dialgia|Mew
+Gui, Add, DropDownList, x80 y166 w145 vopenPack choose%defaultPack% Center, Palkia|Dialga|Mew
 global scaleParam
 
 if (defaultLanguage = "Scale125") {
@@ -184,29 +184,29 @@ else
 
 
 
-Gui, Font, s10 cGray Norm Bold, Segoe UI  ; Normal font for input labels
-Gui Add, Button, x190 y72 w17 h19 gShowMsgName, ? ;Questionmark box for Name Field
-Gui Add, Button, x342 y77 w17 h19 gShowMsgInstances, ? ;Questionmark box for Instance Field
-Gui Add, Button, x415 y77 w17 h19 gShowMsgColumns, ? ;Questionmark box for Instance Per Row Field
+; Gui, Font, s10 cGray Norm Bold, Segoe UI  ; Normal font for input labels
+; Gui Add, Button, x190 y72 w17 h19 gShowMsgName, ? ;Questionmark box for Name Field
+; Gui Add, Button, x342 y77 w17 h19 gShowMsgInstances, ? ;Questionmark box for Instance Field
+; Gui Add, Button, x415 y77 w17 h19 gShowMsgColumns, ? ;Questionmark box for Instance Per Row Field
 
-Gui Add, Button, x190 y145 w17 h19 gShowMsgPacks, ? ;Questionmark box for Pack to Open Field
-Gui Add, Button, x423 y145 w17 h19 gShowMsgGodPacks, ? ;Questionmark box for God Pack to Open Field
+; Gui Add, Button, x190 y145 w17 h19 gShowMsgPacks, ? ;Questionmark box for Pack to Open Field
+; Gui Add, Button, x423 y145 w17 h19 gShowMsgGodPacks, ? ;Questionmark box for God Pack to Open Field
 
-Gui Add, Button, x78 y219 w17 h19 gShowMsgLanguage, ? ;Questionmark box for God Pack to Open Field
-Gui Add, Button, x400 y219 w17 h19 gShowMsgMonitor, ? ;Questionmark box for God Pack to Open Field
+; Gui Add, Button, x78 y219 w17 h19 gShowMsgLanguage, ? ;Questionmark box for God Pack to Open Field
+; Gui Add, Button, x400 y219 w17 h19 gShowMsgMonitor, ? ;Questionmark box for God Pack to Open Field
 
-Gui Add, Button, x192 y307 w17 h19 gShowMsgDelay, ? ;Questionmark box for Delay in ms Field
-Gui Add, Button, x411 y307 w17 h19 gShowMsgTimeZone, ? ;Questionmark box for Timezone Field
+; Gui Add, Button, x192 y307 w17 h19 gShowMsgDelay, ? ;Questionmark box for Delay in ms Field
+; Gui Add, Button, x411 y307 w17 h19 gShowMsgTimeZone, ? ;Questionmark box for Timezone Field
 
-Gui Add, Button, x193 y378 w17 h19 gShowMsgFolder, ? ;Questionmark box for SwipeSpeed Field
-Gui Add, Button, x343 y378 w17 h19 gShowMsgSpeed, ? ;Questionmark box for Speed Field
-Gui Add, Button, x408 y378 w17 h19 gShowMsgSwipeSpeed, ? ;Questionmark box for SwipeSpeed Field
+; Gui Add, Button, x193 y378 w17 h19 gShowMsgFolder, ? ;Questionmark box for SwipeSpeed Field
+; Gui Add, Button, x343 y378 w17 h19 gShowMsgSpeed, ? ;Questionmark box for Speed Field
+; Gui Add, Button, x408 y378 w17 h19 gShowMsgSwipeSpeed, ? ;Questionmark box for SwipeSpeed Field
 
-Gui Add, Button, x428 y448 w17 h19 gShowMsgdiscordwebHook, ? ;Questionmark box for discord id Field
-Gui Add, Button, x330 y448 w17 h19 gShowMsgdiscordID, ? ;Questionmark box for discord web hook Field
+; Gui Add, Button, x428 y448 w17 h19 gShowMsgdiscordwebHook, ? ;Questionmark box for discord id Field
+; Gui Add, Button, x330 y448 w17 h19 gShowMsgdiscordID, ? ;Questionmark box for discord web hook Field
 
-Gui Add, Button, x230 y518 w17 h19 gShowMsgAccountDeletion, ? ;Questionmark box for Account Deletion to Open Field
-Gui Add, Button, x235 y448 w17 h19 gShowMsgSkipGP, ? ;Questionmark box for Account Deletion to Open Field
+; Gui Add, Button, x230 y518 w17 h19 gShowMsgAccountDeletion, ? ;Questionmark box for Account Deletion to Open Field
+; Gui Add, Button, x235 y448 w17 h19 gShowMsgSkipGP, ? ;Questionmark box for Account Deletion to Open Field
 
 ; Show the GUI
 Gui, Show
@@ -277,6 +277,7 @@ ShowMsgSkipGP:
 return
 
 ArrangeWindows:
+	GuiControlGet, FriendID,, FriendID
 	GuiControlGet, Instances,, Instances
 	GuiControlGet, Columns,, Columns
 	GuiControlGet, SelectedMonitorIndex,, SelectedMonitorIndex
@@ -361,21 +362,49 @@ GuiClose:
 ExitApp
 
 resetWindows(Title, SelectedMonitorIndex){
-	global Columns
+	global Columns, FriendID
 	RetryCount := 0
 	MaxRetries := 10
+	if(FriendID){
+		if(Title = 1) {
+			Loop
+			{
+				try {
+					; Get monitor origin from index
+					SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
+					SysGet, Monitor, Monitor, %SelectedMonitorIndex%
+
+					rowHeight := 533  ; Adjust the height of each row
+					currentRow := Floor((Title - 1) / Columns)
+					y := currentRow * rowHeight	
+					x := Mod((Title - 1), Columns) * scaleParam
+					Title := "Main"
+					WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
+					break
+				}
+				catch {
+					if (RetryCount > MaxRetries)
+						Pause
+				}
+				Sleep, 1000
+			}
+			Title := 1
+		}
+	}
 	Loop
 	{
 		try {
 			; Get monitor origin from index
 			SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 			SysGet, Monitor, Monitor, %SelectedMonitorIndex%
-
+			if(FriendID)
+				Title := Title + 1
 			rowHeight := 533  ; Adjust the height of each row
 			currentRow := Floor((Title - 1) / Columns)
 			y := currentRow * rowHeight	
 			x := Mod((Title - 1), Columns) * scaleParam
-	
+			if(FriendID)
+				Title := Title - 1
 			WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
 			break
 		}
