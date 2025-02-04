@@ -204,7 +204,7 @@ CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL
 		CreateStatusMessage("At home page. Opening app..." )
 		restartGameInstance("At the home page during: `n" imageName)
 	}
-	if(imageName = "Country")
+	if(imageName = "Country" || imageName = "Social")
 		FSTime := 180
 	else
 		FSTime := 45 
