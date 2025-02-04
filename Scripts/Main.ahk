@@ -113,7 +113,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	
 	pToken := Gdip_Startup()
 	
-	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 60)
+	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
 Loop {
 	FormatTime, CurrentTime,, HHmm
 
@@ -204,7 +204,7 @@ CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL
 		CreateStatusMessage("At home page. Opening app..." )
 		restartGameInstance("At the home page during: `n" imageName)
 	}
-	if(imageName = "Country" || imageName = "Social")
+	if(imageName = "Country")
 		FSTime := 180
 	else
 		FSTime := 45 
