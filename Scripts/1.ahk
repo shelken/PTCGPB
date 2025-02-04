@@ -15,7 +15,6 @@ DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
 global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended
-
 	scriptName := StrReplace(A_ScriptName, ".ahk")
 	winTitle := scriptName
 	pauseToggle := false
@@ -38,7 +37,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
 	IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 3Pack
 	IniRead, Instances, Settings.ini, UserSettings, Instances, 1
-	
+
 	adbPort := findAdbPorts(folderPath)
 	
 	adbPath := folderPath . "\MuMuPlayerGlobal-12.0\shell\adb.exe"
@@ -359,7 +358,6 @@ Loop {
 	adbInput(username)
 	if(KeepSync(121, 490, 161, 520, , "Return", 185, 372, , 10)) ;click through until return button on open pack
 		break
-		
 	adbClick(90, 370)
 	Sleep, %Delay%
 	adbClick(139, 254) ; 139 254 194 372
@@ -904,18 +902,29 @@ RemoveFriends() {
 	global friendIDs, stopToggle, friended
 	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 500)
 	KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
-	
-	for index, value in friendIDs {
+	if(!friendIDs) {
 		if(KeepSync(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-			KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500)
-			KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500)
-			Sleep, %Delay%
-			adbClick(143, 503)
-			Sleep, %Delay%
-			Sleep, %Delay%
-		}
-		else {
-			break
+				KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500)
+				KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500)
+				Sleep, %Delay%
+				adbClick(143, 503)
+				Sleep, %Delay%
+				Sleep, %Delay%
+			}
+	}
+	else {
+		for index, value in friendIDs {
+			if(KeepSync(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
+				KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500)
+				KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500)
+				Sleep, %Delay%
+				adbClick(143, 503)
+				Sleep, %Delay%
+				Sleep, %Delay%
+			}
+			else {
+				break
+			}
 		}
 	}
 	if(stopToggle)
@@ -942,7 +951,6 @@ AddFriends() {
 			Clipboard := savedClipboard
 			KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
 			if(!friendIDs) {
-				friendIDs := [FriendID] ; needed for remove friend function
 				Loop {
 					adbInput(FriendID)
 					if(CheckInstances(205, 430, 255, 475, , "Search", 0)) {
@@ -970,12 +978,14 @@ AddFriends() {
 			else {
 				;randomize friend id list to not back up mains if running in groups since they'll be sent in a random order.
 				n := friendIDs.MaxIndex()
-				Loop % n {
-					i := n - A_Index + 1  ; Start from last element
-					Random, j, 1, %i%     ; Generate random index between 1 and current position
-					temp := friendIDs[i]  ; Swap elements
-					friendIDs[i] := friendIDs[j]
-					friendIDs[j] := temp
+				Loop % n
+				{
+					i := n - A_Index + 1
+					Random, j, 1, %i%
+					; Force string assignment with quotes
+					temp := friendIDs[i] . ""  ; Concatenation ensures string type
+					friendIDs[i] := friendIDs[j] . ""
+					friendIDs[j] := temp . ""
 				}
 				for index, value in friendIDs {
 					Loop {
@@ -1582,6 +1592,19 @@ ReadFile(filename, numbers := false) {
     return values.MaxIndex() ? values : false
 }
 
+DownloadFile(url) {
+	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+	localPath = %A_ScriptDir%\..\ids.txt ; Change to the folder you want to save the file
+
+	URLDownloadToFile, %url%, %localPath%
+
+	if ErrorLevel
+		MsgBox, Download failed!
+	else
+		MsgBox, File downloaded successfully!
+
+}
+
 adbInput(input) {
 	global adbShell, adbPath, adbPort
 	initializeAdbShell()
@@ -1675,7 +1698,6 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
     . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
     . "-F ""file=@" . screenshotFile . """ "
     . discordWebhookURL
-						msgbox %curlCommand%
 						RunWait, %curlCommand%,, Hide
 					}
 				}
