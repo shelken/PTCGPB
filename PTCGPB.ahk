@@ -12,7 +12,7 @@ if not A_IsAdmin
 
 KillADBProcesses()
 
-global Instances, jsonFileName, PacksText
+global Instances, jsonFileName, PacksText, runMain
 
 totalFile := A_ScriptDir . "\json\total.json"
 backupFile := A_ScriptDir . "\json\total-backup.json"
@@ -51,7 +51,8 @@ global FriendID
 	IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 600
 	IniRead, skipInvalidGP, Settings.ini, UserSettings, skipInvalidGP, Yes
 	IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3Pack
-
+	IniRead, runMain, Settings.ini, UserSettings, runMain, 1
+	IniRead, heartBeat, Settings.ini, UserSettings, heartBeat, 0
 ; Main GUI setup
 ; Add the link text at the bottom of the GUI
 
@@ -78,6 +79,11 @@ if(FriendID = )
 	Gui, Add, Edit, vFriendID x80 y95 w145 h30 Center
 else
 	Gui, Add, Edit, vFriendID x80 y95 w145 h30 Center, %FriendID%
+	
+if(runMain)
+	Gui, Add, CheckBox, Checked vrunMain x1 y95 Center, Main
+else
+	Gui, Add, CheckBox, vrunMain x1 y95 Center, Main
 	
 Gui, Add, Edit, vInstances x275 y95 w72 Center, %Instances%
 Gui, Add, Edit, vColumns x348 y95 w72 Center, %Columns%
@@ -181,6 +187,11 @@ if(StrLen(discordWebhookURL) > 2)
 	Gui, Add, Edit, vdiscordWebhookURL x348 y476 w72 h35 Center, %discordWebhookURL%
 else
 	Gui, Add, Edit, vdiscordWebhookURL x348 y476 w72 h35 Center
+	
+if(heartBeat)
+	Gui, Add, CheckBox, Checked vheartBeat x273 y512 Center, Discord Heart Beat
+else
+	Gui, Add, CheckBox, vheartBeat x273 y512 Center, Discord Heart Beat
 
 
 
@@ -277,7 +288,7 @@ ShowMsgSkipGP:
 return
 
 ArrangeWindows:
-	GuiControlGet, FriendID,, FriendID
+	GuiControlGet, runMain,, runMain
 	GuiControlGet, Instances,, Instances
 	GuiControlGet, Columns,, Columns
 	GuiControlGet, SelectedMonitorIndex,, SelectedMonitorIndex
@@ -320,6 +331,8 @@ IniWrite, %SelectedMonitorIndex%, Settings.ini, UserSettings, SelectedMonitorInd
 IniWrite, %swipeSpeed%, Settings.ini, UserSettings, swipeSpeed
 IniWrite, %skipInvalidGP%, Settings.ini, UserSettings, skipInvalidGP
 IniWrite, %deleteMethod%, Settings.ini, UserSettings, deleteMethod
+IniWrite, %runMain%, Settings.ini, UserSettings, runMain
+IniWrite, %heartBeat%, Settings.ini, UserSettings, heartBeat
 
 ; Loop to process each instance
 Loop, %Instances%
@@ -338,34 +351,128 @@ Loop, %Instances%
 	
 	Run, %Command%
 }
-if(FriendID) {
+if(runMain) {
 	FileName := "Scripts\Main.ahk"
 	Run, %FileName%
 }
+if(inStr(FriendID, "https"))
+	DownloadFile(FriendID, "ids.txt")
 SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 SysGet, Monitor, Monitor, %SelectedMonitorIndex%
 rerollTime := A_TickCount
-
 Loop {
+	Sleep, 30000
 	; Sum all variable values and write to total.json
 	total := SumVariablesInJsonFile()
 	totalSeconds := Round((A_TickCount - rerollTime) / 1000) ; Total time in seconds
 	mminutes := Floor(totalSeconds / 60)
 	if(total = 0)
 	total := "0                             "
-	CreateStatusMessage("Time: " . mminutes . "m Packs: " . total, 287, 490)
-	Sleep, 10000
+	packStatus := "Time: " . mminutes . "m Packs: " . total
+	CreateStatusMessage(packStatus, 287, 490)
+	if(Mod(A_Index, 4) = 0 && InStr(FriendID, "https"))
+		DownloadFile(FriendID, "ids.txt")
+	if(A_Index = 1 || (Mod(A_Index, 60) = 0 && heartBeat)) {	
+		onlineAHK := "Online: "
+		offlineAHK := "Offline: "
+		Online := []
+		if(runMain) {
+			IniRead, value, HeartBeat.ini, HeartBeat, Main
+			if(value)
+				onlineAHK := "Online: Main, "
+			else
+				offlineAHK := "Offline: Main, "
+			IniWrite, 0, HeartBeat.ini, HeartBeat, Main
+		}
+		Loop %Instances% {
+			IniRead, value, HeartBeat.ini, HeartBeat, Instance%A_Index%
+			if(value)
+				Online.push(1)
+			else
+				Online.Push(0)
+			IniWrite, 0, HeartBeat.ini, HeartBeat, Instance%A_Index%
+		}
+		for index, value in Online {
+			if(index = Online.MaxIndex())
+				commaSeparate := "."
+			else
+				commaSeparate := ", "
+			if(value)
+				onlineAHK .= A_Index . commaSeparate
+			else
+				offlineAHK .= A_Index . commaSeparate
+		}
+		if(offlineAHK = "Offline: ")
+			offlineAHK := "Offline: none."
+		if(onlineAHK = "Online: ")
+			onlineAHK := "Online: none."
+		
+		discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
+		LogToDiscord(discMessage, , discordUserID)
+	}
 }
 Return
 
 GuiClose:
 ExitApp
 
+LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
+	global discordUserId, discordWebhookURL, friendCode
+	discordPing := "<" . discordUserId . "> "
+		
+	if (discordWebhookURL != "") {
+		MaxRetries := 10
+		RetryCount := 0
+		Loop {
+			try {
+				; If an image file is provided, send it
+				if (screenshotFile != "") {
+					; Check if the file exists
+					if (FileExist(screenshotFile)) {
+						; Send the image using curl
+						curlCommand := "curl -k "
+    . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" " . discordWebhookURL
+						RunWait, %curlCommand%,, Hide
+					}
+				}
+				else {
+					curlCommand := "curl -k "
+    . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" " . discordWebhookURL
+						RunWait, %curlCommand%,, Hide
+				}
+				break
+			}
+			catch {
+				RetryCount++
+				if (RetryCount >= MaxRetries) {
+					CreateStatusMessage("Failed to send discord message.")
+					break
+				}
+				Sleep, 250
+			}
+			sleep, 250
+		}
+	}
+}
+
+DownloadFile(url, filename) {
+	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+	localPath = %A_ScriptDir%\%filename% ; Change to the folder you want to save the file
+
+	URLDownloadToFile, %url%, %localPath%
+
+	; if ErrorLevel
+		; MsgBox, Download failed!
+	; else
+		; MsgBox, File downloaded successfully!
+
+}
+
 resetWindows(Title, SelectedMonitorIndex){
-	global Columns, FriendID
+	global Columns, runMain
 	RetryCount := 0
 	MaxRetries := 10
-	if(FriendID){
+	if(runMain){
 		if(Title = 1) {
 			Loop
 			{
@@ -397,13 +504,13 @@ resetWindows(Title, SelectedMonitorIndex){
 			; Get monitor origin from index
 			SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 			SysGet, Monitor, Monitor, %SelectedMonitorIndex%
-			if(FriendID)
+			if(runMain)
 				Title := Title + 1
 			rowHeight := 533  ; Adjust the height of each row
 			currentRow := Floor((Title - 1) / Columns)
 			y := currentRow * rowHeight	
 			x := Mod((Title - 1), Columns) * scaleParam
-			if(FriendID)
+			if(runMain)
 				Title := Title - 1
 			WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
 			break
