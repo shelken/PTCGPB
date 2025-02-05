@@ -394,8 +394,6 @@ piplup
 prinplup
 empoleon
 starly
-staravia
-staraptor
 bidoof
 bibarel
 kricketot
@@ -610,7 +608,6 @@ chandelure
 axew
 fraxure
 haxorus
-cubchoo
 beartic
 cryogonal
 shelmet
