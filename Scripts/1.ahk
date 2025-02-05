@@ -14,10 +14,11 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus
 	scriptName := StrReplace(A_ScriptName, ".ahk")
 	winTitle := scriptName
 	pauseToggle := false
+	showStatus := true
 	jsonFileName := A_ScriptDir . "\..\json\Packs.json"
 	IniRead, FriendID, %A_ScriptDir%\..\Settings.ini, UserSettings, FriendID
 	IniRead, waitTime, %A_ScriptDir%\..\Settings.ini, UserSettings, waitTime, 5
@@ -36,8 +37,12 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	IniRead, discordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, discordWebhookURL, ""
 	IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
 	IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 3Pack
-	IniRead, Instances, Settings.ini, UserSettings, Instances, 1
-
+	IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances, 1
+	IniRead, runMain, %A_ScriptDir%\..\Settings.ini, UserSettings, runMain, 1
+	IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 1
+	if(heartBeat)
+		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
+		
 	adbPort := findAdbPorts(folderPath)
 	
 	adbPath := folderPath . "\MuMuPlayerGlobal-12.0\shell\adb.exe"
@@ -88,6 +93,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 			Gui, Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
 			Gui, Add, Button, x60 y0 w40 h25 gResumeScript, Resume (F6)
 			Gui, Add, Button, x100 y0 w30 h25 gStopScript, Stop (F7)
+			Gui, Add, Button, x130 y0 w40 h25 gShowStatusMessages, Status (F8)
 			Gui, Show, NoActivate x%x4% y%y4% AutoSize
 			break
 		}
@@ -142,9 +148,10 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	restartGameInstance("Initializing bot...", false)
 	
 	pToken := Gdip_Startup()
-Loop {
-	friendIDs := ReadFile("ids")
 	packs := 0
+Loop {
+	IniWrite, 1, HeartBeat.ini, HeartBeat, Instance%scriptName%
+	friendIDs := ReadFile("ids")
 	FormatTime, CurrentTime,, HHmm
 
 	StartTime := changeDate - 45 ; 12:55 AM2355
@@ -163,18 +170,19 @@ Loop {
 		Sleep, 5000
 	}
 if(!packs) {
-	KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+	FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
 	if(setSpeed = 3)
-		KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+		FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 	else
-		KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+		FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 	Sleep, %Delay%
 	adbClick(41, 296)
 	Sleep, %Delay%
 }	
+packs := 0
 
 		
-KeepSync(105, 396, 121, 406, , "Country", 143, 370) ;select month and year and click
+FindImageAndClick(105, 396, 121, 406, , "Country", 143, 370) ;select month and year and click
 
 Sleep, %Delay%
 adbClick(80, 400)
@@ -187,7 +195,7 @@ failSafeTime := 0
 Loop
 {
 	Sleep, %Delay%
-	if(KeepSync(100, 386, 138, 416, , "Month", , , , 1, failSafeTime))
+	if(FindImageAndClick(100, 386, 138, 416, , "Month", , , , 1, failSafeTime))
 		break
 	Sleep, %Delay%
 adbClick(142, 159)
@@ -211,7 +219,7 @@ failSafeTime := 0
 Loop ;select month and year and click
 {
 	Sleep, %Delay%
-	if(KeepSync(148, 384, 256, 419, , "Year", , , , 1, failSafeTime))
+	if(FindImageAndClick(148, 384, 256, 419, , "Year", , , , 1, failSafeTime))
 		break
 	Sleep, %Delay%
 	adbClick(142, 159)
@@ -230,11 +238,11 @@ Loop ;select month and year and click
 } ;select month and year and click
 
 Sleep, %Delay%
-if(CheckInstances(93, 471, 122, 485, , "CountrySelect", 0)) {
+if(FindOrLoseImage(93, 471, 122, 485, , "CountrySelect", 0)) {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
-		if(KeepSync(93, 471, 122, 485, , "CountrySelect", 140, 474, 1000, 1, failSafeTime)) {
+		if(FindImageAndClick(93, 471, 122, 485, , "CountrySelect", 140, 474, 1000, 1, failSafeTime)) {
 			sleep, %Delay%
 			sleep, %Delay%
 			sleep, %Delay%
@@ -245,7 +253,7 @@ if(CheckInstances(93, 471, 122, 485, , "CountrySelect", 0)) {
 			sleep, %Delay%
 			sleep, %Delay%
 			adbClick(124, 250)
-			if(KeepSync(116, 352, 138, 389, , "Birth", 140, 474, 1000))
+			if(FindImageAndClick(116, 352, 138, 389, , "Birth", 140, 474, 1000))
 				break
 		}
 		sleep, 10
@@ -254,20 +262,20 @@ if(CheckInstances(93, 471, 122, 485, , "CountrySelect", 0)) {
 		LogToFile("In failsafe for country select. " . failSafeTime "/45 seconds")
 	}
 } else {
-	KeepSync(116, 352, 138, 389, , "Birth", 140, 474, 1000)
+	FindImageAndClick(116, 352, 138, 389, , "Birth", 140, 474, 1000)
 }
 
  ;wait date confirmation screen while clicking ok
 
-KeepSync(210, 285, 250, 315, , "TosScreen", 203, 371, 1000) ;wait to be at the tos screen while confirming birth
+FindImageAndClick(210, 285, 250, 315, , "TosScreen", 203, 371, 1000) ;wait to be at the tos screen while confirming birth
 
-KeepSync(129, 477, 156, 494, , "Tos", 139, 299, 1000) ;wait for tos while clicking it
+FindImageAndClick(129, 477, 156, 494, , "Tos", 139, 299, 1000) ;wait for tos while clicking it
 
-KeepSync(210, 285, 250, 315, , "TosScreen", 142, 486, 1000) ;wait to be at the tos screen and click x
+FindImageAndClick(210, 285, 250, 315, , "TosScreen", 142, 486, 1000) ;wait to be at the tos screen and click x
 
-KeepSync(129, 477, 156, 494, , "Privacy", 142, 339, 1000) ;wait to be at the tos screen
+FindImageAndClick(129, 477, 156, 494, , "Privacy", 142, 339, 1000) ;wait to be at the tos screen
 
-KeepSync(210, 285, 250, 315, , "TosScreen", 142, 486, 1000) ;wait to be at the tos screen, click X
+FindImageAndClick(210, 285, 250, 315, , "TosScreen", 142, 486, 1000) ;wait to be at the tos screen, click X
 
 Sleep, %Delay%
 adbClick(261, 374)
@@ -281,11 +289,11 @@ adbClick(145, 484)
 failSafe := A_TickCount
 failSafeTime := 0
 Loop {
-	if(KeepSync(30, 336, 53, 370, , "Save", 145, 484, , 2, failSafeTime)) ;wait to be at create save data screen while clicking
+	if(FindImageAndClick(30, 336, 53, 370, , "Save", 145, 484, , 2, failSafeTime)) ;wait to be at create save data screen while clicking
 		break
 	Sleep, %Delay%
 	adbClick(261, 406)
-	if(KeepSync(30, 336, 53, 370, , "Save", 145, 484, , 2, failSafeTime)) ;wait to be at create save data screen while clicking
+	if(FindImageAndClick(30, 336, 53, 370, , "Save", 145, 484, , 2, failSafeTime)) ;wait to be at create save data screen while clicking
 		break
 	Sleep, %Delay%
 	adbClick(261, 374)
@@ -300,26 +308,26 @@ adbClick(143, 348)
 
 Sleep, %Delay%
 
-KeepSync(51, 335, 107, 359, , "Link") ;wait for link account screen%
+FindImageAndClick(51, 335, 107, 359, , "Link") ;wait for link account screen%
 Sleep, %Delay%
 failSafe := A_TickCount
 failSafeTime := 0	
 	Loop {
-		if(CheckInstances(51, 335, 107, 359, , "Link", 0, failSafeTime)) {
+		if(FindOrLoseImage(51, 335, 107, 359, , "Link", 0, failSafeTime)) {
 			adbClick(140, 460)
 			Loop {
 				Sleep, %Delay%
-				if(CheckInstances(51, 335, 107, 359, , "Link", 1, failSafeTime)) {
+				if(FindOrLoseImage(51, 335, 107, 359, , "Link", 1, failSafeTime)) {
 					adbClick(140, 380) ; click ok on the interrupted while opening pack prompt
 					break
 				}
 				failSafeTime := (A_TickCount - failSafe) // 1000
 			}
-		} else if(CheckInstances(110, 350, 150, 404, , "Confirm", 0, failSafeTime)) {
+		} else if(FindOrLoseImage(110, 350, 150, 404, , "Confirm", 0, failSafeTime)) {
 			adbClick(203, 364)
-		} else if(CheckInstances(215, 371, 264, 418, , "Complete", 0, failSafeTime)) {
+		} else if(FindOrLoseImage(215, 371, 264, 418, , "Complete", 0, failSafeTime)) {
 			adbClick(140, 370)
-		} else if(CheckInstances(0, 46, 20, 70, , "Cinematic", 0, failSafeTime)) {
+		} else if(FindOrLoseImage(0, 46, 20, 70, , "Cinematic", 0, failSafeTime)) {
 			break
 		}
 		;CreateStatusMessage("Looking for Link/Welcome")
@@ -329,25 +337,25 @@ failSafeTime := 0
 	}
 	
 	if(setSpeed = 3) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-		KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 		Sleep, %Delay%
 		adbClick(41, 296)
 		Sleep, %Delay%
 	}
 	
-	KeepSync(110, 230, 182, 257, , "Welcome", 253, 506, 110) ;click through cutscene until welcome page
+	FindImageAndClick(110, 230, 182, 257, , "Welcome", 253, 506, 110) ;click through cutscene until welcome page
 	
 	if(setSpeed = 3) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
 	
-		KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+		FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 		Sleep, %Delay%
 		adbClick(41, 296)
 	}
-KeepSync(190, 241, 225, 270, , "Name", 189, 438) ;wait for name input screen
+FindImageAndClick(190, 241, 225, 270, , "Name", 189, 438) ;wait for name input screen
 
-KeepSync(0, 476, 40, 502, , "OK", 139, 257) ;wait for name input screen
+FindImageAndClick(0, 476, 40, 502, , "OK", 139, 257) ;wait for name input screen
 
 failSafe := A_TickCount
 failSafeTime := 0
@@ -356,7 +364,7 @@ Loop {
     Random, randomIndex, 1, name.MaxIndex()
 	username := name[randomIndex]
 	adbInput(username)
-	if(KeepSync(121, 490, 161, 520, , "Return", 185, 372, , 10)) ;click through until return button on open pack
+	if(FindImageAndClick(121, 490, 161, 520, , "Return", 185, 372, , 10)) ;click through until return button on open pack
 		break
 	adbClick(90, 370)
 	Sleep, %Delay%
@@ -376,10 +384,10 @@ Sleep, %Delay%
 
 adbClick(140, 424)
 
-KeepSync(203, 273, 228, 290, , "Pack", 140, 424) ;wait for pack to be ready  to trace
+FindImageAndClick(203, 273, 228, 290, , "Pack", 140, 424) ;wait for pack to be ready  to trace
 	if(setSpeed > 1) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-		KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 		Sleep, %Delay%
 	}
 failSafe := A_TickCount
@@ -387,12 +395,12 @@ failSafeTime := 0
 Loop {
 	adbSwipe()
 	Sleep, 10
-	if (CheckInstances(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
+	if (FindOrLoseImage(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
 		if(setSpeed > 1) {
 			if(setSpeed = 3)
-					KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click 3x
+					FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click 3x
 			else
-					KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click 2x
+					FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click 2x
 		}
 		adbClick(41, 296)
 			break
@@ -401,10 +409,10 @@ Loop {
 	CreateStatusMessage("In failsafe for Pack. " . failSafeTime "/45 seconds")
 }
 
-KeepSync(34, 99, 74, 131, , "Swipe", 140, 375) ;click through cards until needing to swipe up
+FindImageAndClick(34, 99, 74, 131, , "Swipe", 140, 375) ;click through cards until needing to swipe up
 	if(setSpeed > 1) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-		KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 		Sleep, %Delay%
 	}
 failSafe := A_TickCount
@@ -412,12 +420,12 @@ failSafeTime := 0
 Loop {
 	adbSwipeUp()
 	Sleep, 10
-	if (CheckInstances(120, 70, 150, 95, , "SwipeUp", 0, failSafeTime)){
+	if (FindOrLoseImage(120, 70, 150, 95, , "SwipeUp", 0, failSafeTime)){
 	if(setSpeed > 1) {
 		if(setSpeed = 3)
-				KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+				FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 		else
-				KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+				FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 	}
 		adbClick(41, 296)
 			break
@@ -429,30 +437,30 @@ Loop {
 
 Sleep, %Delay%
 if(setSpeed > 2) {
-	KeepSync(136, 420, 151, 436, , "Move", 134, 375, 500) ; click through until move
-	KeepSync(50, 394, 86, 412, , "Proceed", 141, 483, 500) ;wait for menu to proceed then click ok. increased delay in between clicks to fix freezing on 3x speed
+	FindImageAndClick(136, 420, 151, 436, , "Move", 134, 375, 500) ; click through until move
+	FindImageAndClick(50, 394, 86, 412, , "Proceed", 141, 483, 500) ;wait for menu to proceed then click ok. increased delay in between clicks to fix freezing on 3x speed
 }
 else {
-	KeepSync(136, 420, 151, 436, , "Move", 134, 375) ; click through until move
-	KeepSync(50, 394, 86, 412, , "Proceed", 141, 483) ;wait for menu to proceed then click ok
+	FindImageAndClick(136, 420, 151, 436, , "Move", 134, 375) ; click through until move
+	FindImageAndClick(50, 394, 86, 412, , "Proceed", 141, 483) ;wait for menu to proceed then click ok
 }
 	
 Sleep, %Delay%
 adbClick(204, 371)
 
-KeepSync(46, 368, 103, 411, , "Gray") ;wait for for missions to be clickable
+FindImageAndClick(46, 368, 103, 411, , "Gray") ;wait for for missions to be clickable
 
 Sleep, %Delay%
 adbClick(247, 472)
 
-KeepSync(115, 97, 174, 150, , "Pokeball", 247, 472, 5000) ; click through missions until missions is open
+FindImageAndClick(115, 97, 174, 150, , "Pokeball", 247, 472, 5000) ; click through missions until missions is open
 
 Sleep, %Delay%
 adbClick(141, 294)
 Sleep, %Delay%
 adbClick(141, 294)
 Sleep, %Delay%
-KeepSync(124, 168, 162, 207, , "Register", 141, 294, 1000) ; wait for register screen
+FindImageAndClick(124, 168, 162, 207, , "Register", 141, 294, 1000) ; wait for register screen
 Sleep, %Delay%
 Sleep, %Delay%
 Sleep, %Delay%
@@ -461,11 +469,11 @@ Sleep, %Delay%
 Sleep, %Delay%
 adbClick(140, 500)
 
-KeepSync(115, 255, 176, 308, , "Mission") ; wait for mission complete screen
+FindImageAndClick(115, 255, 176, 308, , "Mission") ; wait for mission complete screen
 
-KeepSync(46, 368, 103, 411, , "Gray", 143, 360) ;wait for for missions to be clickable
+FindImageAndClick(46, 368, 103, 411, , "Gray", 143, 360) ;wait for for missions to be clickable
 
-KeepSync(170, 160, 220, 200, , "Notifications", 145, 194) ;click on packs. stop at booster pack tutorial
+FindImageAndClick(170, 160, 220, 200, , "Notifications", 145, 194) ;click on packs. stop at booster pack tutorial
 
 Sleep, %Delay%
 Sleep, %Delay%
@@ -484,10 +492,10 @@ Sleep, %Delay%
 Sleep, %Delay%
 adbClick(142, 436)
 
-KeepSync(203, 273, 228, 290, , "Pack", 239, 497) ;wait for pack to be ready  to Trace
+FindImageAndClick(203, 273, 228, 290, , "Pack", 239, 497) ;wait for pack to be ready  to Trace
 	if(setSpeed > 1) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-		KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 		Sleep, %Delay%
 	}
 failSafe := A_TickCount
@@ -495,12 +503,12 @@ failSafeTime := 0
 Loop {
 	adbSwipe()
 	Sleep, 10
-	if (CheckInstances(203, 273, 228, 290, , "Pack", 1, failSafeTime)){	
+	if (FindOrLoseImage(203, 273, 228, 290, , "Pack", 1, failSafeTime)){	
 	if(setSpeed > 1) {
 		if(setSpeed = 3)
-					KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+					FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 		else
-					KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+					FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 	}
 			adbClick(41, 296)
 			break
@@ -510,13 +518,13 @@ Loop {
 	Sleep, %Delay%
 }
 
-KeepSync(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
+FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 
-KeepSync(233, 486, 272, 519, , "Skip", 146, 496) ;click on next until skip button appears
+FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 496) ;click on next until skip button appears
 
-KeepSync(120, 70, 150, 100, , "Next", 239, 497, , 2)
+FindImageAndClick(120, 70, 150, 100, , "Next", 239, 497, , 2)
 
-KeepSync(53, 281, 86, 310, , "Wonder", 146, 494) ;click on next until skip button appearsstop at hourglasses tutorial
+FindImageAndClick(53, 281, 86, 310, , "Wonder", 146, 494) ;click on next until skip button appearsstop at hourglasses tutorial
 
 Sleep, %Delay%
 Sleep, %Delay%
@@ -524,17 +532,17 @@ Sleep, %Delay%
 
 adbClick(140, 358)
 
-KeepSync(191, 393, 211, 411, , "Shop", 146, 444) ;click until at main menu
+FindImageAndClick(191, 393, 211, 411, , "Shop", 146, 444) ;click until at main menu
 
-KeepSync(87, 232, 131, 266, , "Wonder2", 79, 411) ; click until wonder pick tutorial screen
+FindImageAndClick(87, 232, 131, 266, , "Wonder2", 79, 411) ; click until wonder pick tutorial screen
 
-KeepSync(114, 430, 155, 441, , "Wonder3", 190, 437) ; click through tutorial
+FindImageAndClick(114, 430, 155, 441, , "Wonder3", 190, 437) ; click through tutorial
 
 Sleep, %Delay%
 Sleep, %Delay%
 
 
-KeepSync(155, 281, 192, 315, , "Wonder4", 202, 347, 500) ; confirm wonder pick selection 
+FindImageAndClick(155, 281, 192, 315, , "Wonder4", 202, 347, 500) ; confirm wonder pick selection 
 
 Sleep, %Delay%
 Sleep, %Delay%
@@ -546,7 +554,7 @@ if(setSpeed = 3) ;time the animation
 else
 	Sleep, 2500
 
-KeepSync(60, 130, 202, 142, 10, "Pick", 208, 461, 350) ;stop at pick a card
+FindImageAndClick(60, 130, 202, 142, 10, "Pick", 208, 461, 350) ;stop at pick a card
 
 sleep, %Delay%
 
@@ -559,7 +567,7 @@ Loop {
 		continueTime := 1
 	else
 		continueTime := 6
-	if(KeepSync(110, 230, 182, 257, , "Welcome", 239, 497, , continueTime, failSafeTime)) ;click through to end of tut screen
+	if(FindImageAndClick(110, 230, 182, 257, , "Welcome", 239, 497, , continueTime, failSafeTime)) ;click through to end of tut screen
 		break
 	sleep, %Delay%
 	adbClick(143, 492)
@@ -579,7 +587,7 @@ Loop {
 }
 
 
-KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
+FindImageAndClick(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 
 	AddFriends()
 
@@ -588,7 +596,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
-		if(KeepSync(225, 273, 235, 290, , "Pack", 239, 497, , 2))
+		if(FindImageAndClick(225, 273, 235, 290, , "Pack", 239, 497, , 2))
 			break ;wait for pack to be ready to Trace and click skip
 		sleep, %Delay%
 		adbClick(146, 439)
@@ -600,8 +608,8 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	}
 
 	if(setSpeed > 1) {
-	KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-	KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+	FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+	FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 		Sleep, %Delay%
 	}
 	failSafe := A_TickCount
@@ -609,12 +617,12 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	Loop {
 		adbSwipe()	
 		Sleep, 10
-		if (CheckInstances(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
+		if (FindOrLoseImage(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
 		if(setSpeed > 1) {
 			if(setSpeed = 3)
-					KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+					FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 			else
-					KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+					FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 		}
 			adbClick(41, 296)
 			break
@@ -625,7 +633,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	}
 
 		
-	KeepSync(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
+	FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 
 	foundGP := checkBorder() ;check card border to find godpacks	
 	if(foundGP) {
@@ -635,19 +643,19 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
 	}
 	
-	KeepSync(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
+	FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
 	
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
 		Sleep, %Delay%
-		if(CheckInstances(233, 486, 272, 519, , "Skip", 0)) {
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0)) {
 			adbClick(239, 497)
-		} else if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0)) {
 			adbClick(146, 494) ;146, 494
-		} else if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0)) {
 			adbClick(146, 494) ;146, 494
-		} else if(CheckInstances(20, 500, 55, 530, , "Home", 0)) {
+		} else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0)) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
@@ -669,7 +677,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 		Sleep, %Delay%
 		Sleep, %Delay%
 		adbClick(142, 429)
-		if(KeepSync(203, 273, 228, 290, , "Pack", 239, 497, , 2))
+		if(FindImageAndClick(203, 273, 228, 290, , "Pack", 239, 497, , 2))
 			break ;wait for pack to be ready to Trace and click skip
 				
 		
@@ -681,8 +689,8 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	}
 	
 	if(setSpeed > 1) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-		KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 		Sleep, %Delay%
 	}
 	failSafe := A_TickCount
@@ -690,12 +698,12 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	Loop {
 		adbSwipe()
 		Sleep, 10
-		if (CheckInstances(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
+		if (FindOrLoseImage(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
 		if(setSpeed > 1) {
 			if(setSpeed = 3)
-					KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+					FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 			else
-					KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+					FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 		}
 			adbClick(41, 296)
 			break
@@ -704,7 +712,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 		CreateStatusMessage("In failsafe for Pack. " . failSafeTime "/45 seconds")
 		Sleep, %Delay%
 	}
-	KeepSync(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
+	FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 
 	foundGP := checkBorder() ;check card border to find godpacks	
 	if(foundGP) {
@@ -714,19 +722,19 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
 	}
 			
-	KeepSync(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
+	FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
 
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
 		Sleep, %Delay%
-		if(CheckInstances(233, 486, 272, 519, , "Skip", 0)) {
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0)) {
 			adbClick(239, 497)
-		} else if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0)) {
 			adbClick(146, 494) ;146, 494
-		} else if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0)) {
 			adbClick(146, 494) ;146, 494
-		} else if(CheckInstances(178, 193, 251, 282, , "Hourglass", 0)) {
+		} else if(FindOrLoseImage(178, 193, 251, 282, , "Hourglass", 0)) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
@@ -752,7 +760,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	Sleep, %Delay%
 	Sleep, %Delay%
 	
-	KeepSync(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
+	FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
 	Sleep, %Delay%
 
 	adbClick(203, 436) ; 203 436
@@ -763,7 +771,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 		SelectPack(true)
 	}
 	else {
-		KeepSync(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+		FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
 
 		Sleep, %Delay%
 		adbClick(210, 464) ; 210 464
@@ -774,7 +782,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
-		if(KeepSync(203, 273, 228, 290, , "Pack", 239, 497, , 2)) ;wait for pack to be ready to Trace and click skip
+		if(FindImageAndClick(203, 273, 228, 290, , "Pack", 239, 497, , 2)) ;wait for pack to be ready to Trace and click skip
 			break 
 		Sleep, %Delay%
 		adbClick(210, 464) ; 210 464
@@ -788,19 +796,19 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	failSafe := A_TickCount
 	failSafeTime := 0
 		if(setSpeed > 1) {
-		KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
-		KeepSync(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
 			Sleep, %Delay%
 		}
 	Loop {
 		adbSwipe()
 		Sleep, 10
-		if (CheckInstances(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
+		if (FindOrLoseImage(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
 		if(setSpeed > 1) {
 			if(setSpeed = 3)
-					KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+					FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 			else
-					KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+					FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 		}
 			adbClick(41, 296)
 			break
@@ -811,7 +819,7 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 	}
 
 	
-	KeepSync(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
+	FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 
 	foundGP := checkBorder() ;check card border to find godpacks	
 	if(foundGP) {
@@ -821,19 +829,19 @@ KeepSync(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
 			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
 	}
 	
-	KeepSync(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
+	FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
 	
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
 		Sleep, %Delay%
-		if(CheckInstances(233, 486, 272, 519, , "Skip", 0)) {
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0)) {
 			adbClick(239, 497)
-		} else if(CheckInstances(120, 70, 150, 100, , "Next", 0)) {
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next", 0)) {
 			adbClick(146, 494) ;146, 494
-		} else if(CheckInstances(120, 70, 150, 100, , "Next2", 0)) {
+		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0)) {
 			adbClick(146, 494) ;146, 494
-		} else if(CheckInstances(20, 500, 55, 530, , "Home", 0)) {
+		} else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0)) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
@@ -864,48 +872,48 @@ return
 SelectPack(f := false) {
 	global openPack
 	if(openPack = "Mew") { ; MEW
-		KeepSync(233, 400, 264, 428, , "Points", 80, 196) ;Mew
+		FindImageAndClick(233, 400, 264, 428, , "Points", 80, 196) ;Mew
 		if(f = true) {
-			KeepSync(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
 			Sleep, %Delay%
 			adbClick(210, 464) ; 210 464
 			Sleep, %Delay%
 			adbClick(210, 464) ; 210 464
 		}
-		KeepSync(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
+		FindImageAndClick(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
 	}
 	else if(openPack = "Palkia") { ;Palkia
-		KeepSync(233, 400, 264, 428, , "Points", 200, 196) ;Genetic apex
+		FindImageAndClick(233, 400, 264, 428, , "Points", 200, 196) ;Genetic apex
 		if(f = true) {
-			KeepSync(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
 			Sleep, %Delay%
 			adbClick(210, 464) ; 210 464
 			Sleep, %Delay%
 			adbClick(210, 464) ; 210 464
 		}
-		KeepSync(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
+		FindImageAndClick(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
 	}
 	else if(openPack = "Dialga") { ;Dialga
-		KeepSync(233, 400, 264, 428, , "Points", 145, 196) ;Genetic apex
+		FindImageAndClick(233, 400, 264, 428, , "Points", 145, 196) ;Genetic apex
 		if(f = true) {
-			KeepSync(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
 			Sleep, %Delay%
 			adbClick(210, 464) ; 210 464
 			Sleep, %Delay%
 			adbClick(210, 464) ; 210 464
 		}
-		KeepSync(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
+		FindImageAndClick(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
 	}
 }
 
 RemoveFriends() {
 	global friendIDs, stopToggle, friended
-	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 500)
-	KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
+	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
+	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
 	if(!friendIDs) {
-		if(KeepSync(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-				KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500)
-				KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500)
+		if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 9)) {
+				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
+				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
 				Sleep, %Delay%
 				adbClick(143, 503)
 				Sleep, %Delay%
@@ -914,9 +922,9 @@ RemoveFriends() {
 	}
 	else {
 		for index, value in friendIDs {
-			if(KeepSync(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-				KeepSync(135, 355, 160, 385, , "Remove", 145, 407, 500)
-				KeepSync(70, 395, 100, 420, , "Send2", 200, 372, 500)
+			if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 9)) {
+				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
+				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
 				Sleep, %Delay%
 				adbClick(143, 503)
 				Sleep, %Delay%
@@ -941,35 +949,35 @@ AddFriends() {
 			break
 		}
 		if(count = 0) {
-			KeepSync(120, 500, 155, 530, , "Social", 143, 518, 500)
-			KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
-			KeepSync(205, 430, 255, 475, , "Search", 240, 120, 1500)
+			FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
+			FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
+			FindImageAndClick(205, 430, 255, 475, , "Search", 240, 120, 1500)
 			savedClipboard := Clipboard
 			adbClick(210, 342)
 			Sleep, %Delay%
 			friendCode := Clipboard
 			Clipboard := savedClipboard
-			KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
+			FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 			if(!friendIDs) {
 				Loop {
 					adbInput(FriendID)
-					if(CheckInstances(205, 430, 255, 475, , "Search", 0)) {
-						KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
+					if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0)) {
+						FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 						EraseInput(1,1)
-					} else if(CheckInstances(205, 430, 255, 475, , "Search2", 0)) {
+					} else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0)) {
 						break
 					}
 				}
 				Loop {
 					adbClick(232, 453)
-					if(CheckInstances(165, 250, 190, 275, , "Send", 0)) {
+					if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0)) {
 						adbClick(193, 258)
 						break
 					}
-					else if(CheckInstances(165, 240, 255, 270, , "Withdraw", 0)) {
+					else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0)) {
 						break
 					}
-					else if(CheckInstances(165, 250, 190, 275, , "Accepted", 0)) {
+					else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0)) {
 						break
 					}
 					Sleep, 750
@@ -990,36 +998,36 @@ AddFriends() {
 				for index, value in friendIDs {
 					Loop {
 						adbInput(value)
-						if(CheckInstances(205, 430, 255, 475, , "Search", 0)) {
-							KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
+						if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0)) {
+							FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 							EraseInput()
-						} else if(CheckInstances(205, 430, 255, 475, , "Search2", 0)) {
+						} else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0)) {
 							break
 						}
 					}
 					Loop {
 						adbClick(232, 453)
-						if(CheckInstances(165, 250, 190, 275, , "Send", 0)) {
+						if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0)) {
 							adbClick(193, 258)
 							break
 						}
-						else if(CheckInstances(165, 240, 255, 270, , "Withdraw", 0)) {
+						else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0)) {
 							break
 						}
-						else if(CheckInstances(165, 250, 190, 275, , "Accepted", 0)) {
+						else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0)) {
 							break
 						}
 						Sleep, 750
 					}
 					if(index != friendIDs.maxIndex()) {
-						KeepSync(205, 430, 255, 475, , "Search2", 150, 50, 1500)
-						KeepSync(0, 475, 25, 495, , "OK2", 138, 454)
+						FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
+						FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 						EraseInput(index, n)
 					}
 				}
 			}
-			KeepSync(120, 500, 155, 530, , "Social", 143, 518, 500)
-			KeepSync(20, 500, 55, 530, , "Home", 40, 516, 500)
+			FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
+			FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500)
 		}
 		CreateStatusMessage("Waiting for friends to accept request. `n" . count . "/" . waitTime . " seconds.")
 		sleep, 1000
@@ -1030,17 +1038,23 @@ AddFriends() {
 EraseInput(num := 0, total := 0) {
 	if(num)
 		CreateStatusMessage("Removing friend ID " . num . "/" . total)
+	failSafe := A_TickCount
+	failSafeTime := 0
 	Loop {
+		FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 		Loop 20 {
 			adbShell.StdIn.WriteLine("input keyevent 67")	
 			Sleep, 10
 		}
-		if(CheckInstances(15, 500, 68, 520, , "Erase", 0))
+		if(FindOrLoseImage(15, 500, 68, 520, , "Erase", 0, failSafeTime))
 			break
 	}
+	failSafeTime := (A_TickCount - failSafe) // 1000
+	CreateStatusMessage("In failsafe for Erase. " . failSafeTime "/45 seconds")
+	LogToFile("In failsafe for Erase. " . failSafeTime "/45 seconds")
 }
 
-CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
+FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
 	global winTitle, Variation, failSafe
 	if(searchVariation = "")
 		searchVariation := Variation
@@ -1075,7 +1089,9 @@ CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL
 		GDEL := 1
 	else
 		GDEL := 0
-	if (!confirmed && vRet = GDEL) {
+	if (!confirmed && vRet = GDEL && GDEL = 1) {
+		confirmed := vPosXY
+	} else if(!confirmed && vRet = GDEL && GDEL = 0) {
 		confirmed := true
 	}
 	pBitmap := from_window(WinExist(winTitle))
@@ -1097,10 +1113,10 @@ CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL
 		restartGameInstance("Instance " . scriptName . " has been stuck " . imageName)
 		failSafe := A_TickCount
 	}
-	return (confirmed)
+	return confirmed
 }
 
-KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
+FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
 	global winTitle, Variation, failSafe, confirmed
 	if(searchVariation = "")
 		searchVariation := Variation
@@ -1155,7 +1171,7 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 			}
 		}
 		
-		if (confirmed = true) {
+		if (confirmed) {
 			continue
 		}
 
@@ -1167,7 +1183,7 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, X1, Y1, X2, Y2, searchVariation)
 		Gdip_DisposeImage(pBitmap)
 		if (!confirmed && vRet = 1) {
-			confirmed := true
+			confirmed := vPosXY
 		} else {
 			ElapsedTime := (A_TickCount - StartSkipTime) // 1000
 			if(imageName = "Country")
@@ -1188,8 +1204,6 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 				failSafe := A_TickCount
 			}
 		}
-
-		pBitmap := from_window(WinExist(winTitle))
 		Path = %imagePath%Error1.png
 		pNeedle := GetNeedle(Path)
 		; ImageSearch within the region
@@ -1203,7 +1217,6 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 			adbClick(139, 386)
 			Sleep, 1000
 		}
-		pBitmap := from_window(WinExist(winTitle))
 		Path = %imagePath%App.png
 		pNeedle := GetNeedle(Path)
 		; ImageSearch within the region
@@ -1227,7 +1240,7 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 				break
 			}
 		}
-		if (confirmed = true) {
+		if (confirmed) {
 			break
 		}		
 		
@@ -1250,7 +1263,7 @@ resetWindows(){
             Title := winTitle
             rowHeight := 533  ; Height of each row
 			
-			if(FriendID) {
+			if(runMain) {
 				; Calculate currentRow
 				if (winTitle <= Columns - 1) {
 					currentRow := 0  ; First row has (Columns - 1) windows
@@ -1324,12 +1337,12 @@ restartGameInstance(reason, RL := true){
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
 		Reload
 	} else if(RL) {
-		if(!packs && !friended) {
-			KeepSync(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
+		if(friended) {
+			FindImageAndClick(73, 204, 137, 219, , "Platin", 18, 109, 2000) ; click mod settings
 			if(setSpeed = 3)
-				KeepSync(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+				FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
 			else
-				KeepSync(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
+				FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 			Sleep, %Delay%
 			adbClick(41, 296)
 			Sleep, %Delay%
@@ -1340,21 +1353,44 @@ restartGameInstance(reason, RL := true){
 			if(!friended)
 				break
 			adbClick(255, 83)
-			if(CheckInstances(105, 396, 121, 406, , "Country", 0, failSafeTime)) { ;if at country continue
+			if(FindOrLoseImage(105, 396, 121, 406, , "Country", 0, failSafeTime)) { ;if at country continue
 				break
 			}
-			else if(CheckInstances(20, 120, 50, 150, , "Menu", 0, failSafeTime)) { ; if the clicks in the top right open up the game settings menu then continue to delete account
+			else if(FindOrLoseImage(20, 120, 50, 150, , "Menu", 0, failSafeTime)) { ; if the clicks in the top right open up the game settings menu then continue to delete account
 				Sleep,%Delay%
-				KeepSync(56, 312, 108, 334, , "Account2", 79, 256, 1000) ;wait for account menu
+				FindImageAndClick(56, 312, 108, 334, , "Account2", 79, 256, 1000) ;wait for account menu
 				Sleep,%Delay%
-				KeepSync(160, 400, 240, 485, 60, "Delete", 145, 446, 2000) ;wait for delete save data confirmation
-				Sleep,%Delay%
-				KeepSync(113, 340, 138, 410, , "Delete2", 201, 467) ;wait for second delete save data 
-				Sleep,%Delay%
-				KeepSync(24, 183, 255, 222, , "Delete3", 201, 369, 2000) ;wait for second 
-				Sleep,%Delay%
-				adbClick(143, 370)
-				
+				failSafe := A_TickCount
+				failSafeTime := 0
+				Loop {
+					clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0, failSafeTime)
+					if(!clickButton) {
+						clickImage := FindOrLoseImage(140, 340, 250, 530, 60, "DeleteAll", 0, failSafeTime)
+						if(clickImage) {
+							StringSplit, pos, clickImage, `,  ; Split at ", "
+							adbClick(pos1, pos2)
+						}
+						else {
+							adbClick(145, 446)
+						}
+						Sleep, %Delay%
+						failSafeTime := (A_TickCount - failSafe) // 1000
+						CreateStatusMessage("In failsafe for clicking to delete. " . failSafeTime "/45 seconds")
+						LogToFile("In failsafe for clicking to delete. " . failSafeTime "/45 seconds")
+					}
+					else {
+						break
+					}
+					Sleep,%Delay%
+				}
+				StringSplit, pos, clickButton, `,  ; Split at ", "
+				adbClick(pos1, pos2)
+				; FindImageAndClick(160, 400, 240, 485, 60, "Delete", 145, 446, 2000) ;wait for delete save data confirmation
+				; Sleep,%Delay%
+				; FindImageAndClick(113, 340, 138, 410, , "Delete2", 201, 467) ;wait for second delete save data 
+				; Sleep,%Delay%
+				; FindImageAndClick(24, 183, 255, 222, , "Delete3", 201, 369, 2000) ;wait for second 
+				; Sleep,%Delay%
 				break
 			}
 			CreateStatusMessage("Looking for Country/Menu")
@@ -1381,7 +1417,10 @@ LogToFile(message, logFile := "") {
 }
 
 CreateStatusMessage(Message, GuiName := 50, X := 0, Y := 80) {
-	global scriptName, winTitle, StatusText
+	global scriptName, winTitle, StatusText, showStatus
+	if(!showStatus) {
+		return
+	}
 	try {
 		GuiName := GuiName+scriptName
 		WinGetPos, xpos, ypos, Width, Height, %winTitle%
@@ -1463,6 +1502,8 @@ checkBorder() {
 						}
 					}
 				}
+				if(deleteMethod = "1Pack")
+					packs := 1
 				if(invalidGP) {
 					Condemn := ["Uh-oh!", "Oops!", "Not quite!", "Better luck next time!", "Yikes!", "That didn’t go as planned.", "Try again!", "Almost had it!", "Not your best effort.", "Keep practicing!", "Oh no!", "Close, but no cigar.", "You missed it!", "Needs work!", "Back to the drawing board!", "Whoops!", "That’s rough!", "Don’t give up!", "Ouch!", "Swing and a miss!", "Room for improvement!", "Could be better.", "Not this time.", "Try harder!", "Missed the mark.", "Keep at it!", "Bummer!", "That’s unfortunate.", "So close!", "Gotta do better!"]
 					Randmax := Condemn.Length()
@@ -1592,19 +1633,6 @@ ReadFile(filename, numbers := false) {
     return values.MaxIndex() ? values : false
 }
 
-DownloadFile(url) {
-	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
-	localPath = %A_ScriptDir%\..\ids.txt ; Change to the folder you want to save the file
-
-	URLDownloadToFile, %url%, %localPath%
-
-	if ErrorLevel
-		MsgBox, Download failed!
-	else
-		MsgBox, File downloaded successfully!
-
-}
-
 adbInput(input) {
 	global adbShell, adbPath, adbPort
 	initializeAdbShell()
@@ -1701,6 +1729,11 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 						RunWait, %curlCommand%,, Hide
 					}
 				}
+				else {
+					curlCommand := "curl -k "
+    . "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" " . discordWebhookURL
+						RunWait, %curlCommand%,, Hide
+				}
 				break
 			}
 			catch {
@@ -1732,6 +1765,10 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 	; Stop Script
 	StopScript:
 		ToggleStop()
+	return
+	
+	ShowStatusMessages:
+		ToggleStatusMessages()
 	return
 	
 	ReloadScript:
@@ -1884,8 +1921,16 @@ from_window(ByRef image) {
 ~F5::Reload
 ~F6::Pause
 ~F7::ToggleStop()
-;~F8::ToggleTestScript()
+~F8::ToggleStatusMessages()
 ;~F9::restartGameInstance("F9")
+
+ToggleStatusMessages() {
+	if(showStatus) {
+		showStatus := False
+	}
+	else
+		showStatus := True
+}
 
 bboxAndPause(X1, Y1, X2, Y2, doPause := False) {
 	BoxWidth := X2-X1
