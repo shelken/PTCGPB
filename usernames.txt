@@ -75,7 +75,6 @@ geodude
 graveler
 golem
 ponyta
-rapidash
 slowpoke
 slowbro
 magnemite
@@ -256,7 +255,6 @@ torchic
 combusken
 blaziken
 mudkip
-marshtomp
 swampert
 poochyena
 mightyena
@@ -309,7 +307,6 @@ medicham
 electrike
 manectric
 plusle
-minun
 volbeat
 illumise
 roselia
@@ -325,7 +322,6 @@ torkoal
 spoink
 grumpig
 spinda
-trapinch
 vibrava
 flygon
 cacnea
@@ -446,7 +442,6 @@ lucario
 hippopotas
 hippowdon
 skorupi
-drapion
 croagunk
 toxicroak
 carnivine
@@ -459,7 +454,6 @@ weavile
 magnezone
 lickilicky
 rhyperior
-tangrowth
 electivire
 magmortar
 togekiss
@@ -841,8 +835,6 @@ barraskewda
 toxel
 toxtricity
 centiskorch
-clobbopus
-grapploct
 sinistea
 polteageist
 hatenna
@@ -1008,10 +1000,8 @@ munkidori
 fezandipiti
 ogerpon
 archaludon
-hydrapple
 gougingfire
 ragingbolt
 ironboulder
 ironcrown
-terapagos
 pecharunt
