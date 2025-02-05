@@ -911,7 +911,7 @@ RemoveFriends() {
 	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
 	if(!friendIDs) {
-		if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 9)) {
+		if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
 				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
 				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
 				Sleep, %Delay%
@@ -922,7 +922,7 @@ RemoveFriends() {
 	}
 	else {
 		for index, value in friendIDs {
-			if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 9)) {
+			if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
 				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
 				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
 				Sleep, %Delay%
