@@ -14,12 +14,13 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteXML, packs, FriendID, AddFriend, Instances
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteXML, packs, FriendID, AddFriend, Instances, showStatus
 
 	deleteAccount := false
 	scriptName := StrReplace(A_ScriptName, ".ahk")
 	winTitle := scriptName
 	pauseToggle := false
+	showStatus := true
 	jsonFileName := A_ScriptDir . "\..\json\Packs.json"
 	IniRead, FriendID, %A_ScriptDir%\..\Settings.ini, UserSettings, FriendID
 	IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances
@@ -39,6 +40,9 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
 	IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, Hoard
 	IniRead, sendXML, %A_ScriptDir%\..\Settings.ini, UserSettings, sendXML, 0
+	IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 1
+	if(heartBeat)
+		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
 	
 	adbPort := findAdbPorts(folderPath)
 	
@@ -90,6 +94,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 			Gui, Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
 			Gui, Add, Button, x60 y0 w40 h25 gResumeScript, Resume (F6)
 			Gui, Add, Button, x100 y0 w30 h25 gStopScript, Stop (F7)
+			Gui, Add, Button, x130 y0 w40 h25 gShowStatusMessages, Status (F8)
 			Gui, Show, NoActivate x%x4% y%y4% AutoSize
 			break
 		}
@@ -112,14 +117,17 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	restartGameInstance("Initializing bot...", false)
 	
 	pToken := Gdip_Startup()
-	
-	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
+	if(heartBeat)
+		IniWrite, 1, HeartBeat.ini, HeartBeat, Main
+	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
 	firstRun := true
 Loop {
+	if(heartBeat)
+		IniWrite, 1, HeartBeat.ini, HeartBeat, Main
 	Sleep, %Delay%
-	KeepSync(120, 500, 155, 530, , "Social", 143, 518, 1000, 30)
-	KeepSync(226, 100, 270, 135, , "Add", 38, 460, 500)
-	KeepSync(170, 450, 195, 480, , "Approve", 228, 464)
+	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 1000, 30)
+	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
+	FindImageAndClick(170, 450, 195, 480, , "Approve", 228, 464)
 	if(firstRun) {
 		Sleep, 1000
 		adbClick(205, 510)
@@ -130,12 +138,12 @@ Loop {
 	done := false
 	Loop 3 {
 		Sleep, 250
-		if(CheckInstances(225, 195, 250, 215, , "Pending", 0)) {
+		if(FindImageAndClickOrNot(225, 195, 250, 215, , "Pending", 0)) {
 			Loop {
 				Sleep, %Delay%
-				if(CheckInstances(225, 195, 250, 215, , "Pending", 0))
+				if(FindImageAndClickOrNot(225, 195, 250, 215, , "Pending", 0))
 					adbClick(245, 210)
-				if(CheckInstances(186, 496, 206, 518, , "Accept", 0)) {
+				if(FindImageAndClickOrNot(186, 496, 206, 518, , "Accept", 0)) {
 					done := true
 					break
 				}
@@ -147,7 +155,7 @@ Loop {
 }
 return
 
-CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
+FindImageAndClickOrNot(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
 	global winTitle, Variation, failSafe
 	if(searchVariation = "")
 		searchVariation := Variation
@@ -208,7 +216,7 @@ CheckInstances(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL
 	return (confirmed)
 }
 
-KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
+FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
 	global winTitle, Variation, failSafe, confirmed
 	if(searchVariation = "")
 		searchVariation := Variation
@@ -262,7 +270,7 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 			}
 		}
 		
-		if (confirmed = true) {
+		if (confirmed) {
 			continue
 		}
 
@@ -274,18 +282,17 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, X1, Y1, X2, Y2, searchVariation)
 		Gdip_DisposeImage(pBitmap)
 		if (!confirmed && vRet = 1) {
-			confirmed := true
+			confirmed := vPosXY
 		} else {
-			ElapsedTime := (A_TickCount - StartSkipTime) // 1000
-			if(imageName = "Country")
-				FSTime := 180
-			else
+			if(skip < 45) {
+				ElapsedTime := (A_TickCount - StartSkipTime) // 1000
 				FSTime := 45
-			if (ElapsedTime >= FSTime || safeTime >= FSTime) {
-				CreateStatusMessage("Instance " . scriptName . " has been stuck for 90s. Killing it...")
-				restartGameInstance("Instance " . scriptName . " has been stuck at " . imageName) ; change to reset the instance and delete data then reload script
-				StartSkipTime := A_TickCount
-				failSafe := A_TickCount
+				if (ElapsedTime >= FSTime || safeTime >= FSTime) {
+					CreateStatusMessage("Instance " . scriptName . " has been stuck for 90s. Killing it...")
+					restartGameInstance("Instance " . scriptName . " has been stuck at " . imageName) ; change to reset the instance and delete data then reload script
+					StartSkipTime := A_TickCount
+					failSafe := A_TickCount
+				}
 			}
 		}
 
@@ -322,7 +329,7 @@ KeepSync(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx :
 				break
 			}
 		}
-		if (confirmed = true) {
+		if (confirmed) {
 			break
 		}		
 		
@@ -392,6 +399,8 @@ LogToFile(message, logFile := "") {
 
 CreateStatusMessage(Message, GuiName := 50, X := 0, Y := 80) {
 	global scriptName, winTitle, StatusText
+	if(!showStatus)
+		return
 	try {
 		GuiName := GuiName
 		WinGetPos, xpos, ypos, Width, Height, %winTitle%
@@ -565,6 +574,10 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 		ExitApp
 	return
 	
+	ShowStatusMessages:
+		ToggleStatusMessages()
+	return
+	
 	ReloadScript:
 		Reload
 	return
@@ -714,6 +727,14 @@ from_window(ByRef image) {
 ~F5::Reload
 ~F6::Pause
 ~F7::ExitApp
+~F8::ToggleStatusMessages()
+
+ToggleStatusMessages() {
+	if(showStatus)
+		showStatus := False
+	else
+		showStatus := True
+}
 
 bboxAndPause(X1, Y1, X2, Y2, doPause := False) {
 	BoxWidth := X2-X1
