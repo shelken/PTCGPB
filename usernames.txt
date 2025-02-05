@@ -394,8 +394,6 @@ piplup
 prinplup
 empoleon
 starly
-staravia
-staraptor
 bidoof
 bibarel
 kricketot
@@ -429,7 +427,6 @@ lopunny
 mismagius
 honchkrow
 glameow
-purugly
 chingling
 stunky
 skuntank
@@ -540,9 +537,6 @@ sawk
 sewaddle
 swadloon
 leavanny
-venipede
-whirlipede
-scolipede
 cottonee
 whimsicott
 petilil
@@ -610,7 +604,6 @@ chandelure
 axew
 fraxure
 haxorus
-cubchoo
 beartic
 cryogonal
 shelmet
@@ -847,7 +840,6 @@ arrokuda
 barraskewda
 toxel
 toxtricity
-sizzlipede
 centiskorch
 clobbopus
 grapploct
