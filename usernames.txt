@@ -427,7 +427,6 @@ lopunny
 mismagius
 honchkrow
 glameow
-purugly
 chingling
 stunky
 skuntank
@@ -538,9 +537,6 @@ sawk
 sewaddle
 swadloon
 leavanny
-venipede
-whirlipede
-scolipede
 cottonee
 whimsicott
 petilil
@@ -844,7 +840,6 @@ arrokuda
 barraskewda
 toxel
 toxtricity
-sizzlipede
 centiskorch
 clobbopus
 grapploct
