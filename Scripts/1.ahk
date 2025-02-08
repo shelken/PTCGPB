@@ -14,7 +14,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount,  TrainerCheck, NormalCheck, RainbowCheck
 	scriptName := StrReplace(A_ScriptName, ".ahk")
 	winTitle := scriptName
 	injectMethod := false
@@ -44,6 +44,9 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	IniRead, runMain, %A_ScriptDir%\..\Settings.ini, UserSettings, runMain, 1
 	IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 0
 	IniRead, nukeAccount, %A_ScriptDir%\..\Settings.ini, UserSettings, nukeAccount, 0
+	IniRead, TrainerCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, TrainerCheck, Yes
+	IniRead, NormalCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, NormalCheck, Yes
+	IniRead, RainbowCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, RainbowCheck, Yes
 	
 	if(heartBeat)
 		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
@@ -145,6 +148,27 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 		setSpeed := 2
 	else if (setSpeed = "1x/3x")
 		setSpeed := 3
+
+	if (!TrainerCheck)
+    	TrainerCheck = 1
+	if (TrainerCheck = "Yes")
+    	TrainerCheck := 1
+	else if (TrainerCheck = "No")
+    	TrainerCheck := 2
+	
+	if (!NormalCheck)
+    	NormalCheck = 1
+	if (NormalCheck = "Yes")
+    	NormalCheck := 1
+	else if (NormalCheck = "No")
+    	NormalCheck := 2
+	
+	if (!RainbowCheck)
+    	RainbowCheck = 1
+	if (RainbowCheck = "Yes")
+    	RainbowCheck := 1
+	else if (RainbowCheck = "No")
+    	RainbowCheck := 2
 	
 	if(InStr(deleteMethod, "Inject"))
 		injectMethod := true
@@ -987,6 +1011,98 @@ CreateStatusMessage(Message, GuiName := 50, X := 0, Y := 80) {
 	}
 }
 
+checkCards() {
+    global winTitle, discordUserId, scriptName, packs, username, TrainerCheck, NormalCheck, RainbowCheck
+    Sleep, 1000
+    
+    trainerCoords := [[38, 184, 59, 187]
+                     ,[121, 184, 142, 187]
+                     ,[204, 184, 225, 187]
+                     ,[78, 299, 99, 302]
+                     ,[163, 299, 184, 302]]
+
+    borderCoords := [[20, 284, 90, 286]
+                    ,[103, 284, 173, 286]
+                    ,[186, 284, 256, 286]
+                    ,[60, 399, 130, 401]
+                    ,[145, 399, 215, 401]]
+    
+    twostarCoords := [[20, 285, 60, 286]
+                     ,[103, 285, 143, 286]
+                     ,[186, 285, 226, 286]
+                     ,[60, 400, 100, 401]
+                     ,[145, 400, 185, 401]]
+    
+    rainbowCoords := [[30, 284, 90, 286]
+                     ,[113, 284, 173, 286]
+                     ,[196, 284, 256, 286]
+                     ,[70, 399, 130, 401]
+                     ,[155, 399, 215, 401]]
+    
+    rBitmap := Processed_image(WinExist(winTitle))
+    
+    if (TrainerCheck = 1) {
+        pTrainerNeedle := GetNeedle(A_ScriptDir . "\Tanpin\Trainer.png")
+        pBorderNeedle := GetNeedle(A_ScriptDir . "\Tanpin\Border.png")
+        
+        Loop % trainerCoords.Length() {
+            currentCard := A_Index
+            trainerCoord := trainerCoords[currentCard]
+            borderCoord := borderCoords[currentCard]
+            
+            isTrainer := Gdip_ImageSearch(rBitmap, pTrainerNeedle, vPosXY, trainerCoord[1], trainerCoord[2], trainerCoord[3], trainerCoord[4], 57)
+            isNormal := Gdip_ImageSearch(rBitmap, pBorderNeedle, vPosXY, borderCoord[1], borderCoord[2], borderCoord[3], borderCoord[4], 17)
+            
+            if (isTrainer = 1 && isNormal = 0) {
+                logMessage := "Rare Trainer found for " . username . " in instance: " . scriptName . " (" . packs . " packs)"
+                CreateStatusMessage(logMessage)
+                LogToFile(logMessage, "GPlog.txt")
+                LogToDiscord(logMessage, Screenshot(), discordUserId, saveAccount())
+                Gdip_DisposeImage(rBitmap)
+                return true
+            }
+        }
+        CreateStatusMessage("No Rare Trainer")
+    }
+    
+    if (NormalCheck = 1) {
+        pTwostarNeedle := GetNeedle(A_ScriptDir . "\Tanpin\Twostar.png")
+        
+        Loop % twostarCoords.Length() {
+            coord := twostarCoords[A_Index]
+            if (Gdip_ImageSearch(rBitmap, pTwostarNeedle, vPosXY, coord[1], coord[2], coord[3], coord[4], 132) = 1) {
+                logMessage := "Rare Twostar found for " . username . " in instance: " . scriptName . " (" . packs . " packs)"
+                CreateStatusMessage(logMessage)
+                LogToFile(logMessage, "GPlog.txt")
+                LogToDiscord(logMessage, Screenshot(), discordUserId, saveAccount())
+                Gdip_DisposeImage(rBitmap)
+                return true
+            }
+        }
+        CreateStatusMessage("No Rare Twostar")
+    }
+    
+    if (RainbowCheck = 1) {
+        pRainbowNeedle := GetNeedle(A_ScriptDir . "\Tanpin\Rainbow.png")
+        
+        Loop % rainbowCoords.Length() {
+            coord := rainbowCoords[A_Index]
+            if (Gdip_ImageSearch(rBitmap, pRainbowNeedle, vPosXY, coord[1], coord[2], coord[3], coord[4], 137) = 1) {
+                logMessage := "Rare Rainbow found for " . username . " in instance: " . scriptName . " (" . packs . " packs)"
+                CreateStatusMessage(logMessage)
+                LogToFile(logMessage, "GPlog.txt")
+                LogToDiscord(logMessage, Screenshot(), discordUserId, saveAccount())
+                Gdip_DisposeImage(rBitmap)
+                return true
+            }
+        }
+        CreateStatusMessage("No Rare Rainbow")
+    }
+    
+    Gdip_DisposeImage(rBitmap)
+    return false
+}
+
 checkBorder() {
 	global winTitle, discordUserId, skipInvalidGP, Delay, username
 	gpFound := false
@@ -1557,6 +1673,49 @@ from_window(ByRef image) {
   return pBitmap
 }
 
+Processed_image(ByRef image) {
+  ; Thanks tic - https://www.autohotkey.com/boards/viewtopic.php?t=6517
+
+  ; Get the handle to the window.
+  image := (hwnd := WinExist(image)) ? hwnd : image
+
+  ; Restore the window if minimized! Must be visible for capture.
+  if DllCall("IsIconic", "ptr", image)
+	 DllCall("ShowWindow", "ptr", image, "int", 4)
+
+  ; Get the width and height of the client window.
+  VarSetCapacity(Rect, 16) ; sizeof(RECT) = 16
+  DllCall("GetClientRect", "ptr", image, "ptr", &Rect)
+	 , width  := NumGet(Rect, 8, "int")
+	 , height := NumGet(Rect, 12, "int")
+
+  ; struct BITMAPINFOHEADER - https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
+  hdc := DllCall("CreateCompatibleDC", "ptr", 0, "ptr")
+  VarSetCapacity(bi, 40, 0)                ; sizeof(bi) = 40
+	 , NumPut(       40, bi,  0,   "uint") ; Size
+	 , NumPut(    width, bi,  4,   "uint") ; Width
+	 , NumPut(  -height, bi,  8,    "int") ; Height - Negative so (0, 0) is top-left.
+	 , NumPut(        1, bi, 12, "ushort") ; Planes
+	 , NumPut(       32, bi, 14, "ushort") ; BitCount / BitsPerPixel
+	 , NumPut(        0, bi, 16,   "uint") ; Compression = BI_RGB
+     , NumPut(        3, bi, 20,   "uint") ; Quality setting (3 = low quality, no anti-aliasing) 
+  hbm := DllCall("CreateDIBSection", "ptr", hdc, "ptr", &bi, "uint", 0, "ptr*", pBits:=0, "ptr", 0, "uint", 0, "ptr")
+  obm := DllCall("SelectObject", "ptr", hdc, "ptr", hbm, "ptr")
+
+  ; Print the window onto the hBitmap using an undocumented flag. https://stackoverflow.com/a/40042587
+  DllCall("PrintWindow", "ptr", image, "ptr", hdc, "uint", 0x3) ; PW_CLIENTONLY | PW_RENDERFULLCONTENT
+  ; Additional info on how this is implemented: https://www.reddit.com/r/windows/comments/8ffr56/altprintscreen/
+
+  ; Convert the hBitmap to a Bitmap using a built in function as there is no transparency.
+  DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "ptr", hbm, "ptr", 0, "ptr*", pBitmap:=0)
+
+  ; Cleanup the hBitmap and device contexts.
+  DllCall("SelectObject", "ptr", hdc, "ptr", obm)
+  DllCall("DeleteObject", "ptr", hbm)
+  DllCall("DeleteDC",     "ptr", hdc)
+
+  return pBitmap
+}
 
 ~F5::Reload
 ~F6::Pause
@@ -2216,7 +2375,14 @@ PackOpening() {
 
 		
 	FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
-	
+
+	foundTS := checkCards() 	
+	if(foundTS) {
+		if(godPack < 3)
+			killGodPackInstance()
+		else if(godPack = 3)
+			restartGameInstance("TwoStar found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
+	}
 	foundGP := checkBorder() ;check card border to find godpacks	
 	if(foundGP) {
 		if(godPack < 3)
