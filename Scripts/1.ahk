@@ -1698,7 +1698,7 @@ Processed_image(ByRef image) {
 	 , NumPut(        1, bi, 12, "ushort") ; Planes
 	 , NumPut(       32, bi, 14, "ushort") ; BitCount / BitsPerPixel
 	 , NumPut(        0, bi, 16,   "uint") ; Compression = BI_RGB
-     , NumPut(        3, bi, 20,   "uint") ; Quality setting (3 = low quality, no anti-aliasing) 
+	 , NumPut(        3, bi, 20,   "uint") ; Quality setting (3 = low quality, no anti-aliasing) 
   hbm := DllCall("CreateDIBSection", "ptr", hdc, "ptr", &bi, "uint", 0, "ptr*", pBits:=0, "ptr", 0, "uint", 0, "ptr")
   obm := DllCall("SelectObject", "ptr", hdc, "ptr", hbm, "ptr")
 
