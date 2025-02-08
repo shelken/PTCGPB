@@ -45,14 +45,19 @@ global FriendID
 	IniRead, openPack, Settings.ini, UserSettings, openPack, Palkia
 	IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
 	IniRead, Instances, Settings.ini, UserSettings, Instances, 1
-	IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 1x/3x
+	IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 2x
 	IniRead, defaultLanguage, Settings.ini, UserSettings, defaultLanguage, Scale125
 	IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex, 1
 	IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 600
 	IniRead, skipInvalidGP, Settings.ini, UserSettings, skipInvalidGP, Yes
-	IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3Pack
+	IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3 Pack
 	IniRead, runMain, Settings.ini, UserSettings, runMain, 1
 	IniRead, heartBeat, Settings.ini, UserSettings, heartBeat, 0
+	IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, ""
+	IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
+	IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount, 0
+	
+
 ; Main GUI setup
 ; Add the link text at the bottom of the GUI
 
@@ -63,10 +68,11 @@ Gui, Font, s10 Bold , Segoe UI
 ; Add the button image on top of the GUI
 ;Gui, Add, Picture, gStart x196 y196 w108 h108 vImageButton  +BackgroundTrans, %normalImage%
 Gui, Add, Button, gArrangeWindows x215 y208 w70 h32, Arrange Windows
+Gui, Add, Text, x227 y258 w46 h32 BackgroundGreen
 Gui, Add, Button, gStart x227 y258 w46 h32 vArrangeWindows, Start
 
 Gui, Add, Text, x0 y604 w640 h30 gOpenLink cBlue Center +BackgroundTrans
-Gui, Add, Text, x265 y532 w167 h50 gOpenDiscord cBlue Center +BackgroundTrans
+Gui, Add, Text, x265 y558 w167 h50 gOpenDiscord cBlue Center +BackgroundTrans
 Gui, Font, s15 Bold , Segoe UI
 ; Add the background image to the GUI
 Gui, Add, Picture, x0 y0 w500 h640, %A_ScriptDir%\Scripts\GUI\GUI.png
@@ -81,9 +87,9 @@ else
 	Gui, Add, Edit, vFriendID x80 y95 w145 h30 Center, %FriendID%
 	
 if(runMain)
-	Gui, Add, CheckBox, Checked vrunMain x1 y95 Center, Main
+	Gui, Add, CheckBox, Checked vrunMain x2 y95 Center, Main
 else
-	Gui, Add, CheckBox, vrunMain x1 y95 Center, Main
+	Gui, Add, CheckBox, vrunMain x2 y95 Center, Main
 	
 Gui, Add, Edit, vInstances x275 y95 w72 Center, %Instances%
 Gui, Add, Edit, vColumns x348 y95 w72 Center, %Columns%
@@ -127,14 +133,14 @@ Gui, Add, Edit, vDelay x80 y332 w145 Center, %Delay%
 Gui, Add, Edit, vChangeDate x275 y332 w145 Center, %ChangeDate%
 
 ; Speed selection logic
-if (setSpeed = "2x") {
-	defaultSpeed := 1
-} else if (setSpeed = "1x/2x") {
-	defaultSpeed := 2
-} else if (setSpeed = "1x/3x") {
-	defaultSpeed := 3
-}
-Gui, Add, DropDownList, x275 y404 w72 vsetSpeed choose%defaultSpeed% Center, 2x|1x/2x|1x/3x
+; if (setSpeed = "2x") {
+	; defaultSpeed := 1
+; } else if (setSpeed = "1x/2x") {
+	; defaultSpeed := 2
+; } else if (setSpeed = "1x/3x") {
+	; defaultSpeed := 3
+; }
+; Gui, Add, DropDownList, x275 y404 w72 vsetSpeed choose%defaultSpeed% Center, 2x|1x/2x|1x/3x
 
 
 Gui, Add, Edit, vswipeSpeed x348 y404 w72 Center, %swipeSpeed%
@@ -163,19 +169,31 @@ if (skipInvalidGP = "No") {
 Gui, Add, DropDownList, x80 y476 w145 vskipInvalidGP choose%defaultskipGP% Center, No|Yes
 
 ; Pack selection logic
-if (deleteMethod = "3Pack") {
+if (deleteMethod = "3 Pack") {
 	defaultDelete := 1
-} else if (deleteMethod = "1Pack") {
+} else if (deleteMethod = "1 Pack") {
 	defaultDelete := 2
-} else if (deleteMethod = "Inject(Not available yet)") {
+} else if (deleteMethod = "Inject 1 Pack") {
 	defaultDelete := 3
-} else if (deleteMethod = "Safer(not available yet)") {
+} else if (deleteMethod = "Inject 2 Pack") {
 	defaultDelete := 4
 }
 
-Gui, Add, DropDownList, x80 y546 w145 vdeleteMethod choose%defaultDelete% Center, 3Pack|1Pack|Inject(Not available yet)|Safer(not available yet)
+Gui, Add, DropDownList, x80 y546 w145 vdeleteMethod choose%defaultDelete% Center gdeleteSettings, 3 Pack|1 Pack|Inject 1 Pack|Inject 2 Pack
 
 Gui, Font, s10 Bold, Segoe UI 
+if (InStr(deleteMethod, "Inject"))
+	if(nukeAccount)
+		Gui, Add, CheckBox, Checked vnukeAccount x2 y546 Center Hidden, Menu `nDelete
+	else
+		Gui, Add, CheckBox, vnukeAccount x2 y546 Center Hidden, Menu `nDelete
+else
+	if(nukeAccount)
+		Gui, Add, CheckBox, Checked vnukeAccount x2 y546 Center, Menu `nDelete
+	else
+		Gui, Add, CheckBox, vnukeAccount x2 y546 Center, Menu `nDelete
+
+
 Gui, Add, Edit, vfolderPath x80 y404 w145 h35 Center, %folderPath%
 
 if(StrLen(discordUserID) > 2)
@@ -188,10 +206,16 @@ if(StrLen(discordWebhookURL) > 2)
 else
 	Gui, Add, Edit, vdiscordWebhookURL x348 y476 w72 h35 Center
 	
-if(heartBeat)
-	Gui, Add, CheckBox, Checked vheartBeat x273 y512 Center, Discord Heart Beat
-else
-	Gui, Add, CheckBox, vheartBeat x273 y512 Center, Discord Heart Beat
+if(heartBeat) {
+	Gui, Add, CheckBox, Checked vheartBeat x273 y512 Center gdiscordSettings, Discord Heartbeat
+	Gui, Add, Edit, vheartBeatName x273 y532 w72 h20 Center, %heartBeatName%
+	Gui, Add, Edit, vheartBeatWebhookURL x348 y532 w72 h20 Center, %heartBeatWebhookURL%
+}
+else {
+	Gui, Add, CheckBox, vheartBeat x273 y512 Center gdiscordSettings, Discord Heart Beat
+	Gui, Add, Edit, vheartBeatName x273 y532 w72 h20 Center Hidden, %heartBeatName%
+	Gui, Add, Edit, vheartBeatWebhookURL x348 y532 w72 h20 Center Hidden, %heartBeatWebhookURL%
+}
 
 
 
@@ -221,6 +245,32 @@ else
 
 ; Show the GUI
 Gui, Show
+return
+
+
+discordSettings:
+    Gui, Submit, NoHide
+
+    if (heartBeat) {
+		GuiControl, Show, heartBeatName
+        GuiControl, Show, heartBeatWebhookURL
+    }
+    else {
+        GuiControl, Hide, heartBeatName
+        GuiControl, Hide, heartBeatWebhookURL
+    }
+return
+
+deleteSettings:
+    Gui, Submit, NoHide
+	;GuiControlGet, deleteMethod,, deleteMethod
+	
+	if(InStr(deleteMethod, "Inject")) {
+		GuiControl, Hide, nukeAccount
+		nukeAccount = false
+	}
+	else
+		GuiControl, Show, nukeAccount
 return
 
 ShowMsgName:
@@ -333,10 +383,14 @@ IniWrite, %skipInvalidGP%, Settings.ini, UserSettings, skipInvalidGP
 IniWrite, %deleteMethod%, Settings.ini, UserSettings, deleteMethod
 IniWrite, %runMain%, Settings.ini, UserSettings, runMain
 IniWrite, %heartBeat%, Settings.ini, UserSettings, heartBeat
+IniWrite, %heartBeatWebhookURL%, Settings.ini, UserSettings, heartBeatWebhookURL
+IniWrite, %heartBeatName%, Settings.ini, UserSettings, heartBeatName
+IniWrite, %nukeAccount%, Settings.ini, UserSettings, nukeAccount
 
 ; Loop to process each instance
 Loop, %Instances%
 {
+	createAccountList(A_Index)
 	if (A_Index != 1) {
 		SourceFile := "Scripts\1.ahk" ; Path to the source .ahk file
 		TargetFolder := "Scripts\" ; Path to the target folder
@@ -370,55 +424,103 @@ Loop {
 	total := "0                             "
 	packStatus := "Time: " . mminutes . "m Packs: " . total
 	CreateStatusMessage(packStatus, 287, 490)
-	if(Mod(A_Index, 4) = 0 && InStr(FriendID, "https"))
-		DownloadFile(FriendID, "ids.txt")
-	if(A_Index = 1 || (Mod(A_Index, 60) = 0 && heartBeat)) {	
-		onlineAHK := "Online: "
-		offlineAHK := "Offline: "
-		Online := []
-		if(runMain) {
-			IniRead, value, HeartBeat.ini, HeartBeat, Main
-			if(value)
-				onlineAHK := "Online: Main, "
-			else
-				offlineAHK := "Offline: Main, "
-			IniWrite, 0, HeartBeat.ini, HeartBeat, Main
+	if(heartBeat)
+		if((A_Index = 1 || (Mod(A_Index, 60) = 0))) {
+			onlineAHK := "Online: "
+			offlineAHK := "Offline: "
+			Online := []
+			if(runMain) {
+				IniRead, value, HeartBeat.ini, HeartBeat, Main
+				if(value)
+					onlineAHK := "Online: Main, "
+				else
+					offlineAHK := "Offline: Main, "
+				IniWrite, 0, HeartBeat.ini, HeartBeat, Main
+			}
+			Loop %Instances% {
+				IniRead, value, HeartBeat.ini, HeartBeat, Instance%A_Index%
+				if(value)
+					Online.push(1)
+				else
+					Online.Push(0)
+				IniWrite, 0, HeartBeat.ini, HeartBeat, Instance%A_Index%
+			}
+			for index, value in Online {
+				if(index = Online.MaxIndex())
+					commaSeparate := "."
+				else
+					commaSeparate := ", "
+				if(value)
+					onlineAHK .= A_Index . commaSeparate
+				else
+					offlineAHK .= A_Index . commaSeparate
+			}
+			if(offlineAHK = "Offline: ")
+				offlineAHK := "Offline: none."
+			if(onlineAHK = "Online: ")
+				onlineAHK := "Online: none."
+			
+			discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
+			if(heartBeatName)
+				discordUserID := heartBeatName
+			LogToDiscord(discMessage, , discordUserID)
 		}
-		Loop %Instances% {
-			IniRead, value, HeartBeat.ini, HeartBeat, Instance%A_Index%
-			if(value)
-				Online.push(1)
-			else
-				Online.Push(0)
-			IniWrite, 0, HeartBeat.ini, HeartBeat, Instance%A_Index%
-		}
-		for index, value in Online {
-			if(index = Online.MaxIndex())
-				commaSeparate := "."
-			else
-				commaSeparate := ", "
-			if(value)
-				onlineAHK .= A_Index . commaSeparate
-			else
-				offlineAHK .= A_Index . commaSeparate
-		}
-		if(offlineAHK = "Offline: ")
-			offlineAHK := "Offline: none."
-		if(onlineAHK = "Online: ")
-			onlineAHK := "Online: none."
-		
-		discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
-		LogToDiscord(discMessage, , discordUserID)
-	}
 }
 Return
 
 GuiClose:
 ExitApp
 
+createAccountList(instance) {
+	currentDate := A_Now  
+	year := SubStr(currentDate, 1, 4)  
+	month := SubStr(currentDate, 5, 2) 
+	day := SubStr(currentDate, 7, 2)   
+
+
+	daysSinceBase := (year - 1900) * 365 + Floor((year - 1900) / 4)
+	daysSinceBase += MonthToDays(year, month)                       
+	daysSinceBase += day                                            
+
+	remainder := Mod(daysSinceBase, 3)
+	
+	saveDir := A_ScriptDir "\Accounts\Saved\" . remainder . "\" . instance
+	outputTxt := saveDir . "\list.txt"
+	
+	if FileExist(outputTxt) {
+		FileGetTime, fileTime, %outputTxt%, M  ; Get last modified time
+		timeDiff := A_Now - fileTime  ; Calculate time difference
+
+		if (timeDiff > 86400)  ; 24 hours in seconds (60 * 60 * 24)
+			FileDelete, %outputTxt%
+	}
+	if (!FileExist(outputTxt))
+		Loop, %saveDir%\*.xml {
+			FileAppend, % A_LoopFileFullPath "`n", %outputTxt%  ; Append file path to output.txt
+		}
+}
+
+MonthToDays(year, month) {
+    static DaysInMonths := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    days := 0
+    Loop, % month - 1 {
+        days += DaysInMonths[A_Index]
+    }
+    if (month > 2 && IsLeapYear(year))
+        days += 1
+    return days
+}
+
+
+IsLeapYear(year) {
+    return (Mod(year, 4) = 0 && Mod(year, 100) != 0) || Mod(year, 400) = 0
+}
+
 LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
-	global discordUserId, discordWebhookURL, friendCode
-	discordPing := "<" . discordUserId . "> "
+	global discordUserId, discordWebhookURL, friendCode, heartBeatWebhookURL
+	discordPing := discordUserId
+	if(heartBeatWebhookURL)
+		discordWebhookURL := heartBeatWebhookURL
 		
 	if (discordWebhookURL != "") {
 		MaxRetries := 10
