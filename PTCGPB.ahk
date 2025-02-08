@@ -56,7 +56,9 @@ global FriendID
 	IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, ""
 	IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
 	IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount, 0
-	
+	IniRead, TrainerCheck, Settings.ini, UserSettings, TrainerCheck, Yes
+	IniRead, NormalCheck, Settings.ini, UserSettings, NormalCheck, Yes
+	IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, Yes
 
 ; Main GUI setup
 ; Add the link text at the bottom of the GUI
@@ -157,7 +159,27 @@ Gui, Add, Edit, vswipeSpeed x348 y404 w72 Center, %swipeSpeed%
 
 ; Gui, Add, DropDownList, x275 y166 w145 vgodPack choose%defaultgodPack% Center, Close|Pause|Continue
 
-Gui, Add, Edit, vwaitTime x275 y166 w145 Center, %waitTime%
+if (!CardCheck)
+    CardCheck = "Not at all" 
+defaultCardCheck := 1 
+if (TrainerCheck = "Yes" && NormalCheck = "Yes" && RainbowCheck = "Yes")
+    defaultCardCheck := 2      ; All
+else if (TrainerCheck = "Yes" && NormalCheck = "Yes")
+    defaultCardCheck := 3      ; Trainer+Normal
+else if (TrainerCheck = "Yes" && RainbowCheck = "Yes")
+    defaultCardCheck := 4      ; Trainer+Rainbow
+else if (NormalCheck = "Yes" && RainbowCheck = "Yes")
+    defaultCardCheck := 5      ; Normal+Rainbow
+else if (TrainerCheck = "Yes")
+    defaultCardCheck := 6      ; Trainer
+else if (NormalCheck = "Yes")
+    defaultCardCheck := 7      ; Normal
+else if (RainbowCheck = "Yes")
+    defaultCardCheck := 8      ; Rainbow
+
+Gui, Add, DropDownList, x275 y166 w145 vCardCheck choose%defaultCardCheck% Center, Not at all|All|Trainer+Normal|Trainer+Rainbow|Normal+Rainbow|Trainer|Normal|Rainbow
+
+Gui, Add, Edit, x275 y404 w72 vwaitTime Center, %waitTime%
 
 ; Pack selection logic
 if (skipInvalidGP = "No") {
@@ -359,6 +381,41 @@ return
 
 Start:
 Gui, Submit  ; Collect the input values from the first page
+
+if (CardCheck = "Not at all") {
+    TrainerCheck := "No"
+    NormalCheck := "No"
+    RainbowCheck := "No"
+} else if (CardCheck = "All") {
+    TrainerCheck := "Yes"
+    NormalCheck := "Yes"
+    RainbowCheck := "Yes"
+} else if (CardCheck = "Trainer") {
+    TrainerCheck := "Yes"
+    NormalCheck := "No"
+    RainbowCheck := "No"
+} else if (CardCheck = "Normal") {
+    TrainerCheck := "No"
+    NormalCheck := "Yes"
+    RainbowCheck := "No"
+} else if (CardCheck = "Rainbow") {
+    TrainerCheck := "No"
+    NormalCheck := "No"
+    RainbowCheck := "Yes"
+} else if (CardCheck = "Trainer+Normal") {
+    TrainerCheck := "Yes"
+    NormalCheck := "Yes"
+    RainbowCheck := "No"
+} else if (CardCheck = "Trainer+Rainbow") {
+    TrainerCheck := "Yes"
+    NormalCheck := "No"
+    RainbowCheck := "Yes"
+} else if (CardCheck = "Normal+Rainbow") {
+    TrainerCheck := "No"
+    NormalCheck := "Yes"
+    RainbowCheck := "Yes"
+}
+
 Instances := Instances  ; Directly reference the "Instances" variable
 
 ; Create the second page dynamically based on the number of instances
@@ -386,6 +443,9 @@ IniWrite, %heartBeat%, Settings.ini, UserSettings, heartBeat
 IniWrite, %heartBeatWebhookURL%, Settings.ini, UserSettings, heartBeatWebhookURL
 IniWrite, %heartBeatName%, Settings.ini, UserSettings, heartBeatName
 IniWrite, %nukeAccount%, Settings.ini, UserSettings, nukeAccount
+IniWrite, %TrainerCheck%, Settings.ini, UserSettings, TrainerCheck
+IniWrite, %NormalCheck%, Settings.ini, UserSettings, NormalCheck
+IniWrite, %RainbowCheck%, Settings.ini, UserSettings, RainbowCheck
 
 ; Loop to process each instance
 Loop, %Instances%
