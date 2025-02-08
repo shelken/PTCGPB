@@ -42,7 +42,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	IniRead, sendXML, %A_ScriptDir%\..\Settings.ini, UserSettings, sendXML, 0
 	IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 1
 	if(heartBeat)
-		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
+		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 	
 	adbPort := findAdbPorts(folderPath)
 	
@@ -118,12 +118,12 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	
 	pToken := Gdip_Startup()
 	if(heartBeat)
-		IniWrite, 1, HeartBeat.ini, HeartBeat, Main
+		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
 	firstRun := true
 Loop {
 	if(heartBeat)
-		IniWrite, 1, HeartBeat.ini, HeartBeat, Main
+		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 	Sleep, %Delay%
 	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 1000, 30)
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
@@ -138,14 +138,22 @@ Loop {
 	done := false
 	Loop 3 {
 		Sleep, 250
-		if(FindImageAndClickOrNot(225, 195, 250, 215, , "Pending", 0)) {
+		if(FindOrLoseImage(225, 195, 250, 215, , "Pending", 0)) {
 			Loop {
 				Sleep, %Delay%
-				if(FindImageAndClickOrNot(225, 195, 250, 215, , "Pending", 0))
+				clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0) ;looking for ok button in case an invite is withdrawn
+				if(FindOrLoseImage(225, 195, 250, 220, , "Pending", 0)) {
 					adbClick(245, 210)
-				if(FindImageAndClickOrNot(186, 496, 206, 518, , "Accept", 0)) {
+				} else if(FindOrLoseImage(186, 496, 206, 518, , "Accept", 0)) {
 					done := true
 					break
+				} else if(clickButton) {
+					StringSplit, pos, clickButton, `,  ; Split at ", "
+					if(FindImageAndClick(190, 195, 215, 220, , "DeleteFriend", pos1, pos2)) {
+						Sleep, %Delay%
+						adbClick(210, 210)
+						Sleep, %Delay%
+					}
 				}
 			}
 		}
@@ -155,7 +163,7 @@ Loop {
 }
 return
 
-FindImageAndClickOrNot(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
+FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
 	global winTitle, Variation, failSafe
 	if(searchVariation = "")
 		searchVariation := Variation
@@ -190,7 +198,9 @@ FindImageAndClickOrNot(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFA
 		GDEL := 1
 	else
 		GDEL := 0
-	if (!confirmed && vRet = GDEL) {
+	if (!confirmed && vRet = GDEL && GDEL = 1) {
+		confirmed := vPosXY
+	} else if(!confirmed && vRet = GDEL && GDEL = 0) {
 		confirmed := true
 	}
 	pBitmap := from_window(WinExist(winTitle))
@@ -203,17 +213,16 @@ FindImageAndClickOrNot(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFA
 		CreateStatusMessage("At home page. Opening app..." )
 		restartGameInstance("At the home page during: `n" imageName)
 	}
-	if(imageName = "Country")
+	if(imageName = "Country" || imageName = "Social")
 		FSTime := 180
 	else
 		FSTime := 45 
 	if (safeTime >= FSTime) {
 		CreateStatusMessage("Instance " . scriptName . " has been `nstuck " . imageName . " for 90s. EL: " . EL . " sT: " . safeTime . " Killing it...")
 		restartGameInstance("Instance " . scriptName . " has been stuck " . imageName)
-		safeTime := safeTime/2
 		failSafe := A_TickCount
 	}
-	return (confirmed)
+	return confirmed
 }
 
 FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
