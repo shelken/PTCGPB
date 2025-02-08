@@ -228,8 +228,7 @@ Loop {
 	PackOpening()
 	
 	if(packMethod) {
-		RemoveFriends(friendsAdded)
-		friendsAdded := AddFriends()
+		friendsAdded := AddFriends(true)
 		SelectPack()
 	}
 	
@@ -364,7 +363,7 @@ RemoveFriends(added := 0) {
 	friended := false
 }
 
-AddFriends() {
+AddFriends(renew := false) {
 	global FriendID, friendIds, waitTime, friendCode
 	friendIDs := ReadFile("ids")
 	count := 0
@@ -381,14 +380,30 @@ AddFriends() {
 			Loop {
 				adbClick(143, 518)
 				Delay(1)
-				clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0)
 				if(FindOrLoseImage(120, 500, 155, 530, , "Social", 0, failSafeTime)) {
 					break
 				}
-				else if(clickButton) {
-					StringSplit, pos, clickButton, `,  ; Split at ", "
-					adbClick(pos1, pos2)
+				else if(!renew) {
+					clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0)
+					if(clickButton) {
+						StringSplit, pos, clickButton, `,  ; Split at ", "
+						adbClick(pos1, pos2)
+					}
 				} 
+				else if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
+					Delay(3)
+					adbClick(146, 441) ; 146 440
+					Delay(3)
+					adbClick(146, 441)
+					Delay(3)
+					adbClick(146, 441)
+					Delay(3)
+					
+					FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
+					Delay(1)
+		
+					adbClick(203, 436) ; 203 436
+				}
 				failSafeTime := (A_TickCount - failSafe) // 1000
 				CreateStatusMessage("In failsafe for Social. " . failSafeTime "/180 seconds")
 			}
@@ -470,6 +485,12 @@ AddFriends() {
 							break
 						}
 						else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+							if(renew){
+								FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+								FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+								Sleep, %Delay%
+								adbClick(193, 258)
+							}
 							break
 						}
 						Sleep, 750
@@ -2431,8 +2452,7 @@ HourglassOpening() {
 	adbClick(203, 436) ; 203 436
 	
 	if(deleteMethod = "1 Pack") {
-		RemoveFriends()
-		AddFriends()
+		AddFriends(true)
 		SelectPack(true)
 	}
 	else {
