@@ -113,10 +113,9 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	rerollTime := A_TickCount	
 	
 	initializeAdbShell()
-	
 	restartGameInstance("Initializing bot...", false)
-	
 	pToken := Gdip_Startup()
+	
 	if(heartBeat)
 		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
@@ -139,25 +138,36 @@ Loop {
 	Loop 3 {
 		Sleep, 250
 		if(FindOrLoseImage(225, 195, 250, 215, , "Pending", 0)) {
+			failSafe := A_TickCount
+			failSafeTime := 0
 			Loop {
 				Sleep, %Delay%
 				clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0) ;looking for ok button in case an invite is withdrawn
-				if(FindOrLoseImage(225, 195, 250, 220, , "Pending", 0)) {
+				if(FindOrLoseImage(123, 110, 162, 127, , "99", 0)) {
+					done := true
+					break
+				} else if(FindOrLoseImage(80, 170, 120, 195, , "player", 0)) {
+					Sleep, %Delay%
+					adbClick(210, 210)
+					Sleep, 1000
+				} else if(FindOrLoseImage(225, 195, 250, 220, , "Pending", 0)) {
 					adbClick(245, 210)
 				} else if(FindOrLoseImage(186, 496, 206, 518, , "Accept", 0)) {
 					done := true
 					break
 				} else if(clickButton) {
 					StringSplit, pos, clickButton, `,  ; Split at ", "
-					if(FindImageAndClick(190, 195, 215, 220, , "DeleteFriend", pos1, pos2)) {
+					Sleep, 1000
+					if(FindImageAndClick(190, 195, 215, 220, , "DeleteFriend", pos1, pos2, 4000)) {
 						Sleep, %Delay%
 						adbClick(210, 210)
-						Sleep, %Delay%
 					}
 				}
+				failSafeTime := (A_TickCount - failSafe) // 1000
+				CreateStatusMessage("Failsafe " . failSafeTime "/180 seconds")
 			}
 		}
-		if(done)
+		if(done || fullList)
 			break
 	}
 }
@@ -214,7 +224,7 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 		restartGameInstance("At the home page during: `n" imageName)
 	}
 	if(imageName = "Country" || imageName = "Social")
-		FSTime := 180
+		FSTime := 90
 	else
 		FSTime := 45 
 	if (safeTime >= FSTime) {
