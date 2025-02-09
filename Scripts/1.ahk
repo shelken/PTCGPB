@@ -836,7 +836,7 @@ killGodPackInstance(){
 }
 
 restartGameInstance(reason, RL := true){
-	global Delay, scriptName, adbShell, adbPath, adbPort, friended, loadedAccount
+	global Delay, scriptName, adbShell, adbPath, adbPort, friended, loadedAccount, username
 	initializeAdbShell()
 	CreateStatusMessage("Restarting game reason: `n" reason)
 	
@@ -856,7 +856,7 @@ restartGameInstance(reason, RL := true){
 		Reload
 	} else if(RL) {
 		menuDeleteStart()
-		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
+		LogToFile("Restarted game for instance " scriptName " username " username " Reason: " reason, "Restart.txt")
 		Reload
 	}
 }
