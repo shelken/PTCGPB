@@ -10,7 +10,7 @@ if not A_IsAdmin
     ExitApp
 }
 
-KillADBProcesses()
+;KillADBProcesses()
 
 global Instances, jsonFileName, PacksText, runMain
 
@@ -45,7 +45,7 @@ global FriendID
 	IniRead, openPack, Settings.ini, UserSettings, openPack, Palkia
 	IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
 	IniRead, Instances, Settings.ini, UserSettings, Instances, 1
-	IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 2x
+	;IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 1x/3x
 	IniRead, defaultLanguage, Settings.ini, UserSettings, defaultLanguage, Scale125
 	IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex, 1
 	IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 600
@@ -56,9 +56,9 @@ global FriendID
 	IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, ""
 	IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
 	IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount, 0
-	IniRead, TrainerCheck, Settings.ini, UserSettings, TrainerCheck, Yes
-	IniRead, NormalCheck, Settings.ini, UserSettings, NormalCheck, Yes
-	IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, Yes
+	IniRead, TrainerCheck, Settings.ini, UserSettings, TrainerCheck, No
+	IniRead, FullArtCheck, Settings.ini, UserSettings, FullArtCheck, No
+	IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, No
 
 ; Main GUI setup
 ; Add the link text at the bottom of the GUI
@@ -160,24 +160,24 @@ Gui, Add, Edit, vswipeSpeed x348 y404 w72 Center, %swipeSpeed%
 ; Gui, Add, DropDownList, x275 y166 w145 vgodPack choose%defaultgodPack% Center, Close|Pause|Continue
 
 if (!CardCheck)
-    CardCheck = "Not at all" 
+    CardCheck = "Only God Packs" 
 defaultCardCheck := 1 
-if (TrainerCheck = "Yes" && NormalCheck = "Yes" && RainbowCheck = "Yes")
+if (TrainerCheck = "Yes" && FullArtCheck = "Yes" && RainbowCheck = "Yes")
     defaultCardCheck := 2      ; All
-else if (TrainerCheck = "Yes" && NormalCheck = "Yes")
+else if (TrainerCheck = "Yes" && FullArtCheck = "Yes")
     defaultCardCheck := 3      ; Trainer+Normal
 else if (TrainerCheck = "Yes" && RainbowCheck = "Yes")
     defaultCardCheck := 4      ; Trainer+Rainbow
-else if (NormalCheck = "Yes" && RainbowCheck = "Yes")
+else if (FullArtCheck = "Yes" && RainbowCheck = "Yes")
     defaultCardCheck := 5      ; Normal+Rainbow
 else if (TrainerCheck = "Yes")
     defaultCardCheck := 6      ; Trainer
-else if (NormalCheck = "Yes")
+else if (FullArtCheck = "Yes")
     defaultCardCheck := 7      ; Normal
 else if (RainbowCheck = "Yes")
     defaultCardCheck := 8      ; Rainbow
 
-Gui, Add, DropDownList, x275 y166 w145 vCardCheck choose%defaultCardCheck% Center, Not at all|All|Trainer+Normal|Trainer+Rainbow|Normal+Rainbow|Trainer|Normal|Rainbow
+Gui, Add, DropDownList, x275 y166 w145 vCardCheck choose%defaultCardCheck% Center, Only God Packs|All|Trainer+Full Art|Trainer+Rainbow|Full Art+Rainbow|Trainer|Full Arts|Rainbow
 
 Gui, Add, Edit, x275 y404 w72 vwaitTime Center, %waitTime%
 
@@ -228,6 +228,12 @@ if(StrLen(discordWebhookURL) > 2)
 else
 	Gui, Add, Edit, vdiscordWebhookURL x348 y476 w72 h35 Center
 	
+if(StrLen(heartBeatName) < 3)
+	heartBeatName = 
+	
+if(StrLen(heartBeatWebhookURL) < 3)
+	heartBeatWebhookURL = 
+
 if(heartBeat) {
 	Gui, Add, CheckBox, Checked vheartBeat x273 y512 Center gdiscordSettings, Discord Heartbeat
 	Gui, Add, Edit, vheartBeatName x273 y532 w72 h20 Center, %heartBeatName%
@@ -381,42 +387,41 @@ return
 
 Start:
 Gui, Submit  ; Collect the input values from the first page
+Instances := Instances  ; Directly reference the "Instances" variable
 
-if (CardCheck = "Not at all") {
+if (CardCheck = "Only God Packs") {
     TrainerCheck := "No"
-    NormalCheck := "No"
+    FullArtCheck := "No"
     RainbowCheck := "No"
 } else if (CardCheck = "All") {
     TrainerCheck := "Yes"
-    NormalCheck := "Yes"
+    FullArtCheck := "Yes"
     RainbowCheck := "Yes"
 } else if (CardCheck = "Trainer") {
     TrainerCheck := "Yes"
-    NormalCheck := "No"
+    FullArtCheck := "No"
     RainbowCheck := "No"
-} else if (CardCheck = "Normal") {
+} else if (CardCheck = "Full Arts") {
     TrainerCheck := "No"
-    NormalCheck := "Yes"
+    FullArtCheck := "Yes"
     RainbowCheck := "No"
 } else if (CardCheck = "Rainbow") {
     TrainerCheck := "No"
-    NormalCheck := "No"
+    FullArtCheck := "No"
     RainbowCheck := "Yes"
-} else if (CardCheck = "Trainer+Normal") {
+} else if (CardCheck = "Trainer+Full Art") {
     TrainerCheck := "Yes"
-    NormalCheck := "Yes"
+    FullArtCheck := "Yes"
     RainbowCheck := "No"
 } else if (CardCheck = "Trainer+Rainbow") {
     TrainerCheck := "Yes"
-    NormalCheck := "No"
+    FullArtCheck := "No"
     RainbowCheck := "Yes"
-} else if (CardCheck = "Normal+Rainbow") {
+} else if (CardCheck = "Full Art+Rainbow") {
     TrainerCheck := "No"
-    NormalCheck := "Yes"
+    FullArtCheck := "Yes"
     RainbowCheck := "Yes"
 }
-
-Instances := Instances  ; Directly reference the "Instances" variable
 
 ; Create the second page dynamically based on the number of instances
 Gui, Destroy ; Close the first page
@@ -432,7 +437,7 @@ IniWrite, %Columns%, Settings.ini, UserSettings, Columns
 IniWrite, %openPack%, Settings.ini, UserSettings, openPack
 IniWrite, %godPack%, Settings.ini, UserSettings, godPack
 IniWrite, %Instances%, Settings.ini, UserSettings, Instances
-IniWrite, %setSpeed%, Settings.ini, UserSettings, setSpeed
+;IniWrite, %setSpeed%, Settings.ini, UserSettings, setSpeed
 IniWrite, %defaultLanguage%, Settings.ini, UserSettings, defaultLanguage
 IniWrite, %SelectedMonitorIndex%, Settings.ini, UserSettings, SelectedMonitorIndex
 IniWrite, %swipeSpeed%, Settings.ini, UserSettings, swipeSpeed
@@ -444,13 +449,12 @@ IniWrite, %heartBeatWebhookURL%, Settings.ini, UserSettings, heartBeatWebhookURL
 IniWrite, %heartBeatName%, Settings.ini, UserSettings, heartBeatName
 IniWrite, %nukeAccount%, Settings.ini, UserSettings, nukeAccount
 IniWrite, %TrainerCheck%, Settings.ini, UserSettings, TrainerCheck
-IniWrite, %NormalCheck%, Settings.ini, UserSettings, NormalCheck
+IniWrite, %FullArtCheck%, Settings.ini, UserSettings, FullArtCheck
 IniWrite, %RainbowCheck%, Settings.ini, UserSettings, RainbowCheck
 
 ; Loop to process each instance
 Loop, %Instances%
 {
-	createAccountList(A_Index)
 	if (A_Index != 1) {
 		SourceFile := "Scripts\1.ahk" ; Path to the source .ahk file
 		TargetFolder := "Scripts\" ; Path to the target folder
@@ -530,35 +534,6 @@ Return
 
 GuiClose:
 ExitApp
-
-createAccountList(instance) {
-	currentDate := A_Now  
-	year := SubStr(currentDate, 1, 4)  
-	month := SubStr(currentDate, 5, 2) 
-	day := SubStr(currentDate, 7, 2)   
-
-
-	daysSinceBase := (year - 1900) * 365 + Floor((year - 1900) / 4)
-	daysSinceBase += MonthToDays(year, month)                       
-	daysSinceBase += day                                            
-
-	remainder := Mod(daysSinceBase, 3)
-	
-	saveDir := A_ScriptDir "\Accounts\Saved\" . remainder . "\" . instance
-	outputTxt := saveDir . "\list.txt"
-	
-	if FileExist(outputTxt) {
-		FileGetTime, fileTime, %outputTxt%, M  ; Get last modified time
-		timeDiff := A_Now - fileTime  ; Calculate time difference
-
-		if (timeDiff > 86400)  ; 24 hours in seconds (60 * 60 * 24)
-			FileDelete, %outputTxt%
-	}
-	if (!FileExist(outputTxt))
-		Loop, %saveDir%\*.xml {
-			FileAppend, % A_LoopFileFullPath "`n", %outputTxt%  ; Append file path to output.txt
-		}
-}
 
 MonthToDays(year, month) {
     static DaysInMonths := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
