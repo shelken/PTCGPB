@@ -486,6 +486,10 @@ AddFriends(renew := false, getFC := false) {
 					friendIDs[j] := temp . ""
 				}
 				for index, value in friendIDs {
+					if (StrLen(value) != 16) {
+						; Wrong id value
+						continue
+					}
 					failSafe := A_TickCount
 					failSafeTime := 0
 					Loop {
