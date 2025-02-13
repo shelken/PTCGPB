@@ -1430,7 +1430,16 @@ DownloadFile(url, filename) {
 	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
 	localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
 
-	URLDownloadToFile, %url%, %localPath%
+	; URLDownloadToFile, %url%, %localPath%
+	; Use ComObjCreate as it is less prone to errors.
+	whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+	whr.Open("GET", url, true)
+	whr.Send()
+	whr.WaitForResponse()
+	ids := whr.ResponseText
+
+	FileDelete, %localPath%
+	FileAppend, %ids%, %localPath%
 
 	; if ErrorLevel
 		; MsgBox, Download failed!
