@@ -1,3 +1,8 @@
+NOTICE: This project was previously licensed under GPL but has now been re-licensed under [CC BY-NC 4.0].  
+Older versions remain under GPL, but all new releases will follow the new licensing terms.
+
+------------------------------------------
+
 *The bot will always be free and I will update it as long as this method is viable. I've spent many hours creating the PTCGPB, and if it’s helped you complete your collection, consider buying me a coffee to keep me going and adding new features!*
 https://buymeacoffee.com/aarturoo
 
@@ -12,3 +17,6 @@ https://buymeacoffee.com/aarturoo
 Join the discord for an updated guide: https://discord.gg/C9Nyf7P4sT Translations are being worked on so if there isn't an updated guide in your language then use the express install English guide: https://discord.com/channels/1330305075393986703/1335717204989055087
 
 A guide will be posted here in the future.
+
+## License
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
