@@ -5,7 +5,7 @@ SetTitleMatchMode, 3
 
 githubUser := "Arturo-1212"
 repoName := "PTCGPB"
-localVersion := "v6.3.3"
+localVersion := "v6.3.2"
 scriptFolder := A_ScriptDir
 zipPath := A_Temp . "\update.zip"
 extractPath := A_Temp . "\update"
@@ -701,6 +701,7 @@ CheckForUpdate() {
 	latestReleaseBody := FixFormat(ExtractJSONValue(response, "body"))
 	latestVersion := ExtractJSONValue(response, "tag_name")
 	zipDownloadURL := ExtractJSONValue(response, "zipball_url")
+	Clipboard := latestReleaseBody
 	if (zipDownloadURL = "" || !InStr(zipDownloadURL, "http"))
 	{
 		MsgBox, Failed to find the ZIP download URL in the release.
@@ -717,10 +718,10 @@ CheckForUpdate() {
 	if (VersionCompare(latestVersion, localVersion) > 0)
 	{
 		; Get release notes from the JSON (ensure this is populated earlier in the script)
-		releaseNotes := "Release Notes:`n" . latestReleaseBody  ; Assuming `latestReleaseBody` contains the release notes
+		releaseNotes := latestReleaseBody  ; Assuming `latestReleaseBody` contains the release notes
 
 		; Show a message box asking if the user wants to download
-		MsgBox, 4, Update Available, A new version (%latestVersion%) is available.`n`n%releaseNotes%`n`nDo you want to download the latest version?
+		MsgBox, 4, Update Available %latestVersion%, %releaseNotes%`n`nDo you want to download the latest version?
 		
 		; If the user clicks Yes (return value 6)
 		IfMsgBox, Yes
@@ -852,8 +853,9 @@ FixFormat(text) {
     text := StrReplace(text, "\None", "None")       ; Remove backslash around "None"
     text := StrReplace(text, "\Welcome", "Welcome") ; Removing \ before "Welcome"
 
-    ; If you want to add any other replacements, do them here.
-    
+    ; Escape commas by replacing them with %2C (URL encoding)
+    text := StrReplace(text, ",", "")
+
     return text
 }
 
