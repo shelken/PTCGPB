@@ -3,6 +3,17 @@ version = Arturos PTCGP Bot
 CoordMode, Mouse, Screen
 SetTitleMatchMode, 3
 
+githubUser := "Arturo-1212"
+repoName := "PTCGPB"
+localVersion := "v6.2.5beta"
+scriptFolder := A_ScriptDir
+zipPath := A_Temp . "\update.zip"
+extractPath := A_Temp . "\update"
+
+MsgBox, 64, The project is now licensed under CC BY-NC 4.0, The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community. `nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases.
+
+CheckForUpdate()
+
 if not A_IsAdmin
 {
     ; Relaunch script with admin rights
@@ -10,9 +21,9 @@ if not A_IsAdmin
     ExitApp
 }
 
-;KillADBProcesses()
+KillADBProcesses()
 
-global Instances, jsonFileName, PacksText, runMain
+global Instances, jsonFileName, PacksText, runMain, scaleParam
 
 totalFile := A_ScriptDir . "\json\total.json"
 backupFile := A_ScriptDir . "\json\total-backup.json"
@@ -34,90 +45,193 @@ if FileExist(packsFile) ; Check if the file exists
 InitializeJsonFile() ; Create or open the JSON file
 global FriendID
 ; Create the main GUI for selecting number of instances
-	IniRead, FriendID, Settings.ini, UserSettings, FriendID
-	IniRead, waitTime, Settings.ini, UserSettings, waitTime, 5
-	IniRead, Delay, Settings.ini, UserSettings, Delay, 250
-	IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
-	IniRead, discordWebhookURL, Settings.ini, UserSettings, discordWebhookURL, ""
-	IniRead, discordUserId, Settings.ini, UserSettings, discordUserId, ""
-	IniRead, changeDate, Settings.ini, UserSettings, ChangeDate, 0100
-	IniRead, Columns, Settings.ini, UserSettings, Columns, 5
-	IniRead, openPack, Settings.ini, UserSettings, openPack, Palkia
-	IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
-	IniRead, Instances, Settings.ini, UserSettings, Instances, 1
-	;IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 1x/3x
-	IniRead, defaultLanguage, Settings.ini, UserSettings, defaultLanguage, Scale125
-	IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex, 1
-	IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 600
-	IniRead, skipInvalidGP, Settings.ini, UserSettings, skipInvalidGP, Yes
-	IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3 Pack
-	IniRead, runMain, Settings.ini, UserSettings, runMain, 1
-	IniRead, heartBeat, Settings.ini, UserSettings, heartBeat, 0
-	IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, ""
-	IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
-	IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount, 0
-	IniRead, TrainerCheck, Settings.ini, UserSettings, TrainerCheck, No
-	IniRead, FullArtCheck, Settings.ini, UserSettings, FullArtCheck, No
-	IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, No
+IniRead, FriendID, Settings.ini, UserSettings, FriendID
+IniRead, waitTime, Settings.ini, UserSettings, waitTime, 5
+IniRead, Delay, Settings.ini, UserSettings, Delay, 250
+IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
+IniRead, discordWebhookURL, Settings.ini, UserSettings, discordWebhookURL, ""
+IniRead, discordUserId, Settings.ini, UserSettings, discordUserId, ""
+IniRead, changeDate, Settings.ini, UserSettings, ChangeDate, 0100
+IniRead, Columns, Settings.ini, UserSettings, Columns, 5
+IniRead, openPack, Settings.ini, UserSettings, openPack, Palkia
+IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
+IniRead, Instances, Settings.ini, UserSettings, Instances, 1
+;IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 1x/3x
+IniRead, defaultLanguage, Settings.ini, UserSettings, defaultLanguage, Scale125
+IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex, 1
+IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 300
+IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3 Pack
+IniRead, runMain, Settings.ini, UserSettings, runMain, 1
+IniRead, heartBeat, Settings.ini, UserSettings, heartBeat, 0
+IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, ""
+IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
+IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount, 0
+IniRead, packMethod, Settings.ini, UserSettings, packMethod, 0
+IniRead, TrainerCheck, Settings.ini, UserSettings, TrainerCheck, 0
+IniRead, FullArtCheck, Settings.ini, UserSettings, FullArtCheck, 0
+IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, 0
+IniRead, CrownCheck, Settings.ini, UserSettings, CrownCheck, 0
+IniRead, ImmersiveCheck, Settings.ini, UserSettings, ImmersiveCheck, 0
+IniRead, PseudoGodPack, Settings.ini, UserSettings, PseudoGodPack, 0
+IniRead, minStars, Settings.ini, UserSettings, minStars, 0
+IniRead, Palkia, Settings.ini, UserSettings, Palkia, 0
+IniRead, Dialga, Settings.ini, UserSettings, Dialga, 1
+IniRead, Mew, Settings.ini, UserSettings, Mew, 0
+IniRead, Pikachu, Settings.ini, UserSettings, Pikachu, 0
+IniRead, Charizard, Settings.ini, UserSettings, Charizard, 0
+IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
 
-; Main GUI setup
-; Add the link text at the bottom of the GUI
-
-Gui, Show, w500 h640, Arturo's PTCGPB Bot Setup ;' Ensure the GUI size is appropriate
-
-Gui, Color, White  ; Set the background color to white
-Gui, Font, s10 Bold , Segoe UI 
-; Add the button image on top of the GUI
-;Gui, Add, Picture, gStart x196 y196 w108 h108 vImageButton  +BackgroundTrans, %normalImage%
-Gui, Add, Button, gArrangeWindows x215 y208 w70 h32, Arrange Windows
-Gui, Add, Text, x227 y258 w46 h32 BackgroundGreen
-Gui, Add, Button, gStart x227 y258 w46 h32 vArrangeWindows, Start
-
-Gui, Add, Text, x0 y604 w640 h30 gOpenLink cBlue Center +BackgroundTrans
-Gui, Add, Text, x265 y558 w167 h50 gOpenDiscord cBlue Center +BackgroundTrans
-Gui, Font, s15 Bold , Segoe UI
-; Add the background image to the GUI
-Gui, Add, Picture, x0 y0 w500 h640, %A_ScriptDir%\Scripts\GUI\GUI.png
-
+Gui, Add, Text, x10 y10, Friend ID:
 ; Add input controls
 if(FriendID = "ERROR")
 	FriendID = 
 
 if(FriendID = )
-	Gui, Add, Edit, vFriendID x80 y95 w145 h30 Center
+	Gui, Add, Edit, vFriendID w120 x60 y8
 else
-	Gui, Add, Edit, vFriendID x80 y95 w145 h30 Center, %FriendID%
-	
+	Gui, Add, Edit, vFriendID w120 x60 y8 h18, %FriendID%
+
+Gui, Add, Text, x10 y30, Rerolling Instances:
+Gui, Add, Text, x30 y50, Instances:
+Gui, Add, Edit, vInstances w25 x80 y45 h18, %Instances%
+Gui, Add, Text, x30 y75, Columns:
+Gui, Add, Edit, vColumns w25 x80 y70 h18, %Columns%
 if(runMain)
-	Gui, Add, CheckBox, Checked vrunMain x2 y95 Center, Main
+	Gui, Add, Checkbox, Checked vrunMain x30 y95, Run Main
 else
-	Gui, Add, CheckBox, vrunMain x2 y95 Center, Main
-	
-Gui, Add, Edit, vInstances x275 y95 w72 Center, %Instances%
-Gui, Add, Edit, vColumns x348 y95 w72 Center, %Columns%
+	Gui, Add, Checkbox, vrunMain x30 y95, Run Main
+
+Gui, Add, Text, x10 y120, God Pack Settings:
+Gui, Add, Text, x30 y140, Min. 2 Stars:
+Gui, Add, Edit, vminStars w25 x90 y135 h18, %minStars%
+
+Gui, Add, Text, x10 y160, Method:
 
 ; Pack selection logic
-if (openPack = "Palkia") {
-	defaultPack := 1
-} else if (openPack = "Dialga") {
-	defaultPack := 2
-} else if (openPack = "Mew") {
-	defaultPack := 3
-} 
+if (deleteMethod = "5 Pack") {
+	defaultDelete := 1
+} else if (deleteMethod = "3 Pack") {
+	defaultDelete := 2
+} else if (deleteMethod = "Inject") {
+	defaultDelete := 3
+}
 
-Gui, Add, DropDownList, x80 y166 w145 vopenPack choose%defaultPack% Center, Palkia|Dialga|Mew
-global scaleParam
+Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x55 y158 w60, 5 Pack|3 Pack|Inject
 
-if (defaultLanguage = "Scale125") {
-	defaultLang := 1
-	scaleParam := 277
-} else if (defaultLanguage = "Scale100") {
-	defaultLang := 2
-	scaleParam := 287
-} 
+if(packMethod)
+	Gui, Add, Checkbox, Checked vpackMethod x30 y185, 1 Pack Method
+else
+	Gui, Add, Checkbox, vpackMethod x30 y185, 1 Pack Method
 
-Gui, Add, DropDownList, x80 y245 w145 vdefaultLanguage choose%defaultLang%, Scale125
+if(nukeAccount)
+	Gui, Add, Checkbox, Checked vnukeAccount x30 y205, Menu Delete Account
+else
+	Gui, Add, Checkbox, vnukeAccount x30 y205, Menu Delete Account
 
+if(StrLen(discordUserID) < 3)
+	discordUserID = 
+if(StrLen(discordWebhookURL) < 3)
+	discordWebhookURL = 
+	
+Gui, Add, Text, x10 y225, Discord Settings:
+Gui, Add, Text, x30 y245, Discord ID:
+Gui, Add, Edit, vdiscordUserId w100 x90 y240 h18, %discordUserId%
+Gui, Add, Text, x30 y270, Discord Webhook URL:
+Gui, Add, Edit, vdiscordWebhookURL h20 w100 x150 y265 h18, %discordWebhookURL%
+
+if(StrLen(heartBeatName) < 3)
+	heartBeatName = 
+if(StrLen(heartBeatWebhookURL) < 3)
+	heartBeatWebhookURL = 
+if(heartBeat) {
+	Gui, Add, Checkbox, Checked vheartBeat x30 y295 gdiscordSettings, Discord Heartbeat
+	Gui, Add, Text, vhbName x30 y315, Name:
+	Gui, Add, Edit, vheartBeatName w50 x70 y310 h18, %heartBeatName%
+	Gui, Add, Text, vhbURL x30 y340, Webhook URL:
+	Gui, Add, Edit, vheartBeatWebhookURL h20 w100 x110 y335 h18, %heartBeatWebhookURL%
+} else {
+	Gui, Add, Checkbox, vheartBeat x30 y295 gdiscordSettings, Discord Heartbeat
+	Gui, Add, Text, vhbName x30 y315 Hidden, Name:
+	Gui, Add, Edit, vheartBeatName w50 x70 y310 h18 Hidden, %heartBeatName%
+	Gui, Add, Text, vhbURL x30 y340 Hidden, Webhook URL:
+	Gui, Add, Edit, vheartBeatWebhookURL h20 w100 x110 y335 h18 Hidden, %heartBeatWebhookURL%
+}
+
+Gui, Add, Text, x275 y10, Choose Pack(s):
+
+if(Dialga)
+	Gui, Add, Checkbox, Checked vDialga x295 y30, Dialga
+else
+	Gui, Add, Checkbox, vDialga x295 y30, Dialga
+	
+if(Palkia)
+	Gui, Add, Checkbox, Checked vPalkia x295 y50, Palkia
+else
+	Gui, Add, Checkbox, vPalkia x295 y50, Palkia
+	
+if(Mew)
+	Gui, Add, Checkbox, Checked vMew x295 y70, Mew
+else
+	Gui, Add, Checkbox, vMew x295 y70, Mew
+	
+if(Pikachu)
+	Gui, Add, Checkbox, Checked vPikachu x350 y30, Pikachu
+else
+	Gui, Add, Checkbox, vPikachu x350 y30, Pikachu
+	
+if(Charizard)
+	Gui, Add, Checkbox, Checked vCharizard x350 y50, Charizard
+else
+	Gui, Add, Checkbox, vCharizard x350 y50, Charizard
+	
+if(Mewtwo)
+	Gui, Add, Checkbox, Checked vMewtwo x350 y70, Mewtwo
+else
+	Gui, Add, Checkbox, vMewtwo x350 y70, Mewtwo
+
+Gui, Add, Text, x275 y90, Other Pack Detection Settings:
+
+if(FullArtCheck)
+	Gui, Add, Checkbox, Checked vFullArtCheck x295 y110, Single Full Art
+else
+	Gui, Add, Checkbox, vFullArtCheck x295 y110, Single Full Art
+
+if(TrainerCheck)
+	Gui, Add, Checkbox, Checked vTrainerCheck x295 y130, Single Trainer
+else
+	Gui, Add, Checkbox, vTrainerCheck x295 y130, Single Trainer
+
+if(RainbowCheck)
+	Gui, Add, Checkbox, Checked vRainbowCheck x295 y150, Single Rainbow
+else
+	Gui, Add, Checkbox, vRainbowCheck x295 y150, Single Rainbow
+
+if(PseudoGodPack)
+	Gui, Add, Checkbox, Checked vPseudoGodPack x392 y110, Double 2 Star
+else
+	Gui, Add, Checkbox, vPseudoGodPack x392 y110, Double 2 Star
+
+if(CrownCheck)
+	Gui, Add, Checkbox, Checked vCrownCheck x392 y130, Save Crowns
+else
+	Gui, Add, Checkbox, vCrownCheck x392 y130, Save Crowns
+
+if(ImmersiveCheck)
+	Gui, Add, Checkbox, Checked vImmersiveCheck x392 y150, Save Immersives
+else
+	Gui, Add, Checkbox, vImmersiveCheck x392 y150, Save Immersives
+	
+
+Gui, Add, Text, x275 y170, Time Settings:
+Gui, Add, Text, x295 y190, Delay:
+Gui, Add, Edit, vDelay w35 x330 y190 h18, %Delay%
+Gui, Add, Text, x295 y210, Wait Time:
+Gui, Add, Edit, vwaitTime w25 x350 y210 h18, %waitTime%
+Gui, Add, Text, x295 y230, Swipe Speed:
+Gui, Add, Edit, vswipeSpeed w35 x365 y230 h18, %swipeSpeed%
+
+Gui, Add, Text, x275 y250, Other Settings:
+Gui, Add, Text, x295 y270, Monitor: 
 ; Initialize monitor dropdown options
 SysGet, MonitorCount, MonitorCount
 MonitorOptions := ""
@@ -129,152 +243,33 @@ Loop, %MonitorCount%
 	
 }
 SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
-Gui, Add, DropDownList, x275 y245 w145 vSelectedMonitorIndex Choose%SelectedMonitorIndex%, %MonitorOptions%
-
-Gui, Add, Edit, vDelay x80 y332 w145 Center, %Delay%
-Gui, Add, Edit, vChangeDate x275 y332 w145 Center, %ChangeDate%
-
-; Speed selection logic
-; if (setSpeed = "2x") {
-	; defaultSpeed := 1
-; } else if (setSpeed = "1x/2x") {
-	; defaultSpeed := 2
-; } else if (setSpeed = "1x/3x") {
-	; defaultSpeed := 3
-; }
-; Gui, Add, DropDownList, x275 y404 w72 vsetSpeed choose%defaultSpeed% Center, 2x|1x/2x|1x/3x
+Gui, Add, DropDownList, x335 y268 w90 vSelectedMonitorIndex Choose%SelectedMonitorIndex%, %MonitorOptions%
+Gui, Add, Text, x295 y290, Folder Path:
+Gui, Add, Edit, vfolderPath w100 x355 y290 h18, %folderPath%
 
 
-Gui, Add, Edit, vswipeSpeed x348 y404 w72 Center, %swipeSpeed%
+Gui, Add, Button, gOpenLink x15 y380 w120, Buy Me a Coffee <3
+Gui, Add, Button, gOpenDiscord x145 y380 w120, Join our Discord!
+Gui, Add, Button, gCheckForUpdates x275 y360 w120, Check for updates
+Gui, Add, Button, gArrangeWindows x275 y380 w120, Arrange Windows
+Gui, Add, Button, gStart x405 y380 w120, Start
 
+if (defaultLanguage = "Scale125") {
+	defaultLang := 1
+	scaleParam := 277
+} else if (defaultLanguage = "Scale100") {
+	defaultLang := 2
+	scaleParam := 287
+} 
 
-; Pack selection logic
-; if (godPack = "Close") {
-	; defaultgodPack := 1
-; } else if (godPack = "Pause") {
-	; defaultgodPack := 2
-; } else if (godPack = "Continue") {
-	; defaultgodPack := 3
-; }
+; Gui, Add, DropDownList, x80 y245 w145 vdefaultLanguage choose%defaultLang%, Scale125
 
-; Gui, Add, DropDownList, x275 y166 w145 vgodPack choose%defaultgodPack% Center, Close|Pause|Continue
+Gui, Show, , %localVersion% PTCGPB Bot Setup [Non-Commercial 4.0 International License] ;'
+Return
 
-if (!CardCheck)
-    CardCheck = "Only God Packs" 
-defaultCardCheck := 1 
-if (TrainerCheck = "Yes" && FullArtCheck = "Yes" && RainbowCheck = "Yes")
-    defaultCardCheck := 2      ; All
-else if (TrainerCheck = "Yes" && FullArtCheck = "Yes")
-    defaultCardCheck := 3      ; Trainer+Normal
-else if (TrainerCheck = "Yes" && RainbowCheck = "Yes")
-    defaultCardCheck := 4      ; Trainer+Rainbow
-else if (FullArtCheck = "Yes" && RainbowCheck = "Yes")
-    defaultCardCheck := 5      ; Normal+Rainbow
-else if (TrainerCheck = "Yes")
-    defaultCardCheck := 6      ; Trainer
-else if (FullArtCheck = "Yes")
-    defaultCardCheck := 7      ; Normal
-else if (RainbowCheck = "Yes")
-    defaultCardCheck := 8      ; Rainbow
-
-Gui, Add, DropDownList, x275 y166 w145 vCardCheck choose%defaultCardCheck% Center, Only God Packs|All|Trainer+Full Art|Trainer+Rainbow|Full Art+Rainbow|Trainer|Full Arts|Rainbow
-
-Gui, Add, Edit, x275 y404 w72 vwaitTime Center, %waitTime%
-
-; Pack selection logic
-if (skipInvalidGP = "No") {
-	defaultskipGP := 1
-} else if (skipInvalidGP = "Yes") {
-	defaultskipGP := 2
-}
-
-Gui, Add, DropDownList, x80 y476 w145 vskipInvalidGP choose%defaultskipGP% Center, No|Yes
-
-; Pack selection logic
-if (deleteMethod = "3 Pack") {
-	defaultDelete := 1
-} else if (deleteMethod = "1 Pack") {
-	defaultDelete := 2
-} else if (deleteMethod = "Inject 1 Pack") {
-	defaultDelete := 3
-} else if (deleteMethod = "Inject 2 Pack") {
-	defaultDelete := 4
-}
-
-Gui, Add, DropDownList, x80 y546 w145 vdeleteMethod choose%defaultDelete% Center gdeleteSettings, 3 Pack|1 Pack|Inject 1 Pack|Inject 2 Pack
-
-Gui, Font, s10 Bold, Segoe UI 
-if (InStr(deleteMethod, "Inject"))
-	if(nukeAccount)
-		Gui, Add, CheckBox, Checked vnukeAccount x2 y546 Center Hidden, Menu `nDelete
-	else
-		Gui, Add, CheckBox, vnukeAccount x2 y546 Center Hidden, Menu `nDelete
-else
-	if(nukeAccount)
-		Gui, Add, CheckBox, Checked vnukeAccount x2 y546 Center, Menu `nDelete
-	else
-		Gui, Add, CheckBox, vnukeAccount x2 y546 Center, Menu `nDelete
-
-
-Gui, Add, Edit, vfolderPath x80 y404 w145 h35 Center, %folderPath%
-
-if(StrLen(discordUserID) > 2)
-	Gui, Add, Edit, vdiscordUserId x273 y476 w72 h35 Center, %discordUserId%
-else
-	Gui, Add, Edit, vdiscordUserId x273 y476 w72 h35 Center
-	
-if(StrLen(discordWebhookURL) > 2)
-	Gui, Add, Edit, vdiscordWebhookURL x348 y476 w72 h35 Center, %discordWebhookURL%
-else
-	Gui, Add, Edit, vdiscordWebhookURL x348 y476 w72 h35 Center
-	
-if(StrLen(heartBeatName) < 3)
-	heartBeatName = 
-	
-if(StrLen(heartBeatWebhookURL) < 3)
-	heartBeatWebhookURL = 
-
-if(heartBeat) {
-	Gui, Add, CheckBox, Checked vheartBeat x273 y512 Center gdiscordSettings, Discord Heartbeat
-	Gui, Add, Edit, vheartBeatName x273 y532 w72 h20 Center, %heartBeatName%
-	Gui, Add, Edit, vheartBeatWebhookURL x348 y532 w72 h20 Center, %heartBeatWebhookURL%
-}
-else {
-	Gui, Add, CheckBox, vheartBeat x273 y512 Center gdiscordSettings, Discord Heart Beat
-	Gui, Add, Edit, vheartBeatName x273 y532 w72 h20 Center Hidden, %heartBeatName%
-	Gui, Add, Edit, vheartBeatWebhookURL x348 y532 w72 h20 Center Hidden, %heartBeatWebhookURL%
-}
-
-
-
-; Gui, Font, s10 cGray Norm Bold, Segoe UI  ; Normal font for input labels
-; Gui Add, Button, x190 y72 w17 h19 gShowMsgName, ? ;Questionmark box for Name Field
-; Gui Add, Button, x342 y77 w17 h19 gShowMsgInstances, ? ;Questionmark box for Instance Field
-; Gui Add, Button, x415 y77 w17 h19 gShowMsgColumns, ? ;Questionmark box for Instance Per Row Field
-
-; Gui Add, Button, x190 y145 w17 h19 gShowMsgPacks, ? ;Questionmark box for Pack to Open Field
-; Gui Add, Button, x423 y145 w17 h19 gShowMsgGodPacks, ? ;Questionmark box for God Pack to Open Field
-
-; Gui Add, Button, x78 y219 w17 h19 gShowMsgLanguage, ? ;Questionmark box for God Pack to Open Field
-; Gui Add, Button, x400 y219 w17 h19 gShowMsgMonitor, ? ;Questionmark box for God Pack to Open Field
-
-; Gui Add, Button, x192 y307 w17 h19 gShowMsgDelay, ? ;Questionmark box for Delay in ms Field
-; Gui Add, Button, x411 y307 w17 h19 gShowMsgTimeZone, ? ;Questionmark box for Timezone Field
-
-; Gui Add, Button, x193 y378 w17 h19 gShowMsgFolder, ? ;Questionmark box for SwipeSpeed Field
-; Gui Add, Button, x343 y378 w17 h19 gShowMsgSpeed, ? ;Questionmark box for Speed Field
-; Gui Add, Button, x408 y378 w17 h19 gShowMsgSwipeSpeed, ? ;Questionmark box for SwipeSpeed Field
-
-; Gui Add, Button, x428 y448 w17 h19 gShowMsgdiscordwebHook, ? ;Questionmark box for discord id Field
-; Gui Add, Button, x330 y448 w17 h19 gShowMsgdiscordID, ? ;Questionmark box for discord web hook Field
-
-; Gui Add, Button, x230 y518 w17 h19 gShowMsgAccountDeletion, ? ;Questionmark box for Account Deletion to Open Field
-; Gui Add, Button, x235 y448 w17 h19 gShowMsgSkipGP, ? ;Questionmark box for Account Deletion to Open Field
-
-; Show the GUI
-Gui, Show
+CheckForUpdates:
+	CheckForUpdate()
 return
-
 
 discordSettings:
     Gui, Submit, NoHide
@@ -282,10 +277,14 @@ discordSettings:
     if (heartBeat) {
 		GuiControl, Show, heartBeatName
         GuiControl, Show, heartBeatWebhookURL
+        GuiControl, Show, hbName
+        GuiControl, Show, hbURL
     }
     else {
         GuiControl, Hide, heartBeatName
         GuiControl, Hide, heartBeatWebhookURL
+        GuiControl, Hide, hbName
+        GuiControl, Hide, hbURL
     }
 return
 
@@ -299,70 +298,6 @@ deleteSettings:
 	}
 	else
 		GuiControl, Show, nukeAccount
-return
-
-ShowMsgName:
-	MsgBox, Input the name you want the accounts to have. `nIf it's getting stuck inputting the name then make sure your dpi is set to 220.`nLeave blank for a random pokemon name ;'
-return
-
-ShowMsgInstances:
-	MsgBox, Input how many instances you are running
-return
-
-ShowMsgColumns:
-	MsgBox, Input the number of instances per row
-return
-
-ShowMsgPacks:
-	MsgBox, Select the pack you want to open
-return
-
-ShowMsgGodPacks:
-	MsgBox, Select the behavior you want when finding a god pack. `nClose will close the emulator and stop the script to save resources. `nPause will only pause the script on the opening screen. `nContinue will save the account data to a file and continue rolling with the instance. The xml account data can then be injected into an instance using the tools in the 'Accounts' folder to recover the god pack.
-return
-
-ShowMsgLanguage:
-	MsgBox, Select your game's language. In order to change your language > change language settings in mumu > delete the game account data. ;'
-return
-
-ShowMsgMonitor:
-	MsgBox, Select the monitor you want the instances to be on. `nBe sure to start them on that monitor to prevent issues. `nIf you're having issues make sure all monitors are set to 125`% scale or the scale you have chosen ;'
-return
-
-ShowMsgDelay:
-	MsgBox, Input the delay in between clicks.
-return
-
-ShowMsgTimeZone:
-	MsgBox, What time the date change is for you. `n1 AM EST is default you can look up what that is in your time zone.
-return
-
-ShowMsgFolder:
-	MsgBox, Where the "MuMuPlayerGlobal-12.0" folder is located. `nTypically it's in the Netease folder: C:\Program Files\Netease ;'
-return
-
-ShowMsgSpeed:
-	MsgBox, Select the speed configuration. `n2x flat speed. (usually better when maxing out your system) `n1x/2x to swipe at 1x speed then do the rest on 2x. This needs the new speed mod in the guide. (Good option if you are having issues swiping on flat 2x speed) `n1x/3x to swipe at 1x speed then do the reset on 3x. This needs the new speed mod in the guide. (usually better when running fewer instances)
-return
-
-ShowMsgSwipeSpeed:
-	MsgBox, Input the swipe speed in milliseconds. `nAnything from 100 to 1000 can probably work. `nPlay around with the speed to get the best speed for your system. Lower number = faster speed. 
-return
-
-ShowMsgdiscordID:
-	MsgBox, Input your discord ID for pings using webhook. Not your username, but your numerical discord ID.
-return
-
-ShowMsgdiscordwebHook:
-	MsgBox, Input your server's webhook. It will be something like: https://discord.com/api/webhooks/124124151245/oihri1u24hifb12oiu43hy1 `nCreate a server in discord > for any channel > click the edit channel cog wheel > integrations > create a webhook > click on the webhook created > copy webhook url. Paste that here. ;'
-return
-
-ShowMsgAccountDeletion:
-	MsgBox, Select the method to delete the account. `nFile method deletes the XML file and then closes/reopens the game. This should be more efficient. `nClicks method will simulate clicking and deleting the account through the Menu. Use this if for some reason your game takes a long time starting up.
-return
-
-ShowMsgSkipGP:
-	MsgBox, Select whether or not to skip god packs. If you skip them you will still receive a discord ping and the account XML is also saved in the Accounts folder.
 return
 
 ArrangeWindows:
@@ -389,40 +324,6 @@ Start:
 Gui, Submit  ; Collect the input values from the first page
 Instances := Instances  ; Directly reference the "Instances" variable
 
-if (CardCheck = "Only God Packs") {
-    TrainerCheck := "No"
-    FullArtCheck := "No"
-    RainbowCheck := "No"
-} else if (CardCheck = "All") {
-    TrainerCheck := "Yes"
-    FullArtCheck := "Yes"
-    RainbowCheck := "Yes"
-} else if (CardCheck = "Trainer") {
-    TrainerCheck := "Yes"
-    FullArtCheck := "No"
-    RainbowCheck := "No"
-} else if (CardCheck = "Full Arts") {
-    TrainerCheck := "No"
-    FullArtCheck := "Yes"
-    RainbowCheck := "No"
-} else if (CardCheck = "Rainbow") {
-    TrainerCheck := "No"
-    FullArtCheck := "No"
-    RainbowCheck := "Yes"
-} else if (CardCheck = "Trainer+Full Art") {
-    TrainerCheck := "Yes"
-    FullArtCheck := "Yes"
-    RainbowCheck := "No"
-} else if (CardCheck = "Trainer+Rainbow") {
-    TrainerCheck := "Yes"
-    FullArtCheck := "No"
-    RainbowCheck := "Yes"
-} else if (CardCheck = "Full Art+Rainbow") {
-    TrainerCheck := "No"
-    FullArtCheck := "Yes"
-    RainbowCheck := "Yes"
-}
-
 ; Create the second page dynamically based on the number of instances
 Gui, Destroy ; Close the first page
 
@@ -441,16 +342,26 @@ IniWrite, %Instances%, Settings.ini, UserSettings, Instances
 IniWrite, %defaultLanguage%, Settings.ini, UserSettings, defaultLanguage
 IniWrite, %SelectedMonitorIndex%, Settings.ini, UserSettings, SelectedMonitorIndex
 IniWrite, %swipeSpeed%, Settings.ini, UserSettings, swipeSpeed
-IniWrite, %skipInvalidGP%, Settings.ini, UserSettings, skipInvalidGP
 IniWrite, %deleteMethod%, Settings.ini, UserSettings, deleteMethod
 IniWrite, %runMain%, Settings.ini, UserSettings, runMain
 IniWrite, %heartBeat%, Settings.ini, UserSettings, heartBeat
 IniWrite, %heartBeatWebhookURL%, Settings.ini, UserSettings, heartBeatWebhookURL
 IniWrite, %heartBeatName%, Settings.ini, UserSettings, heartBeatName
 IniWrite, %nukeAccount%, Settings.ini, UserSettings, nukeAccount
+IniWrite, %packMethod%, Settings.ini, UserSettings, packMethod
 IniWrite, %TrainerCheck%, Settings.ini, UserSettings, TrainerCheck
 IniWrite, %FullArtCheck%, Settings.ini, UserSettings, FullArtCheck
 IniWrite, %RainbowCheck%, Settings.ini, UserSettings, RainbowCheck
+IniWrite, %CrownCheck%, Settings.ini, UserSettings, CrownCheck
+IniWrite, %ImmersiveCheck%, Settings.ini, UserSettings, ImmersiveCheck
+IniWrite, %PseudoGodPack%, Settings.ini, UserSettings, PseudoGodPack
+IniWrite, %minStars%, Settings.ini, UserSettings, minStars
+IniWrite, %Palkia%, Settings.ini, UserSettings, Palkia
+IniWrite, %Dialga%, Settings.ini, UserSettings, Dialga
+IniWrite, %Mew%, Settings.ini, UserSettings, Mew
+IniWrite, %Pikachu%, Settings.ini, UserSettings, Pikachu
+IniWrite, %Charizard%, Settings.ini, UserSettings, Charizard
+IniWrite, %Mewtwo%, Settings.ini, UserSettings, Mewtwo
 
 ; Loop to process each instance
 Loop, %Instances%
@@ -459,7 +370,10 @@ Loop, %Instances%
 		SourceFile := "Scripts\1.ahk" ; Path to the source .ahk file
 		TargetFolder := "Scripts\" ; Path to the target folder
 		TargetFile := TargetFolder . A_Index . ".ahk" ; Generate target file path
-		FileCopy, %SourceFile%, %TargetFile%, 1 ; Copy source file to target
+		if(Instances > 1) {
+			FileDelete, %TargetFile%
+			FileCopy, %SourceFile%, %TargetFile%, 1 ; Copy source file to target
+		}
 		if (ErrorLevel)
 			MsgBox, Failed to create %TargetFile%. Ensure permissions and paths are correct.
 	}
@@ -774,4 +688,202 @@ KillADBProcesses() {
     RunWait, %ComSpec% /c taskkill /IM adb.exe /F /T,, Hide
 }
 
-~F7::ExitApp
+CheckForUpdate() {
+    global githubUser, repoName, localVersion, zipPath, extractPath, scriptFolder
+    url := "https://api.github.com/repos/" githubUser "/" repoName "/releases/latest"
+	
+    response := HttpGet(url)
+    if !response
+    {
+        MsgBox, Failed to fetch release info.
+        return
+    }
+	latestReleaseBody := FixFormat(ExtractJSONValue(response, "body"))
+	latestVersion := ExtractJSONValue(response, "tag_name")
+	zipDownloadURL := ExtractJSONValue(response, "zipball_url")
+	if (zipDownloadURL = "" || !InStr(zipDownloadURL, "http"))
+	{
+		MsgBox, Failed to find the ZIP download URL in the release.
+		return
+	}
+
+
+    if (latestVersion = "")
+    {
+        MsgBox, Failed to retrieve version info.
+        return
+    }
+
+	if (VersionCompare(latestVersion, localVersion) > 0)
+	{
+		; Get release notes from the JSON (ensure this is populated earlier in the script)
+		releaseNotes := "Release Notes:`n" . latestReleaseBody  ; Assuming `latestReleaseBody` contains the release notes
+
+		; Show a message box asking if the user wants to download
+		MsgBox, 4, Update Available, A new version (%latestVersion%) is available.`n`n%releaseNotes%`n`nDo you want to download the latest version?
+		
+		; If the user clicks Yes (return value 6)
+		IfMsgBox, Yes
+		{
+			MsgBox, 64, Downloading..., Downloading the latest version...
+			
+			; Proceed with downloading the update
+			URLDownloadToFile, %zipDownloadURL%, %zipPath%
+			if ErrorLevel
+			{
+				MsgBox, Failed to download update.
+				return
+			}
+			else {
+				MsgBox, Download complete. Extracting...
+				
+				; Create a temporary folder for extraction
+				tempExtractPath := A_Temp "\PTCGPB_Temp"
+				FileCreateDir, %tempExtractPath%
+
+				; Extract the ZIP file into the temporary folder
+				RunWait, powershell -Command "Expand-Archive -Path '%zipPath%' -DestinationPath '%tempExtractPath%' -Force",, Hide
+
+				; Check if extraction was successful
+				if !FileExist(tempExtractPath)
+				{
+					MsgBox, Failed to extract the update.
+					return
+				}
+
+				; Get the first subfolder in the extracted folder
+				Loop, Files, %tempExtractPath%\*, D
+				{
+					extractedFolder := A_LoopFileFullPath
+					break
+				}
+
+				; Check if a subfolder was found and move its contents recursively to the script folder
+				if (extractedFolder)
+				{
+					MoveFilesRecursively(extractedFolder, scriptFolder)
+
+					; Clean up the temporary extraction folder
+					FileRemoveDir, %tempExtractPath%, 1
+					MsgBox, Update installed. Restarting...
+					Reload
+				}
+				else
+				{
+					MsgBox, Failed to find the extracted contents.
+					return
+				}
+			}
+		}
+		else
+		{
+			MsgBox, The update was canceled.
+			return
+		}
+	}
+    else
+    {
+        MsgBox, You are running the latest version (%localVersion%).
+    }
+}
+
+MoveFilesRecursively(srcFolder, destFolder) {
+    ; Loop through all files and subfolders in the source folder
+    Loop, Files, % srcFolder . "\*", R
+    {
+        ; Get the relative path of the file/folder from the srcFolder
+        relativePath := SubStr(A_LoopFileFullPath, StrLen(srcFolder) + 2)
+        
+        ; Create the corresponding destination path
+        destPath := destFolder . "\" . relativePath
+        
+        ; If it's a directory, create it in the destination folder
+        if (A_LoopIsDir)
+        {
+            ; Ensure the directory exists, if not, create it
+            FileCreateDir, % destPath
+        }
+        else
+        {
+            ; If it's a file, move it to the destination folder
+            ; Ensure the directory exists before moving the file
+            FileCreateDir, % SubStr(destPath, 1, InStr(destPath, "\", 0, 0) - 1)
+            FileMove, % A_LoopFileFullPath, % destPath, 1
+        }
+    }
+}
+
+HttpGet(url) {
+    http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    http.Open("GET", url, false)
+    http.Send()
+    return http.ResponseText
+}
+
+; Existing function to extract value from JSON
+ExtractJSONValue(json, key1, key2:="", ext:="") {
+    value := ""
+    json := StrReplace(json, """", "")
+    lines := StrSplit(json, ",")
+    
+    Loop, % lines.MaxIndex()
+    {
+        if InStr(lines[A_Index], key1 ":") {
+            ; Take everything after the first colon as the value
+            value := SubStr(lines[A_Index], InStr(lines[A_Index], ":") + 1)
+            if (key2 != "")
+            {
+                if InStr(lines[A_Index+1], key2 ":") && InStr(lines[A_Index+1], ext)
+                    value := SubStr(lines[A_Index+1], InStr(lines[A_Index+1], ":") + 1)
+            }
+            break
+        }
+    }
+    return Trim(value)
+}
+
+FixFormat(text) {
+    ; Replace carriage return and newline with an actual line break
+    text := StrReplace(text, "\r\n", "`n")  ; Replace \r\n with actual newlines
+    text := StrReplace(text, "\n", "`n")    ; Replace \n with newlines
+
+    ; Remove unnecessary backslashes before other characters like "player" and "None"
+    text := StrReplace(text, "\player", "player")   ; Example: removing backslashes around words
+    text := StrReplace(text, "\None", "None")       ; Remove backslash around "None"
+    text := StrReplace(text, "\Welcome", "Welcome") ; Removing \ before "Welcome"
+
+    ; If you want to add any other replacements, do them here.
+    
+    return text
+}
+
+VersionCompare(v1, v2) {
+    ; Remove non-numeric characters (like 'alpha', 'beta')
+    cleanV1 := RegExReplace(v1, "[^\d.]")
+    cleanV2 := RegExReplace(v2, "[^\d.]")
+
+    v1Parts := StrSplit(cleanV1, ".")
+    v2Parts := StrSplit(cleanV2, ".")
+
+    Loop, % Max(v1Parts.MaxIndex(), v2Parts.MaxIndex()) {
+        num1 := v1Parts[A_Index] ? v1Parts[A_Index] : 0
+        num2 := v2Parts[A_Index] ? v2Parts[A_Index] : 0
+        if (num1 > num2)
+            return 1
+        if (num1 < num2)
+            return -1
+    }
+
+    ; If versions are numerically equal, check if one is an alpha version
+    isV1Alpha := InStr(v1, "alpha") || InStr(v1, "beta")
+    isV2Alpha := InStr(v2, "alpha") || InStr(v2, "beta")
+
+    if (isV1Alpha && !isV2Alpha)
+        return -1 ; Non-alpha version is newer
+    if (!isV1Alpha && isV2Alpha)
+        return 1 ; Alpha version is older
+
+    return 0 ; Versions are equal
+}
+
+~+F7::ExitApp
