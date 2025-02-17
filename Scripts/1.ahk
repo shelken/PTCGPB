@@ -9,45 +9,74 @@ SetDefaultMouseSpeed, 0
 SetBatchLines, -1
 SetTitleMatchMode, 3
 CoordMode, Pixel, Screen
+#NoEnv
 
 ; Allocate and hide the console window to reduce flashing
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange
-	scriptName := StrReplace(A_ScriptName, ".ahk")
-	winTitle := scriptName
-	injectMethod := false
-	packMethod := false
-	pauseToggle := false
-	showStatus := true
-	friended := false
-	dateChange := false
-	jsonFileName := A_ScriptDir . "\..\json\Packs.json"
-	IniRead, FriendID, %A_ScriptDir%\..\Settings.ini, UserSettings, FriendID
-	IniRead, waitTime, %A_ScriptDir%\..\Settings.ini, UserSettings, waitTime, 5
-	IniRead, Delay, %A_ScriptDir%\..\Settings.ini, UserSettings, Delay, 250
-	IniRead, folderPath, %A_ScriptDir%\..\Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
-	IniRead, Variation, %A_ScriptDir%\..\Settings.ini, UserSettings, Variation, 20
-	IniRead, changeDate, %A_ScriptDir%\..\Settings.ini, UserSettings, ChangeDate, 0100
-	IniRead, Columns, %A_ScriptDir%\..\Settings.ini, UserSettings, Columns, 5
-	IniRead, openPack, %A_ScriptDir%\..\Settings.ini, UserSettings, openPack, 1
-	;IniRead, setSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, setSpeed, 1x/3x
-	IniRead, defaultLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, defaultLanguage, Scale125
-	IniRead, SelectedMonitorIndex, %A_ScriptDir%\..\Settings.ini, UserSettings, SelectedMonitorIndex, 1:
-	IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 600
-	IniRead, skipInvalidGP, %A_ScriptDir%\..\Settings.ini, UserSettings, skipInvalidGP, No
-	IniRead, godPack, %A_ScriptDir%\..\Settings.ini, UserSettings, godPack, Continue
-	IniRead, discordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, discordWebhookURL, ""
-	IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
-	IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 3 Pack
-	IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances, 1
-	IniRead, runMain, %A_ScriptDir%\..\Settings.ini, UserSettings, runMain, 1
-	IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 0
-	IniRead, nukeAccount, %A_ScriptDir%\..\Settings.ini, UserSettings, nukeAccount, 0
-	IniRead, TrainerCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, TrainerCheck, No
-	IniRead, FullArtCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, FullArtCheck, No
-	IniRead, RainbowCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, RainbowCheck, No
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck
+scriptName := StrReplace(A_ScriptName, ".ahk")
+winTitle := scriptName
+foundGP := false
+injectMethod := false
+pauseToggle := false
+showStatus := true
+friended := false
+dateChange := false
+jsonFileName := A_ScriptDir . "\..\json\Packs.json"
+IniRead, FriendID, %A_ScriptDir%\..\Settings.ini, UserSettings, FriendID
+IniRead, waitTime, %A_ScriptDir%\..\Settings.ini, UserSettings, waitTime, 5
+IniRead, Delay, %A_ScriptDir%\..\Settings.ini, UserSettings, Delay, 250
+IniRead, folderPath, %A_ScriptDir%\..\Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
+IniRead, discordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, discordWebhookURL, ""
+IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
+IniRead, changeDate, %A_ScriptDir%\..\Settings.ini, UserSettings, ChangeDate, 0100
+IniRead, Columns, %A_ScriptDir%\..\Settings.ini, UserSettings, Columns, 5
+IniRead, openPack, %A_ScriptDir%\..\Settings.ini, UserSettings, openPack, Palkia
+IniRead, godPack, %A_ScriptDir%\..\Settings.ini, UserSettings, godPack, Continue
+IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances, 1
+;IniRead, setSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, setSpeed, 1x/3x
+IniRead, defaultLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, defaultLanguage, Scale125
+IniRead, SelectedMonitorIndex, %A_ScriptDir%\..\Settings.ini, UserSettings, SelectedMonitorIndex, 1
+IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 300
+IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 3 Pack
+IniRead, runMain, %A_ScriptDir%\..\Settings.ini, UserSettings, runMain, 1
+IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 0
+IniRead, heartBeatWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeatWebhookURL, ""
+IniRead, heartBeatName, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeatName, ""
+IniRead, nukeAccount, %A_ScriptDir%\..\Settings.ini, UserSettings, nukeAccount, 0
+IniRead, packMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, packMethod, 0
+IniRead, TrainerCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, TrainerCheck, 0
+IniRead, FullArtCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, FullArtCheck, 0
+IniRead, RainbowCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, RainbowCheck, 0
+IniRead, CrownCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, CrownCheck, 0
+IniRead, ImmersiveCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, ImmersiveCheck, 0
+IniRead, PseudoGodPack, %A_ScriptDir%\..\Settings.ini, UserSettings, PseudoGodPack, 0
+IniRead, minStars, %A_ScriptDir%\..\Settings.ini, UserSettings, minStars, 0
+IniRead, Palkia, %A_ScriptDir%\..\Settings.ini, UserSettings, Palkia, 0
+IniRead, Dialga, %A_ScriptDir%\..\Settings.ini, UserSettings, Dialga, 1
+IniRead, Mew, %A_ScriptDir%\..\Settings.ini, UserSettings, Mew, 0
+IniRead, Pikachu, %A_ScriptDir%\..\Settings.ini, UserSettings, Pikachu, 0
+IniRead, Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, Charizard, 0
+IniRead, Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, Mewtwo, 0
+
+packArray :=[]
+
+if(Palkia)
+	packArray.push("Palkia")
+if(Dialga)
+	packArray.push("Dialga")
+if(Mew)
+	packArray.push("Mew")
+if(Pikachu)
+	packArray.push("Pikachu")
+if(Charizard)
+	packArray.push("Charizard")
+if(Mewtwo)
+	packArray.push("Mewtwo")
+	
+	changeDate := getChangeDateTime() ; get server reset time
 	
 	if(heartBeat)
 		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
@@ -126,20 +155,6 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 		godPack = 2
 	if (godPack = "Continue")
 		godPack = 3
-	
-	if (!falsePositive)
-		falsePositive = 1
-	else if (falsePositive = "No")
-		falsePositive = 1
-	else if (falsePositive = "Yes")
-		falsePositive = 2
-	
-	if (!skipInvalidGP)
-		skipInvalidGP = 1
-	else if (skipInvalidGP = "No")
-		skipInvalidGP = 1
-	else if (skipInvalidGP = "Yes")
-		skipInvalidGP = 2
 		
 	if (!setSpeed)
 		setSpeed = 1
@@ -154,29 +169,6 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	
 	if(InStr(deleteMethod, "Inject"))
 		injectMethod := true
-	if(InStr(deleteMethod, "1 Pack"))
-		packMethod := true
-	
-	if (!TrainerCheck)
-    	TrainerCheck = 1
-	if (TrainerCheck = "Yes")
-    	TrainerCheck := 1
-	else if (TrainerCheck = "No")
-    	TrainerCheck := 2
-
-	if (!FullArtCheck)
-    	FullArtCheck = 1
-	if (FullArtCheck = "Yes")
-    	FullArtCheck := 1
-	else if (FullArtCheck = "No")
-    	FullArtCheck := 2
-
-	if (!RainbowCheck)
-    	RainbowCheck = 1
-	if (RainbowCheck = "Yes")
-    	RainbowCheck := 1
-	else if (RainbowCheck = "No")
-    	RainbowCheck := 2
 		
 	rerollTime := A_TickCount	
 	
@@ -196,10 +188,13 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	packs := 0
 	
 Loop {
+	Randmax := packArray.Length()
+	Random, rand, 1, Randmax
+	openPack := packArray[rand]
 	friended := false
 	IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Instance%scriptName%
 	FormatTime, CurrentTime,, HHmm
-
+	
 	StartTime := changeDate - 45 ; 12:55 AM2355
 	EndTime := changeDate + 5 ; 1:01 AM
 
@@ -232,9 +227,13 @@ Loop {
 	
 	if(!injectMethod || !loadedAccount)
 		DoTutorial()
-		
+	
+	if(deleteMethod = "5 Pack" || packMethod)
+		if(!loadedAccount)
+			wonderPicked := DoWonderPick()
+	
 	friendsAdded := AddFriends()
-	SelectPack()
+	SelectPack("First")
 	PackOpening()
 	
 	if(packMethod) {
@@ -246,10 +245,24 @@ Loop {
 	
 	if(!injectMethod || !loadedAccount)
 		HourglassOpening() ;deletemethod check in here at the start
+		
+	if(wonderPicked) {
+		friendsAdded := AddFriends(true)
+		SelectPack("HGPack")
+		PackOpening()
+		if(packMethod) {
+			friendsAdded := AddFriends(true)
+			SelectPack("HGPack")
+			PackOpening()
+		}
+		else {
+			HourglassOpening(true)
+		}
+	}
 	
 	if(nukeAccount && !injectMethod)
 		menuDelete()
-	else
+	else 
 		RemoveFriends(friendsAdded)
 	
 	if(injectMethod)
@@ -261,8 +274,12 @@ Loop {
 			restartGameInstance("New Run", false)
 		}
 	}
+	
 	CreateStatusMessage("New Run")
 	rerolls++
+	if(!loadedAccount)
+		if(deleteMethod = "5 Pack" || packMethod)
+			packs := 5
 	AppendToJsonFile(packs)
 	totalSeconds := Round((A_TickCount - rerollTime) / 1000) ; Total time in seconds
 	avgtotalSeconds := Round(totalSeconds / rerolls) ; Total time in seconds
@@ -276,43 +293,6 @@ Loop {
 		ExitApp
 }
 return
-
-SelectPack(f := false) {
-	global openPack
-	if(openPack = "Mew") { ; MEW
-		FindImageAndClick(233, 400, 264, 428, , "Points", 80, 196) ;Mew
-		if(f = true) {
-			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
-			Delay(1)
-			adbClick(210, 464) ; 210 464
-			Delay(1)
-			adbClick(210, 464) ; 210 464
-		}
-		FindImageAndClick(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
-	}
-	else if(openPack = "Palkia") { ;Palkia
-		FindImageAndClick(233, 400, 264, 428, , "Points", 200, 196) ;Genetic apex
-		if(f = true) {
-			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
-			Delay(1)
-			adbClick(210, 464) ; 210 464
-			Delay(1)
-			adbClick(210, 464) ; 210 464
-		}
-		FindImageAndClick(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
-	}
-	else if(openPack = "Dialga") { ;Dialga
-		FindImageAndClick(233, 400, 264, 428, , "Points", 145, 196) ;Genetic apex
-		if(f = true) {
-			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
-			Delay(1)
-			adbClick(210, 464) ; 210 464
-			Delay(1)
-			adbClick(210, 464) ; 210 464
-		}
-		FindImageAndClick(233, 486, 272, 519, , "Skip2", 146, 439) ;click on next until skip button appears
-	}
-}
 
 RemoveFriends(added := 0) {
 	global friendIDs, stopToggle, friended
@@ -338,7 +318,7 @@ RemoveFriends(added := 0) {
 		}
 		Sleep, 500
 		failSafeTime := (A_TickCount - failSafe) // 1000
-		CreateStatusMessage("In failsafe for Social. " . failSafeTime "/180 seconds")
+		CreateStatusMessage("In failsafe for Social. " . failSafeTime "/90 seconds")
 	}
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
 	if(!friendIDs) {
@@ -426,7 +406,7 @@ AddFriends(renew := false, getFC := false) {
 					adbClick(203, 436) ; 203 436
 				}
 				failSafeTime := (A_TickCount - failSafe) // 1000
-				CreateStatusMessage("In failsafe for Social. " . failSafeTime "/180 seconds")
+				CreateStatusMessage("In failsafe for Social. " . failSafeTime "/90 seconds")
 			}
 			FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
 			FindImageAndClick(205, 430, 255, 475, , "Search", 240, 120, 1500)
@@ -443,6 +423,7 @@ AddFriends(renew := false, getFC := false) {
 				failSafeTime := 0
 				Loop {
 					adbInput(FriendID)
+					Delay(1)
 					if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
 						FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 						EraseInput(1,1)
@@ -465,6 +446,14 @@ AddFriends(renew := false, getFC := false) {
 						break
 					}
 					else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+						if(renew){
+								FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+								if(!friended)
+									ExitApp
+								FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+								Delay(2)
+								adbClick(243, 258)
+							}
 						break
 					}
 					Sleep, 750
@@ -494,6 +483,7 @@ AddFriends(renew := false, getFC := false) {
 					failSafeTime := 0
 					Loop {
 						adbInput(value)
+						Delay(1)
 						if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
 							FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 							EraseInput()
@@ -555,7 +545,7 @@ EraseInput(num := 0, total := 0) {
 	Loop {
 		FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 		Loop 20 {
-			adbShell.StdIn.WriteLine("input keyevent 67")	
+			adbInputEvent("67")
 			Sleep, 10
 		}
 		if(FindOrLoseImage(15, 500, 68, 520, , "Erase", 0, failSafeTime))
@@ -567,9 +557,9 @@ EraseInput(num := 0, total := 0) {
 }
 
 FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
-	global winTitle, Variation, failSafe
+	global winTitle, failSafe
 	if(searchVariation = "")
-		searchVariation := Variation
+		searchVariation := 20
 	imagePath := A_ScriptDir . "\" . defaultLanguage . "\"
 	confirmed := false
 	
@@ -596,7 +586,6 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 
 	; ImageSearch within the region
 	vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, X1, Y1, X2, Y2, searchVariation)
-	Gdip_DisposeImage(pBitmap)
 	if(EL = 0)
 		GDEL := 1
 	else
@@ -609,8 +598,7 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 	Path = %imagePath%App.png
 	pNeedle := GetNeedle(Path)
 	; ImageSearch within the region
-	vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 15, 155, 270, 420, searchVariation)
-	Gdip_DisposeImage(pBitmap)
+	vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 225, 300, 242, 314, searchVariation)
 	if (vRet = 1) {
 		CreateStatusMessage("At home page. Opening app..." )
 		restartGameInstance("At the home page during: `n" imageName)
@@ -623,13 +611,15 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 		pNeedle := GetNeedle(Path)
 		; ImageSearch within the region
 		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 30, 331, 50, 449, searchVariation)
-		Gdip_DisposeImage(pBitmap)
 		if (vRet = 1) {
+			adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
+			waitadb()
 			CreateStatusMessage("Loaded deleted account. Deleting XML." )
 			if(loadedAccount) {
 				FileDelete, %loadedAccount%
 			}
-			restartGameInstance("No save data. Restarting.")
+			LogToFile("Restarted game for instance " scriptName " Reason: No save data found", "Restart.txt")
+			Reload
 		}
 	}
 	if(imageName = "Points" || imageName = "Home") { ;look for level up ok "button"
@@ -644,13 +634,14 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 		restartGameInstance("Instance " . scriptName . " has been stuck " . imageName)
 		failSafe := A_TickCount
 	}
+	Gdip_DisposeImage(pBitmap)
 	return confirmed
 }
 
 FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
-	global winTitle, Variation, failSafe, confirmed
+	global winTitle, failSafe, confirmed
 	if(searchVariation = "")
-		searchVariation := Variation
+		searchVariation := 20
 	if (sleepTime = "") {
 		global Delay
 		sleepTime := Delay
@@ -712,7 +703,6 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 		;bboxAndPause(X1, Y1, X2, Y2)
 		; ImageSearch within the region
 		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, X1, Y1, X2, Y2, searchVariation)
-		Gdip_DisposeImage(pBitmap)
 		if (!confirmed && vRet = 1) {
 			confirmed := vPosXY
 		} else {
@@ -739,7 +729,6 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 		pNeedle := GetNeedle(Path)
 		; ImageSearch within the region
 		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 15, 155, 270, 420, searchVariation)
-		Gdip_DisposeImage(pBitmap)
 		if (vRet = 1) {
 			CreateStatusMessage("Error message in " . scriptName " Clicking retry..." )
 			LogToFile("Error message in " scriptName " Clicking retry..." )
@@ -751,26 +740,28 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 		Path = %imagePath%App.png
 		pNeedle := GetNeedle(Path)
 		; ImageSearch within the region
-		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 15, 155, 270, 420, searchVariation)
-		Gdip_DisposeImage(pBitmap)
+		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 225, 300, 242, 314, searchVariation)
 		if (vRet = 1) {
 			CreateStatusMessage("At home page. Opening app..." )
 			restartGameInstance("Found myself at the home page during: `n" imageName)
 		}
-		if(imageName = "Social" || imageName = "Country") { ;only look for deleted account on start up.
+		if(imageName = "Social" || imageName = "Country" || imageName = "Account2" || imageName = "Account") { ;only look for deleted account on start up.
 			Path = %imagePath%NoSave.png ; look for No Save Data error message > if loaded account > delete xml > reload
 			pNeedle := GetNeedle(Path)
 			; ImageSearch within the region
 			vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 30, 331, 50, 449, searchVariation)
-			Gdip_DisposeImage(pBitmap)
 			if (vRet = 1) {
+				adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
+				waitadb()
 				CreateStatusMessage("Loaded deleted account. Deleting XML." )
 				if(loadedAccount) {
 					FileDelete, %loadedAccount%
 				}
-				restartGameInstance("No save data. Restarting.")
+				LogToFile("Restarted game for instance " scriptName " Reason: No save data found", "Restart.txt")
+				Reload
 			}
 		}
+		Gdip_DisposeImage(pBitmap)
 		if(imageName = "Points" || imageName = "Home") { ;look for level up ok "button"
 			LevelUp()
 		}
@@ -785,6 +776,7 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 				firstTime := false
 			}
 			if (ElapsedTime >= skip) {
+				Gdip_DisposeImage(pBitmap)
 				return false
 				ElapsedTime := ElapsedTime/2
 				break
@@ -793,13 +785,12 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 		if (confirmed) {
 			break
 		}		
-		
 	}
 	return confirmed
 }
 
 LevelUp() {
-	Leveled := FindOrLoseImage(120, 150, 160, 210, , "LevelUp", 0)
+	Leveled := FindOrLoseImage(100, 86, 167, 116, , "LevelUp", 0)
 	if(Leveled) {
 		clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0, failSafeTime)
 		StringSplit, pos, clickButton, `,  ; Split at ", "
@@ -877,6 +868,17 @@ killGodPackInstance(){
 	}
 }
 
+waitadb() {
+	adbShell.StdIn.WriteLine("echo done")
+	while !adbShell.StdOut.AtEndOfStream
+	{
+			line := adbShell.StdOut.ReadLine()
+			if (line = "done")
+				break
+			Sleep, 50
+	}
+}
+
 restartGameInstance(reason, RL := true){
 	global Delay, scriptName, adbShell, adbPath, adbPort, friended, loadedAccount
 	initializeAdbShell()
@@ -884,13 +886,14 @@ restartGameInstance(reason, RL := true){
 	
 	if(!RL || RL != "GodPack") {
 		adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
+		waitadb()
 		if(!RL)
 			adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
 		;adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
-		Sleep, 1500
+		waitadb()
 		adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
+		waitadb()
 	}
-
 	Sleep, 4500
 	
 	if(RL = "GodPack") {
@@ -904,6 +907,8 @@ restartGameInstance(reason, RL := true){
 }
 
 menuDelete() {
+	if(foundGP)
+		return
 	sleep, %Delay%
 	failSafe := A_TickCount
 	failSafeTime := 0
@@ -927,14 +932,6 @@ menuDelete() {
 	FindImageAndClick(56, 312, 108, 334, , "Account2", 79, 256, 1000) ;wait for account menu
 	Sleep,%Delay%
 	
-	
-	; FindImageAndClick(160, 400, 240, 485, 60, "Delete", 145, 446, 2000) ;wait for delete save data confirmation
-	; Sleep,%Delay%
-	; FindImageAndClick(113, 340, 138, 410, , "Delete2", 201, 456) ;wait for second delete save data 
-	; Sleep,%Delay%
-	; FindImageAndClick(24, 150, 255, 260, , "Delete3", 201, 369, 2000) ;wait for second 
-	; Sleep,%Delay%
-	; adbClick(143, 370)
 	failSafe := A_TickCount
 	failSafeTime := 0		
 	Loop {
@@ -974,6 +971,8 @@ menuDelete() {
 
 menuDeleteStart() {
 	global friended
+	if(foundGP)
+		return
 	if(friended) {
 		FindImageAndClick(65, 195, 100, 215, , "Platin", 18, 109, 2000) ; click mod settings
 		if(setSpeed = 3)
@@ -1074,216 +1073,181 @@ CreateStatusMessage(Message, GuiName := 50, X := 0, Y := 80) {
 	}
 }
 
-checkCards() {
-    global winTitle, discordUserId, scriptName, packs, username, TrainerCheck, FullArtCheck, RainbowCheck
-    Sleep, 1000
-
-    trainerCoords := [[38, 184, 59, 187]
-                     ,[121, 184, 142, 187]
-                     ,[204, 184, 225, 187]
-                     ,[78, 299, 99, 302]
-                     ,[163, 299, 184, 302]]
-
-    borderCoords := [[20, 284, 90, 286]
-                    ,[103, 284, 173, 286]
-                    ,[186, 284, 256, 286]
-                    ,[60, 399, 130, 401]
-                    ,[145, 399, 215, 401]]
-
-    twostarCoords := [[20, 285, 60, 286]
-                     ,[103, 285, 143, 286]
-                     ,[186, 285, 226, 286]
-                     ,[60, 400, 100, 401]
-                     ,[145, 400, 185, 401]]
-
-    rainbowCoords := [[30, 284, 90, 286]
-                     ,[113, 284, 173, 286]
-                     ,[196, 284, 256, 286]
-                     ,[70, 399, 130, 401]
-                     ,[155, 399, 215, 401]]
-
-    rBitmap := from_window(WinExist(winTitle))
-
-    if (TrainerCheck = 1) {
-        pTrainerNeedle := GetNeedle(A_ScriptDir . "\" . defaultLanguage . "\Trainer.png")
-        pBorderNeedle := GetNeedle(A_ScriptDir . "\" . defaultLanguage . "\Trainer2.png")
-
-        Loop % trainerCoords.Length() {
-            currentCard := A_Index
-            trainerCoord := trainerCoords[currentCard]
-            borderCoord := borderCoords[currentCard]
-
-            isTrainer := Gdip_ImageSearch(rBitmap, pTrainerNeedle, vPosXY, trainerCoord[1], trainerCoord[2], trainerCoord[3], trainerCoord[4], 57)
-            isNormal := Gdip_ImageSearch(rBitmap, pBorderNeedle, vPosXY, borderCoord[1], borderCoord[2], borderCoord[3], borderCoord[4], 17)
-
-            if (isTrainer = 1 && isNormal = 0) {
-				screenShot := Screenshot("Trainer")
-				accountFile := saveAccount("Trainer")
-				friendCode := getFriendCode()
-                logMessage := "2-Star Trainer found for " . username . "(" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts folder and continuing..."
-                CreateStatusMessage(logMessage)
-                LogToFile(logMessage, "GPlog.txt")
-                LogToDiscord(logMessage, screenShot, discordUserId)
-                Gdip_DisposeImage(rBitmap)
-                return true
-            }
-        }
-        CreateStatusMessage("No Rare Trainer")
-    }
-
-    if (FullArtCheck = 1) {
-        pTwostarNeedle := GetNeedle(A_ScriptDir . "\" . defaultLanguage . "\Twostar.png")
-
-        Loop % twostarCoords.Length() {
-            coord := twostarCoords[A_Index]
-            if (Gdip_ImageSearch(rBitmap, pTwostarNeedle, vPosXY, coord[1], coord[2], coord[3], coord[4], 132) = 1) {
-				screenShot := Screenshot("2Star")
-				accountFile := saveAccount("2Star")
-				friendCode := getFriendCode()
-                logMessage := "2-Star Full Art found for " . username . "(" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts folder and continuing..."
-                CreateStatusMessage(logMessage)
-                LogToFile(logMessage, "GPlog.txt")
-                LogToDiscord(logMessage, screenShot, discordUserId)
-                Gdip_DisposeImage(rBitmap)
-                return true
-            }
-        }
-        CreateStatusMessage("No Rare 2-Star")
-    }
-
-    if (RainbowCheck = 1) {
-        pRainbowNeedle := GetNeedle(A_ScriptDir . "\" . defaultLanguage . "\Rainbow.png")
-
-        Loop % rainbowCoords.Length() {
-            coord := rainbowCoords[A_Index]
-            if (Gdip_ImageSearch(rBitmap, pRainbowNeedle, vPosXY, coord[1], coord[2], coord[3], coord[4], 137) = 1) {
-				screenShot := Screenshot("Rainbow")
-				accountFile := saveAccount("Rainbow")
-				friendCode := getFriendCode()
-                logMessage := "2-Star Rainbow found for " . username . "(" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts folder and continuing..."
-                CreateStatusMessage(logMessage)
-                LogToFile(logMessage, "GPlog.txt")
-                LogToDiscord(logMessage, screenShot, discordUserId)
-                Gdip_DisposeImage(rBitmap)
-                return true
-            }
-        }
-        CreateStatusMessage("No Rare Rainbow")
-    }
-
-    Gdip_DisposeImage(rBitmap)
-    return false
+CheckPack() {
+	foundGP := false ;check card border to find godpacks
+	foundTrainer := false
+	foundRainbow := false
+	foundFullArt := false
+	foundCrown := false
+	foundImmersive := false
+	foundTS := false
+	foundGP := FindGodPack()
+	;msgbox 1 foundGP:%foundGP%, TC:%TrainerCheck%, RC:%RainbowCheck%, FAC:%FullArtCheck%, FTS:%foundTS%
+	if(TrainerCheck && !foundTS) {
+		foundTrainer := FindBorders("trainer")
+		if(foundTrainer)
+			foundTS := "Trainer"
+	}
+	if(RainbowCheck && !foundTS) {
+		foundRainbow := FindBorders("rainbow")
+		if(foundRainbow)
+			foundTS := "Rainbow"
+	}
+	if(FullArtCheck && !foundTS) {
+		foundFullArt := FindBorders("fullart")
+		if(foundFullArt)
+			foundTS := "Full Art"
+	}
+	if(ImmersiveCheck && !foundTS) {
+		foundImmersive := FindBorders("immersive")
+		if(foundImmersive)
+			foundTS := "Immersive"
+	}
+	If(CrownCheck && !foundTS) {
+		foundCrown := FindBorders("crown")
+		if(foundCrown)
+			foundTS := "Crown"
+	}
+	If(PseudoGodPack && !foundTS) {
+		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
+		if(2starCount > 1)
+			foundTS := "Double two star"
+	}
+	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundImmersive || foundCrown) {
+		if(loadedAccount)
+			FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
+		if(foundGP)
+			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
+		else {
+			FoundStars(foundTS)
+			restartGameInstance(foundTS . " found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
+		}
+	}
 }
 
-checkBorder() {
-	global winTitle, discordUserId, skipInvalidGP, Delay, username
+FoundStars(star) {
+	screenShot := Screenshot(star)
+	accountFile := saveAccount(star)
+	friendCode := getFriendCode()
+	if(star = "Crown" || star = "Immersive")
+		RemoveFriends(friendsAdded)
+	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
+	CreateStatusMessage(logMessage)
+	LogToFile(logMessage, "GPlog.txt")
+	LogToDiscord(logMessage, screenShot, discordUserId)
+}
+
+FindBorders(prefix) {
+	count := 0
+	searchVariation := 40
+	borderCoords := [[30, 284, 83, 286]
+					,[113, 284, 166, 286]
+					,[196, 284, 249, 286]
+					,[70, 399, 123, 401]
+					,[155, 399, 208, 401]]
+	pBitmap := from_window(WinExist(winTitle))
+	; imagePath := "C:\Users\Arturo\Desktop\PTCGP\GPs\" . Clipboard . ".png"
+	; pBitmap := Gdip_CreateBitmapFromFile(imagePath)
+	for index, value in borderCoords {
+		coords := borderCoords[A_Index]
+		Path = %A_ScriptDir%\%defaultLanguage%\%prefix%%A_Index%.png
+		pNeedle := GetNeedle(Path)
+		vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, coords[1], coords[2], coords[3], coords[4], searchVariation)
+		if (vRet = 1) {
+			count += 1
+		}
+	}
+	Gdip_DisposeImage(pBitmap)
+	return count
+}
+
+FindGodPack() {
+	global winTitle, discordUserId, Delay, username, packs, minStars
 	gpFound := false
 	invalidGP := false
 	searchVariation := 5
 	confirm := false
-	Sleep, 250 ; give time for cards to render
 	Loop {
+		if(FindBorders("lag") = 0)
+			break
+		Delay(1)
+	}
+	borderCoords := [[20, 284, 90, 286]
+					,[103, 284, 173, 286]]
+	Sleep, 250 ; give time for cards to render
+	if(packs = 3)
+		packs := 0
+	Loop {
+		normalBorders := false
 		pBitmap := from_window(WinExist(winTitle))
 		Path = %A_ScriptDir%\%defaultLanguage%\Border.png
 		pNeedle := GetNeedle(Path)
-		; ImageSearch within the region
-		if (scaleParam = 277) { ; 125% scale
-			vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 20, 284, 90, 286, searchVariation)
-		} else {
-			vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 20, 284-6, 90, 286-6, searchVariation)
-			;bboxAndPause(20, 284-6, 90, 286-6)
+		for index, value in borderCoords {
+			coords := borderCoords[A_Index]
+			vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, coords[1], coords[2], coords[3], coords[4], searchVariation)
+			if (vRet = 1) {
+				normalBorders := true
+				break
+			}				
 		}
 		Gdip_DisposeImage(pBitmap)
-		if (vRet = 1) {
+		if(normalBorders) {
 			CreateStatusMessage("Not a God Pack ")
 			packs += 1
 			break
-		}
-		else {
-			;pause (should pause if first card is not 1 or 2 diamonds)
-			pBitmap := from_window(WinExist(winTitle))
-			Path = %A_ScriptDir%\%defaultLanguage%\Border.png
-			pNeedle := GetNeedle(Path)
-			; ImageSearch within the region
-			if (scaleParam = 277) { ; 125% scale
-				vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 103, 284, 173, 286, searchVariation)
-			} else {
-				vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 103, 284-6, 173, 286-6, searchVariation)
-				;bboxAndPause(103, 284-6, 173, 286-6)
+		} else {
+			packs += 1
+			if(deleteMethod = "1 Pack")
+				packs := 1
+			foundImmersive := FindBorders("immersive")
+			foundCrown := FindBorders("crown")
+			if(foundImmersive || foundCrown) {
+				invalidGP := true
 			}
-			Gdip_DisposeImage(pBitmap)
-			if (vRet = 1) {
-				CreateStatusMessage("Not a God Pack ")
-				LogToFile("Second card checked. Not a God Pack ")
-				packs += 1
+			if(!invalidGP && minStars > 0) {
+				starCount := 5 - FindBorders("1star")
+				if(starCount < minStars) {
+					CreateStatusMessage("Does not meet minimum 2 star threshold.")
+					invalidGP := true
+				}
+			}
+			if(invalidGP) {
+				GodPackFound("Invalid")
+				RemoveFriends(friendsAdded)
+				gpFound := true
 				break
 			}
-			else if (confirm) {
-				packs += 1
-				if(skipInvalidGP = 2) {
-					Loop 8 {
-						pBitmap := from_window(WinExist(winTitle))
-						if (scaleParam = 277) { ; 125% scale
-							Path = %A_ScriptDir%\Skip\%A_Index%.png
-						} else {
-							Path = %A_ScriptDir%\Skip\100\%A_Index%.png
-						}
-						pNeedle := GetNeedle(Path)
-						vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 5, 165, 265, 405, searchVariation)
-						;bboxAndPause(5, 165, 265, 405, True)
-						Gdip_DisposeImage(pBitmap)
-						if (vRet = 1) {
-							invalidGP := true
-						}
-					}
-				}
-				if(deleteMethod = "1 Pack")
-					packs := 1
-				if(invalidGP) {
-					Condemn := ["Uh-oh!", "Oops!", "Not quite!", "Better luck next time!", "Yikes!", "That didn’t go as planned.", "Try again!", "Almost had it!", "Not your best effort.", "Keep practicing!", "Oh no!", "Close, but no cigar.", "You missed it!", "Needs work!", "Back to the drawing board!", "Whoops!", "That’s rough!", "Don’t give up!", "Ouch!", "Swing and a miss!", "Room for improvement!", "Could be better.", "Not this time.", "Try harder!", "Missed the mark.", "Keep at it!", "Bummer!", "That’s unfortunate.", "So close!", "Gotta do better!"]
-					Randmax := Condemn.Length()
-					Random, rand, 1, Randmax
-					Interjection := Condemn[rand]
-					screenShot := Screenshot("Invalid")
-					accountFile := saveAccount("Invalid")
-					friendCode := getFriendCode()
-					logMessage := Interjection . "\n" . username . "(" . friendCode . ")\nFound an invalid pack in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts folder and continuing..."
-					CreateStatusMessage(logMessage)
-					godPackLog = GPlog.txt
-					LogToFile(logMessage, godPackLog)
-					LogToDiscord(logMessage, screenShot, discordUserId)
-					break
-				}
-				else {
-					Praise := ["Congrats!", "Congratulations!", "GG!", "Whoa!", "Praise Helix! ༼ つ ◕_◕ ༽つ", "Way to go!", "You did it!", "Awesome!", "Nice!", "Cool!", "You deserve it!", "Keep going!", "This one has to be live!", "No duds, no duds, no duds!", "Fantastic!", "Bravo!", "Excellent work!", "Impressive!", "You're amazing!", "Well done!", "You're crushing it!", "Keep up the great work!", "You're unstoppable!", "Exceptional!", "You nailed it!", "Hats off to you!", "Sweet!", "Kudos!", "Phenomenal!", "Boom! Nailed it!", "Marvelous!", "Outstanding!", "Legendary!", "Youre a rock star!", "Unbelievable!", "Keep shining!", "Way to crush it!", "You're on fire!", "Killing it!", "Top-notch!", "Superb!", "Epic!", "Cheers to you!", "Thats the spirit!", "Magnificent!", "Youre a natural!", "Gold star for you!", "You crushed it!", "Incredible!", "Shazam!", "You're a genius!", "Top-tier effort!", "This is your moment!", "Powerful stuff!", "Wicked awesome!", "Props to you!", "Big win!", "Yesss!", "Champion vibes!", "Spectacular!"]
-
-					Randmax := Praise.Length()
-					Random, rand, 1, Randmax
-					Interjection := Praise[rand]
-					screenShot := Screenshot()
-					accountFile := saveAccount()
-					friendCode := getFriendCode()
-					if(godPack < 3)
-						logMessage := Interjection . "\n" . username . "(" . friendCode . ")\nFound a God pack found in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nInstance is stopping."
-					else if(godPack = 3)
-						logMessage := Interjection . "\n" . username . "(" . friendCode . ")\nFound a God Pack found in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts folder and continuing..."
-					CreateStatusMessage(logMessage)
-					godPackLog = GPlog.txt
-					LogToFile(logMessage, godPackLog)
-					;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
-					LogToDiscord(logMessage, screenShot, discordUserId)
-					gpFound := true
-					break
-				}
-			}
 			else {
-				fpSleep := Delay * 5
-				Sleep, %fpSleep% ; delay to make sure cards rendered after not detecting common borders to eliminate false positives
-				confirm := true
+				GodPackFound("Valid")
+				gpFound := true
+				break
 			}
 		}
 	}
 	return gpFound
+}
+
+GodPackFound(validity) {
+	if(validity = "Valid") {
+		Praise := ["Congrats!", "Congratulations!", "GG!", "Whoa!", "Praise Helix! ༼ つ ◕_◕ ༽つ", "Way to go!", "You did it!", "Awesome!", "Nice!", "Cool!", "You deserve it!", "Keep going!", "This one has to be live!", "No duds, no duds, no duds!", "Fantastic!", "Bravo!", "Excellent work!", "Impressive!", "You're amazing!", "Well done!", "You're crushing it!", "Keep up the great work!", "You're unstoppable!", "Exceptional!", "You nailed it!", "Hats off to you!", "Sweet!", "Kudos!", "Phenomenal!", "Boom! Nailed it!", "Marvelous!", "Outstanding!", "Legendary!", "Youre a rock star!", "Unbelievable!", "Keep shining!", "Way to crush it!", "You're on fire!", "Killing it!", "Top-notch!", "Superb!", "Epic!", "Cheers to you!", "Thats the spirit!", "Magnificent!", "Youre a natural!", "Gold star for you!", "You crushed it!", "Incredible!", "Shazam!", "You're a genius!", "Top-tier effort!", "This is your moment!", "Powerful stuff!", "Wicked awesome!", "Props to you!", "Big win!", "Yesss!", "Champion vibes!", "Spectacular!"]
+		invalid := ""
+	} else {
+		Praise := ["Uh-oh!", "Oops!", "Not quite!", "Better luck next time!", "Yikes!", "That didn’t go as planned.", "Try again!", "Almost had it!", "Not your best effort.", "Keep practicing!", "Oh no!", "Close, but no cigar.", "You missed it!", "Needs work!", "Back to the drawing board!", "Whoops!", "That’s rough!", "Don’t give up!", "Ouch!", "Swing and a miss!", "Room for improvement!", "Could be better.", "Not this time.", "Try harder!", "Missed the mark.", "Keep at it!", "Bummer!", "That’s unfortunate.", "So close!", "Gotta do better!"]
+		invalid := validity
+	}
+	Randmax := Praise.Length()
+	Random, rand, 1, Randmax
+	Interjection := Praise[rand]
+	starCount := 5 - FindBorders("1star")
+	screenShot := Screenshot(validity)
+	accountFile := saveAccount(validity)
+	friendCode := getFriendCode()
+	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
+	CreateStatusMessage(logMessage)
+	godPackLog = GPlog.txt
+	LogToFile(logMessage, godPackLog)
+	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
+	LogToDiscord(logMessage, screenShot, discordUserId)
 }
 
 loadAccount() {
@@ -1346,11 +1310,11 @@ loadAccount() {
 	
 	adbShell.StdIn.WriteLine("cp /sdcard/deviceAccount.xml /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml")
 	
-	Sleep, 500
-	
+	waitadb()
 	adbShell.StdIn.WriteLine("rm /sdcard/deviceAccount.xml")
+	waitadb()
 	adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
-	
+	waitadb()
 	return loadDir
 }
 
@@ -1371,17 +1335,20 @@ saveAccount(file := "Valid") {
 	
 	if (file = "All") {
 		saveDir := A_ScriptDir "\..\Accounts\Saved\" . remainder . "\" . winTitle
-		if !FileExist(saveDir) ; Check if the directory exists
-			FileCreateDir, %saveDir% ; Create the directory if it doesn't exist
-		saveDir := saveDir . "\" . A_Now . "_" . winTitle . ".xml"
-	}
-	else {
-		saveDir := A_ScriptDir "\..\Accounts\GodPacks\"
-		if !FileExist(saveDir) ; Check if the directory exists
-			FileCreateDir, %saveDir% ; Create the directory if it doesn't exist
+		filePath := saveDir . "\" . A_Now . "_" . winTitle . ".xml"
+	} else if(file = "Valid" || file = "Invalid") {
+		filePath := A_ScriptDir "\..\Accounts\GodPacks\"
 		xmlFile := A_Now . "_" . winTitle . "_" . file . "_" . packs . "_packs.xml"
-		saveDir := A_ScriptDir "\..\Accounts\GodPacks\" . xmlFile
+		filePath := saveDir . xmlFile
+	} else {
+		saveDir := A_ScriptDir "\..\Accounts\SpecificCards\"
+		xmlFile := A_Now . "_" . winTitle . "_" . file . "_" . packs . "_packs.xml"
+		filePath := saveDir . xmlFile
 	}
+	
+	if !FileExist(saveDir) ; Check if the directory exists
+		FileCreateDir, %saveDir% ; Create the directory if it doesn't exist
+		
 	count := 0
 	Loop {
 		CreateStatusMessage("Attempting to save account XML. " . count . "/10")
@@ -1390,7 +1357,7 @@ saveAccount(file := "Valid") {
 		
 		Sleep, 500
 		
-		RunWait, % adbPath . " -s 127.0.0.1:" . adbPort . " pull /sdcard/deviceAccount.xml """ . saveDir,, Hide
+		RunWait, % adbPath . " -s 127.0.0.1:" . adbPort . " pull /sdcard/deviceAccount.xml """ . filePath,, Hide
 		
 		Sleep, 500
 		
@@ -1398,7 +1365,7 @@ saveAccount(file := "Valid") {
 		
 		Sleep, 500
 		
-		FileGetSize, OutputVar, %saveDir%
+		FileGetSize, OutputVar, %filePath%
 		
 		if(OutputVar > 0)
 			break
@@ -1433,23 +1400,20 @@ ControlClick(X, Y) {
 DownloadFile(url, filename) {
 	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
 	localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
-
-	; URLDownloadToFile, %url%, %localPath%
-	; Use ComObjCreate as it is less prone to errors.
-	whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-	whr.Open("GET", url, true)
-	whr.Send()
-	whr.WaitForResponse()
-	ids := whr.ResponseText
-
-	FileDelete, %localPath%
-	FileAppend, %ids%, %localPath%
-
-	; if ErrorLevel
-		; MsgBox, Download failed!
-	; else
-		; MsgBox, File downloaded successfully!
-
+	errored := false
+	try {
+		whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+		whr.Open("GET", url, true)
+		whr.Send()
+		whr.WaitForResponse()
+		ids := whr.ResponseText
+	} catch {
+		errored := true
+	}
+	if(!errored) {
+		FileDelete, %localPath%
+		FileAppend, %ids%, %localPath%
+	}
 }
 
 ReadFile(filename, numbers := false) {
@@ -1476,21 +1440,22 @@ ReadFile(filename, numbers := false) {
 adbInput(input) {
 	global adbShell, adbPath, adbPort
 	initializeAdbShell()
-	Delay(1)
-	Delay(1)
-	Delay(1)
+	Delay(3)
 	adbShell.StdIn.WriteLine("input text " . input )
-	Delay(1)
-	Delay(1)
-	Delay(1)
+	Delay(3)
+}
+
+adbInputEvent(event) {
+	global adbShell, adbPath, adbPort
+	initializeAdbShell()
+	adbShell.StdIn.WriteLine("input keyevent " . event)
 }
 
 adbSwipeUp() {
 	global adbShell, adbPath, adbPort
 	initializeAdbShell()
 	adbShell.StdIn.WriteLine("input swipe 309 816 309 355 60") 
-	;adbShell.StdIn.WriteLine("input swipe 309 816 309 555 30")	
-	Sleep, 150
+	waitadb()
 }
 
 adbSwipe() {
@@ -1506,14 +1471,7 @@ adbSwipe() {
     Y2 := Round((Y2 - 44) / 489 * 960)
 
     adbShell.StdIn.WriteLine("input swipe " . X1 . " " . Y1 . " " . X2 . " " . Y2 . " " . swipeSpeed)
-    adbShell.StdIn.WriteLine("echo SwipeDone")
-    while !adbShell.StdOut.AtEndOfStream
-    {
-            line := adbShell.StdOut.ReadLine()
-            if (line = "SwipeDone")
-                break
-            Sleep, 50
-    }
+    waitadb()
 }
 
 Screenshot(filename := "Valid") {
@@ -1709,54 +1667,54 @@ SumVariablesInJsonFile() {
 }
 
 from_window(ByRef image) {
-  ; Thanks tic - https://www.autohotkey.com/boards/viewtopic.php?t=6517
+	; Thanks tic - https://www.autohotkey.com/boards/viewtopic.php?t=6517
 
-  ; Get the handle to the window.
-  image := (hwnd := WinExist(image)) ? hwnd : image
+	; Get the handle to the window.
+	image := (hwnd := WinExist(image)) ? hwnd : image
 
-  ; Restore the window if minimized! Must be visible for capture.
-  if DllCall("IsIconic", "ptr", image)
+	; Restore the window if minimized! Must be visible for capture.
+	if DllCall("IsIconic", "ptr", image)
 	 DllCall("ShowWindow", "ptr", image, "int", 4)
 
-  ; Get the width and height of the client window.
-  VarSetCapacity(Rect, 16) ; sizeof(RECT) = 16
-  DllCall("GetClientRect", "ptr", image, "ptr", &Rect)
+	; Get the width and height of the client window.
+	VarSetCapacity(Rect, 16) ; sizeof(RECT) = 16
+	DllCall("GetClientRect", "ptr", image, "ptr", &Rect)
 	 , width  := NumGet(Rect, 8, "int")
 	 , height := NumGet(Rect, 12, "int")
 
-  ; struct BITMAPINFOHEADER - https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
-  hdc := DllCall("CreateCompatibleDC", "ptr", 0, "ptr")
-  VarSetCapacity(bi, 40, 0)                ; sizeof(bi) = 40
- , NumPut(       40, bi,  0,   "uint") ; Size
- , NumPut(    width, bi,  4,   "uint") ; Width
- , NumPut(  -height, bi,  8,    "int") ; Height - Negative so (0, 0) is top-left.
- , NumPut(        1, bi, 12, "ushort") ; Planes
- , NumPut(       32, bi, 14, "ushort") ; BitCount / BitsPerPixel
- , NumPut(        0, bi, 16,   "uint") ; Compression = BI_RGB
-     , NumPut(        3, bi, 20,   "uint") ; Quality setting (3 = low quality, no anti-aliasing) 
-  hbm := DllCall("CreateDIBSection", "ptr", hdc, "ptr", &bi, "uint", 0, "ptr*", pBits:=0, "ptr", 0, "uint", 0, "ptr")
-  obm := DllCall("SelectObject", "ptr", hdc, "ptr", hbm, "ptr")
+	; struct BITMAPINFOHEADER - https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
+	hdc := DllCall("CreateCompatibleDC", "ptr", 0, "ptr")
+	VarSetCapacity(bi, 40, 0)                ; sizeof(bi) = 40
+	, NumPut(       40, bi,  0,   "uint") ; Size
+	, NumPut(    width, bi,  4,   "uint") ; Width
+	, NumPut(  -height, bi,  8,    "int") ; Height - Negative so (0, 0) is top-left.
+	, NumPut(        1, bi, 12, "ushort") ; Planes
+	, NumPut(       32, bi, 14, "ushort") ; BitCount / BitsPerPixel
+	, NumPut(        0, bi, 16,   "uint") ; Compression = BI_RGB
+	 , NumPut(        3, bi, 20,   "uint") ; Quality setting (3 = low quality, no anti-aliasing) 
+	hbm := DllCall("CreateDIBSection", "ptr", hdc, "ptr", &bi, "uint", 0, "ptr*", pBits:=0, "ptr", 0, "uint", 0, "ptr")
+	obm := DllCall("SelectObject", "ptr", hdc, "ptr", hbm, "ptr")
 
-  ; Print the window onto the hBitmap using an undocumented flag. https://stackoverflow.com/a/40042587
-  DllCall("PrintWindow", "ptr", image, "ptr", hdc, "uint", 0x3) ; PW_CLIENTONLY | PW_RENDERFULLCONTENT
-  ; Additional info on how this is implemented: https://www.reddit.com/r/windows/comments/8ffr56/altprintscreen/
+	; Print the window onto the hBitmap using an undocumented flag. https://stackoverflow.com/a/40042587
+	DllCall("PrintWindow", "ptr", image, "ptr", hdc, "uint", 0x3) ; PW_CLIENTONLY | PW_RENDERFULLCONTENT
+	; Additional info on how this is implemented: https://www.reddit.com/r/windows/comments/8ffr56/altprintscreen/
 
-  ; Convert the hBitmap to a Bitmap using a built in function as there is no transparency.
-  DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "ptr", hbm, "ptr", 0, "ptr*", pBitmap:=0)
+	; Convert the hBitmap to a Bitmap using a built in function as there is no transparency.
+	DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "ptr", hbm, "ptr", 0, "ptr*", pBitmap:=0)
 
-  ; Cleanup the hBitmap and device contexts.
-  DllCall("SelectObject", "ptr", hdc, "ptr", obm)
-  DllCall("DeleteObject", "ptr", hbm)
-  DllCall("DeleteDC",	 "ptr", hdc)
+	; Cleanup the hBitmap and device contexts.
+	DllCall("SelectObject", "ptr", hdc, "ptr", obm)
+	DllCall("DeleteObject", "ptr", hbm)
+	DllCall("DeleteDC",	 "ptr", hdc)
 
-  return pBitmap
+	return pBitmap
 }
 
 
-~F5::Reload
-~F6::Pause
-~F7::ToggleStop()
-~F8::ToggleStatusMessages()
+~+F5::Reload
+~+F6::Pause
+~+F7::ToggleStop()
+~+F8::ToggleStatusMessages()
 ;~F9::restartGameInstance("F9")
 
 ToggleStatusMessages() {
@@ -2158,6 +2116,7 @@ DoTutorial() {
 		name := ReadFile("usernames")
 		Random, randomIndex, 1, name.MaxIndex()
 		username := name[randomIndex]
+		username := SubStr(username, 1, 14)  ;max character limit
 		adbInput(username)
 		if(FindImageAndClick(121, 490, 161, 520, , "Return", 185, 372, , 10)) ;click through until return button on open pack
 			break
@@ -2383,19 +2342,85 @@ DoTutorial() {
 	return true
 }
 
+SelectPack(HG := false) {
+	global openPack, packArray
+	packy := 196
+	if(openPack = "Mew") {
+		packx := 80
+	} else if(openPack = "Palkia") {
+		packx := 200
+	} else if(openPack = "Dialga") {
+		packx := 145
+	} else {
+		packx := 200
+	}
+	FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
+	if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard") {
+		packy := 440
+		if(openPack = "Pikachu"){
+			packx := 125
+		} else if(openPack = "Mewtwo"){
+			packx := 65
+		} else if(openPack = "Charizard"){
+			packx := 26
+		}
+		FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 245, 475)
+		FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
+	}
+	if(HG = "Tutorial") {
+		FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+	}
+	else if(HG = "HGPack") {
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			if(FindOrLoseImage(60, 440, 90, 480, , "HourglassPack", 0, failSafeTime)) {
+				break
+			}
+			adbClick(146, 439)
+			Delay(1)
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for HourglassPack3. " . failSafeTime "/45 seconds")
+		}
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			if(FindOrLoseImage(60, 440, 90, 480, , "HourglassPack", 1, failSafeTime)) {
+				break
+			}
+			adbClick(205, 458)
+			Delay(1)
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for HourglassPack4. " . failSafeTime "/45 seconds")
+		}
+	}
+	if(HG != "Tutorial")
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			if(FindImageAndClick(233, 486, 272, 519, , "Skip2", 130, 430, , 2)) ;click on next until skip button appears
+				break
+			Delay(1)
+			adbClick(200, 461)
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for Skip2. " . failSafeTime "/45 seconds")
+		}
+}
+
 PackOpening() {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
-		if(FindImageAndClick(225, 273, 235, 290, , "Pack", 239, 497, , 2))
-			break ;wait for pack to be ready to Trace and click skip
-		Delay(1)
 		adbClick(146, 439)
-		
+		Delay(1)
+		if(FindOrLoseImage(225, 273, 235, 290, , "Pack", 0, failSafeTime))
+			break ;wait for pack to be ready to Trace and click skip
+		else
+			adbClick(239, 497)
 		failSafeTime := (A_TickCount - failSafe) // 1000
-		CreateStatusMessage("In failsafe for Trace2. " . failSafeTime "/45 seconds")
+		CreateStatusMessage("In failsafe for Pack. " . failSafeTime "/45 seconds")
 		if(failSafeTime > 45)
-			restartGameInstance("Stuck at Trace2")
+			restartGameInstance("Stuck at Pack")
 	}
 
 	if(setSpeed > 1) {
@@ -2426,20 +2451,7 @@ PackOpening() {
 		
 	FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 	
-	foundGP := checkBorder() ;check card border to find godpacks	
-	if(foundGP) {
-		if(godPack < 3)
-			killGodPackInstance()
-		else if(godPack = 3)
-			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
-	}
-	foundTS := checkCards() 	
-	if(foundTS) {
-		if(godPack < 3)
-			killGodPackInstance()
-		else if(godPack = 3)
-			restartGameInstance("TwoStar found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
-	}
+	CheckPack()
 	
 	FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
 	
@@ -2453,7 +2465,7 @@ PackOpening() {
 			adbClick(146, 494) ;146, 494
 		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
 			adbClick(146, 494) ;146, 494
-		} else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0, failSafeTime)) {
+		} else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
 			break
 		} else if(FindOrLoseImage(178, 193, 251, 282, , "Hourglass", 0, failSafeTime)) {
 			break
@@ -2466,56 +2478,80 @@ PackOpening() {
 	}
 }
 
-HourglassOpening() {
-	Delay(3)
-	adbClick(146, 441) ; 146 440
-	Delay(3)
-	adbClick(146, 441)
-	Delay(3)
-	adbClick(146, 441)
-	Delay(3)
-	
-	FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
-	Delay(1)
+HourglassOpening(HG := false) {
+	if(!HG) {
+		Delay(3)
+		adbClick(146, 441) ; 146 440
+		Delay(3)
+		adbClick(146, 441)
+		Delay(3)
+		adbClick(146, 441)
+		Delay(3)
+		
+		FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
+		Delay(1)
 
-	adbClick(203, 436) ; 203 436
-	
-	if(deleteMethod = "1 Pack") {
-		AddFriends(true)
-		SelectPack(true)
-	}
-	else {
-		FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
-
-		Delay(1)
-		adbClick(210, 464) ; 210 464
-		Delay(1)
-		adbClick(210, 464) ; 210 464
-	}
-	
-	failSafe := A_TickCount
-	failSafeTime := 0
-	Loop {
-		if(FindImageAndClick(203, 273, 228, 290, , "Pack", 239, 497, , 2)) ;wait for pack to be ready to Trace and click skip
-			break 
-		Delay(1)
-		adbClick(210, 464) ; 210 464
-		failSafeTime := (A_TickCount - failSafe) // 1000
-		CreateStatusMessage("In failsafe for Trace4. " . failSafeTime "/45 seconds")
-		LogToFile("In failsafe for Trace4. " . failSafeTime "/45 seconds")
-		if(failSafeTime > 45)
-			restartGameInstance("Stuck at Trace4")
-	}
-	
-	failSafe := A_TickCount
-	failSafeTime := 0
-		if(setSpeed > 1) {
-		FindImageAndClick(65, 195, 100, 215, , "Platin", 18, 109, 2000) ; click mod settings
-		FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
-			Delay(1)
+		adbClick(203, 436) ; 203 436
+		
+		if(deleteMethod = "1 Pack") {
+			AddFriends(true)
+			SelectPack("Tutorial")
 		}
+		else {
+			FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
+		}
+	}
+	if(!packMethod) {
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			if(FindOrLoseImage(60, 440, 90, 480, , "HourglassPack", 0, failSafeTime)) {
+				break
+			}
+			adbClick(146, 439)
+			Delay(1)
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for HourglassPack. " . failSafeTime "/45 seconds")
+		}
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			if(FindOrLoseImage(60, 440, 90, 480, , "HourglassPack", 1, failSafeTime)) {
+				break
+			}
+			adbClick(205, 458)
+			Delay(1)
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for HourglassPack2. " . failSafeTime "/45 seconds")
+		}
+	}
 	Loop {
-		adbSwipe()
+		adbClick(146, 439)
+		Delay(1)
+		if(FindOrLoseImage(225, 273, 235, 290, , "Pack", 0, failSafeTime))
+			break ;wait for pack to be ready to Trace and click skip
+		else
+			adbClick(239, 497)
+		clickButton := FindOrLoseImage(145, 440, 258, 480, 80, "Button", 0, failSafeTime)
+		if(clickButton) {
+			StringSplit, pos, clickButton, `,  ; Split at ", "
+			adbClick(pos1, pos2)
+		}
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for Pack. " . failSafeTime "/45 seconds")
+		if(failSafeTime > 45)
+			restartGameInstance("Stuck at Pack")
+	}
+
+	if(setSpeed > 1) {
+	FindImageAndClick(65, 195, 100, 215, , "Platin", 18, 109, 2000) ; click mod settings
+	FindImageAndClick(9, 170, 25, 190, , "One", 26, 180) ; click mod settings
+		Delay(1)
+	}
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		adbSwipe()	
 		Sleep, 10
 		if (FindOrLoseImage(203, 273, 228, 290, , "Pack", 1, failSafeTime)){
 		if(setSpeed > 1) {
@@ -2528,27 +2564,13 @@ HourglassOpening() {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
-		CreateStatusMessage("In failsafe for Pack. " . failSafeTime "/45 seconds")
+		CreateStatusMessage("In failsafe for Trace. " . failSafeTime "/45 seconds")
 		Delay(1)
 	}
-
 	
 	FindImageAndClick(0, 98, 116, 125, 5, "Opening", 239, 497) ;skip through cards until results opening screen
 	
-	foundGP := checkBorder() ;check card border to find godpacks	
-	if(foundGP) {
-		if(godPack < 3)
-			killGodPackInstance()
-		else if(godPack = 3)
-			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
-	}
-	foundTS := checkCards() 	
-	if(foundTS) {
-		if(godPack < 3)
-			killGodPackInstance()
-		else if(godPack = 3)
-			restartGameInstance("TwoStar found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
-	}
+	CheckPack()
 	
 	FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
 	
@@ -2562,14 +2584,14 @@ HourglassOpening() {
 			adbClick(146, 494) ;146, 494
 		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
 			adbClick(146, 494) ;146, 494
-		} else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0, failSafeTime)) {
+		} else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
-		CreateStatusMessage("In failsafe for Home. " . failSafeTime "/45 seconds")
-		LogToFile("In failsafe for Home. " . failSafeTime "/45 seconds")
+		CreateStatusMessage("In failsafe for ConfirmPack. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for ConfirmPack. " . failSafeTime "/45 seconds")
 		if(failSafeTime > 45)
-			restartGameInstance("Stuck at Home")
+			restartGameInstance("Stuck at ConfirmPack")
 	}
 }
 
@@ -2587,7 +2609,10 @@ getFriendCode() {
 			adbClick(146, 494) ;146, 494
 		} else if(FindOrLoseImage(120, 70, 150, 100, , "Next2", 0, failSafeTime)) {
 			adbClick(146, 494) ;146, 494
-		} else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0, failSafeTime)) {
+		} else if(FindOrLoseImage(121, 465, 140, 485, , "ConfirmPack", 0, failSafeTime)) {
+			break
+		}
+		else if(FindOrLoseImage(20, 500, 55, 530, , "Home", 0, failSafeTime)) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
@@ -2626,12 +2651,137 @@ createAccountList(instance) {
 	}
 	if (!FileExist(outputTxt))
 		Loop, %saveDir%\*.xml {
-			FileAppend, % A_LoopFileName "`n", %outputTxt%  ; Append file path to output.txt
+			xml := saveDir . "\" A_LoopFileName . ".xml"
+			FileGetTime, fileTime, %xml%, M
+			if (timeDiff > 86400)  ; 24 hours in seconds (60 * 60 * 24)
+				FileAppend, % A_LoopFileName "`n", %outputTxt%  ; Append file path to output.txt
 		}
 }
 
-^e::
-	msgbox ss
-	pToken := Gdip_Startup()
-	Screenshot()
-return
+DoWonderPick() {
+	FindImageAndClick(191, 393, 211, 411, , "Shop", 40, 515) ;click until at main menu
+	FindImageAndClick(240, 80, 265, 100, , "WonderPick", 59, 429) ;click until in wonderpick Screen
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		adbClick(80, 460)
+		if(FindOrLoseImage(240, 80, 265, 100, , "WonderPick", 1, failSafeTime)) {
+			clickButton := FindOrLoseImage(100, 340, 190, 480, 100, "Button", 0, failSafeTime)
+			if(clickButton) {
+				StringSplit, pos, clickButton, `,  ; Split at ", "
+					adbClick(pos1, pos2)
+				Delay(3)
+				if(FindImageAndClick(160, 330, 200, 370, , "Card"))
+					break
+			}
+		}
+		Delay(1)
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
+	}
+	Sleep, 300
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		adbClick(183, 350) ; click card
+		if(FindOrLoseImage(160, 330, 200, 370, , "Card", 1, failSafeTime)) {
+			break
+		}
+		Delay(1)
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for Card. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for Card. " . failSafeTime "/45 seconds")
+	}
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		adbClick(146, 494)
+		if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime) || FindOrLoseImage(240, 80, 265, 100, , "WonderPick", 0, failSafeTime))
+			break
+		delay(1)
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for Shop. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for Shop. " . failSafeTime "/45 seconds")
+	}
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		Delay(2)
+		if(FindOrLoseImage(191, 393, 211, 411, , "Shop", 0, failSafeTime))
+			break
+		else if(FindOrLoseImage(233, 486, 272, 519, , "Skip", 0, failSafeTime))
+			adbClick(239, 497)
+		else
+			adbInputEvent("111") ;send ESC
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for Shop. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for Shop. " . failSafeTime "/45 seconds")
+	}
+	FindImageAndClick(2, 85, 34, 120, , "Missions", 261, 478, 500)
+	FindImageAndClick(130, 170, 170, 205, , "WPMission", 150, 286, 1000)
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		clickButton := FindOrLoseImage(145, 447, 258, 480, 80, "Button", 0, failSafeTime)
+		if(clickButton) {
+			adbClick(110, 369)
+		}
+		else if(FindOrLoseImage(191, 393, 211, 411, , "Shop", 1, failSafeTime))
+			adbInputEvent("111") ;send ESC
+		else
+			break
+		Delay(1)
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
+		LogToFile("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
+	}
+	return true
+}
+
+getChangeDateTime() {
+	; Get system timezone bias and determine local time for 1 AM EST
+
+	; Retrieve timezone information from Windows registry
+	RegRead, TimeBias, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation, Bias
+	RegRead, DltBias, HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation, ActiveTimeBias
+
+	; Convert registry values to integers
+	Bias := TimeBias + 0  
+	DltBias := DltBias + 0  
+
+	; Determine if Daylight Saving Time (DST) is active
+	IsDST := (Bias != DltBias) ? 1 : 0
+
+	; EST is UTC-5 (300 minutes offset)
+	EST_Offset := 300
+
+	; Use the correct local offset (DST or Standard)
+	Local_Offset := (IsDST) ? DltBias : Bias
+
+	; Convert 1 AM EST to UTC (UTC = EST + 5 hours)
+	UTC_Time := 1 + EST_Offset / 60  ; 06:00 UTC
+
+	; Convert UTC to local time
+	Local_Time := UTC_Time - (Local_Offset / 60)  
+
+	; Round to ensure we get whole numbers
+	Local_Time := Floor(Local_Time)  
+
+	; Handle 24-hour wrap-around
+	If (Local_Time < 0)
+		Local_Time += 24
+	Else If (Local_Time >= 24)
+		Local_Time -= 24
+
+	; Format output as HHMM
+	FormattedTime := (Local_Time < 10 ? "0" : "") . Local_Time . "00"
+
+	Return FormattedTime
+}
+
+; ^e::
+	; msgbox ss
+	; pToken := Gdip_Startup()
+	; Screenshot()
+; return
