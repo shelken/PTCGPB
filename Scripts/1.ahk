@@ -2671,9 +2671,9 @@ DoWonderPick() {
 				StringSplit, pos, clickButton, `,  ; Split at ", "
 					adbClick(pos1, pos2)
 				Delay(3)
-				if(FindImageAndClick(160, 330, 200, 370, , "Card"))
-					break
 			}
+			if(FindOrLoseImage(160, 330, 200, 370, , "Card", 0, failSafeTime))
+				break
 		}
 		Delay(1)
 		failSafeTime := (A_TickCount - failSafe) // 1000
@@ -2719,10 +2719,14 @@ DoWonderPick() {
 		LogToFile("In failsafe for Shop. " . failSafeTime "/45 seconds")
 	}
 	FindImageAndClick(2, 85, 34, 120, , "Missions", 261, 478, 500)
-	FindImageAndClick(130, 170, 170, 205, , "WPMission", 150, 286, 1000)
+	;FindImageAndClick(130, 170, 170, 205, , "WPMission", 150, 286, 1000)
+	FindImageAndClick(120, 185, 150, 215, , "FirstMission", 150, 286, 1000)
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
+		Delay(1)
+		adbClick(139, 424)
+		Delay(1)
 		clickButton := FindOrLoseImage(145, 447, 258, 480, 80, "Button", 0, failSafeTime)
 		if(clickButton) {
 			adbClick(110, 369)
@@ -2731,7 +2735,6 @@ DoWonderPick() {
 			adbInputEvent("111") ;send ESC
 		else
 			break
-		Delay(1)
 		failSafeTime := (A_TickCount - failSafe) // 1000
 		CreateStatusMessage("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
 		LogToFile("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
