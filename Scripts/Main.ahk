@@ -33,7 +33,7 @@ global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipT
 	IniRead, setSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, setSpeed, 2x
 	IniRead, defaultLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, defaultLanguage, Scale125
 	IniRead, SelectedMonitorIndex, %A_ScriptDir%\..\Settings.ini, UserSettings, SelectedMonitorIndex, 1:
-	IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 600
+	IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 350
 	IniRead, skipInvalidGP, %A_ScriptDir%\..\Settings.ini, UserSettings, skipInvalidGP, No
 	IniRead, godPack, %A_ScriptDir%\..\Settings.ini, UserSettings, godPack, Continue
 	IniRead, discordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, discordWebhookURL, ""
@@ -136,23 +136,23 @@ Loop {
 	}
 	done := false
 	Loop 3 {
-		Sleep, 250
+		Sleep, %Delay%
 		if(FindOrLoseImage(225, 195, 250, 215, , "Pending", 0)) {
 			failSafe := A_TickCount
 			failSafeTime := 0
 			Loop {
 				Sleep, %Delay%
-				clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0) ;looking for ok button in case an invite is withdrawn
-				if(FindOrLoseImage(123, 110, 162, 127, , "99", 0)) {
+				clickButton := FindOrLoseImage(75, 340, 195, 530, 80, "Button", 0, failSafeTime) ;looking for ok button in case an invite is withdrawn
+				if(FindOrLoseImage(123, 110, 162, 127, , "99", 0, failSafeTime)) {
 					done := true
 					break
-				} else if(FindOrLoseImage(80, 170, 120, 195, , "player", 0)) {
+				} else if(FindOrLoseImage(80, 170, 120, 195, , "player", 0, failSafeTime)) {
 					Sleep, %Delay%
 					adbClick(210, 210)
 					Sleep, 1000
-				} else if(FindOrLoseImage(225, 195, 250, 220, , "Pending", 0)) {
+				} else if(FindOrLoseImage(225, 195, 250, 220, , "Pending", 0, failSafeTime)) {
 					adbClick(245, 210)
-				} else if(FindOrLoseImage(186, 496, 206, 518, , "Accept", 0)) {
+				} else if(FindOrLoseImage(186, 496, 206, 518, , "Accept", 0, failSafeTime)) {
 					done := true
 					break
 				} else if(clickButton) {
@@ -226,7 +226,7 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 	if(imageName = "Country" || imageName = "Social")
 		FSTime := 90
 	else
-		FSTime := 45 
+		FSTime := 180 
 	if (safeTime >= FSTime) {
 		CreateStatusMessage("Instance " . scriptName . " has been `nstuck " . imageName . " for 90s. EL: " . EL . " sT: " . safeTime . " Killing it...")
 		restartGameInstance("Instance " . scriptName . " has been stuck " . imageName)
@@ -963,8 +963,8 @@ IsLeapYear(year) {
     return (Mod(year, 4) = 0 && Mod(year, 100) != 0) || Mod(year, 400) = 0
 }
 
-^e::
-	msgbox ss
-	pToken := Gdip_Startup()
-	Screenshot()
-return
+; ^e::
+	; msgbox ss
+	; pToken := Gdip_Startup()
+	; Screenshot()
+; return
