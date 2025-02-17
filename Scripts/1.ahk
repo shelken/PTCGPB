@@ -2666,7 +2666,7 @@ DoWonderPick() {
 	Loop {
 		adbClick(80, 460)
 		if(FindOrLoseImage(240, 80, 265, 100, , "WonderPick", 1, failSafeTime)) {
-			clickButton := FindOrLoseImage(100, 340, 190, 480, 100, "Button", 0, failSafeTime)
+			clickButton := FindOrLoseImage(100, 367, 190, 480, 100, "Button", 0, failSafeTime)
 			if(clickButton) {
 				StringSplit, pos, clickButton, `,  ; Split at ", "
 					adbClick(pos1, pos2)
