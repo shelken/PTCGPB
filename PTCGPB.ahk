@@ -5,7 +5,7 @@ SetTitleMatchMode, 3
 
 githubUser := "Arturo-1212"
 repoName := "PTCGPB"
-localVersion := "v6.3.7"
+localVersion := "v6.3.8"
 scriptFolder := A_ScriptDir
 zipPath := A_Temp . "\update.zip"
 extractPath := A_Temp . "\update"
@@ -52,10 +52,8 @@ IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Ne
 IniRead, discordWebhookURL, Settings.ini, UserSettings, discordWebhookURL, ""
 IniRead, discordUserId, Settings.ini, UserSettings, discordUserId, ""
 IniRead, Columns, Settings.ini, UserSettings, Columns, 5
-IniRead, openPack, Settings.ini, UserSettings, openPack, Palkia
 IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
 IniRead, Instances, Settings.ini, UserSettings, Instances, 1
-;IniRead, setSpeed, Settings.ini, UserSettings, setSpeed, 1x/3x
 IniRead, defaultLanguage, Settings.ini, UserSettings, defaultLanguage, Scale125
 IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex, 1
 IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 300
@@ -806,6 +804,15 @@ MoveFilesRecursively(srcFolder, destFolder) {
 		}
 		else
 		{
+			if ((relativePath = "ids.txt" && FileExist(destPath)) || (relativePath = "usernames.txt" && FileExist(destPath)) || (relativePath = "discord.txt" && FileExist(destPath))) {
+                continue
+            }
+			if (relativePath = "usernames.txt" && FileExist(destPath)) {
+                continue
+            }
+			if (relativePath = "usernames.txt" && FileExist(destPath)) {
+                continue
+            }
 			; If it's a file, move it to the destination folder
 			; Ensure the directory exists before moving the file
 			FileCreateDir, % SubStr(destPath, 1, InStr(destPath, "\", 0, 0) - 1)
