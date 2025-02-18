@@ -27,7 +27,6 @@ IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances
 IniRead, Delay, %A_ScriptDir%\..\Settings.ini, UserSettings, Delay, 250
 IniRead, folderPath, %A_ScriptDir%\..\Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 IniRead, Variation, %A_ScriptDir%\..\Settings.ini, UserSettings, Variation, 20
-IniRead, changeDate, %A_ScriptDir%\..\Settings.ini, UserSettings, ChangeDate, 0100
 IniRead, Columns, %A_ScriptDir%\..\Settings.ini, UserSettings, Columns, 5
 IniRead, openPack, %A_ScriptDir%\..\Settings.ini, UserSettings, openPack, 1
 IniRead, setSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, setSpeed, 2x
@@ -737,10 +736,10 @@ from_window(ByRef image) {
 	return pBitmap
 }
 
-~F5::Reload
-~F6::Pause
-~F7::ExitApp
-~F8::ToggleStatusMessages()
+~+F5::Reload
+~+F6::Pause
+~+F7::ExitApp
+~+F8::ToggleStatusMessages()
 
 ToggleStatusMessages() {
 	if(showStatus)

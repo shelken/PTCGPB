@@ -15,7 +15,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion
 scriptName := StrReplace(A_ScriptName, ".ahk")
 winTitle := scriptName
 foundGP := false
@@ -31,7 +31,6 @@ IniRead, Delay, %A_ScriptDir%\..\Settings.ini, UserSettings, Delay, 250
 IniRead, folderPath, %A_ScriptDir%\..\Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 IniRead, discordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, discordWebhookURL, ""
 IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
-IniRead, changeDate, %A_ScriptDir%\..\Settings.ini, UserSettings, ChangeDate, 0100
 IniRead, Columns, %A_ScriptDir%\..\Settings.ini, UserSettings, Columns, 5
 IniRead, openPack, %A_ScriptDir%\..\Settings.ini, UserSettings, openPack, Palkia
 IniRead, godPack, %A_ScriptDir%\..\Settings.ini, UserSettings, godPack, Continue
@@ -60,6 +59,7 @@ IniRead, Mew, %A_ScriptDir%\..\Settings.ini, UserSettings, Mew, 0
 IniRead, Pikachu, %A_ScriptDir%\..\Settings.ini, UserSettings, Pikachu, 0
 IniRead, Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, Mewtwo, 0
+IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 
 packArray :=[]
 
@@ -556,6 +556,10 @@ EraseInput(num := 0, total := 0) {
 
 FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
 	global winTitle, failSafe
+	if(slowMotion) {
+		if(imageName = "Platin" || imageName = "One" || imageName = "Two" || imageName = "Three")
+			return true
+	}
 	if(searchVariation = "")
 		searchVariation := 20
 	imagePath := A_ScriptDir . "\" . defaultLanguage . "\"
@@ -637,7 +641,12 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 }
 
 FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", clickx := 0, clicky := 0, sleepTime := "", skip := false, safeTime := 0) {
-	global winTitle, failSafe, confirmed
+	global winTitle, failSafe, confirmed, slowMotion
+	
+	if(slowMotion) {
+		if(imageName = "Platin" || imageName = "One" || imageName = "Two" || imageName = "Three")
+			return true
+	}
 	if(searchVariation = "")
 		searchVariation := 20
 	if (sleepTime = "") {
@@ -1194,7 +1203,7 @@ FindGodPack() {
 			break
 		} else {
 			packs += 1
-			if(deleteMethod = "1 Pack")
+			if(packMethod)
 				packs := 1
 			foundImmersive := FindBorders("immersive")
 			foundCrown := FindBorders("crown")
@@ -1311,6 +1320,7 @@ loadAccount() {
 	waitadb()
 	adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
 	waitadb()
+	Sleep, 1000
 	return loadDir
 }
 
@@ -2482,7 +2492,7 @@ HourglassOpening(HG := false) {
 
 		adbClick(203, 436) ; 203 436
 
-		if(deleteMethod = "1 Pack") {
+		if(packMethod) {
 			AddFriends(true)
 			SelectPack("Tutorial")
 		}
@@ -2669,6 +2679,8 @@ DoWonderPick() {
 		LogToFile("In failsafe for WonderPick. " . failSafeTime "/45 seconds")
 	}
 	Sleep, 300
+	if(slowMotion)
+		Sleep, 3000
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
