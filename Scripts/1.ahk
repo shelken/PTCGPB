@@ -32,7 +32,6 @@ IniRead, folderPath, %A_ScriptDir%\..\Settings.ini, UserSettings, folderPath, C:
 IniRead, discordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, discordWebhookURL, ""
 IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUserId, ""
 IniRead, Columns, %A_ScriptDir%\..\Settings.ini, UserSettings, Columns, 5
-IniRead, openPack, %A_ScriptDir%\..\Settings.ini, UserSettings, openPack, Palkia
 IniRead, godPack, %A_ScriptDir%\..\Settings.ini, UserSettings, godPack, Continue
 IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances, 1
 ;IniRead, setSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, setSpeed, 1x/3x
@@ -1342,7 +1341,7 @@ saveAccount(file := "Valid") {
 		saveDir := A_ScriptDir "\..\Accounts\Saved\" . remainder . "\" . winTitle
 		filePath := saveDir . "\" . A_Now . "_" . winTitle . ".xml"
 	} else if(file = "Valid" || file = "Invalid") {
-		filePath := A_ScriptDir "\..\Accounts\GodPacks\"
+		saveDir := A_ScriptDir "\..\Accounts\GodPacks\"
 		xmlFile := A_Now . "_" . winTitle . "_" . file . "_" . packs . "_packs.xml"
 		filePath := saveDir . xmlFile
 	} else {
@@ -1385,6 +1384,7 @@ saveAccount(file := "Valid") {
 		}
 		count++
 	}
+	msgbox %filePath%
 
 	return xmlFile
 }
