@@ -51,7 +51,6 @@ IniRead, Delay, Settings.ini, UserSettings, Delay, 250
 IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 IniRead, discordWebhookURL, Settings.ini, UserSettings, discordWebhookURL, ""
 IniRead, discordUserId, Settings.ini, UserSettings, discordUserId, ""
-IniRead, changeDate, Settings.ini, UserSettings, ChangeDate, 0100
 IniRead, Columns, Settings.ini, UserSettings, Columns, 5
 IniRead, openPack, Settings.ini, UserSettings, openPack, Palkia
 IniRead, godPack, Settings.ini, UserSettings, godPack, Continue
@@ -80,6 +79,7 @@ IniRead, Mew, Settings.ini, UserSettings, Mew, 0
 IniRead, Pikachu, Settings.ini, UserSettings, Pikachu, 0
 IniRead, Charizard, Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
+IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
 
 Gui, Add, Text, x10 y10, Friend ID:
 ; Add input controls
@@ -245,6 +245,10 @@ SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 Gui, Add, DropDownList, x335 y268 w90 vSelectedMonitorIndex Choose%SelectedMonitorIndex%, %MonitorOptions%
 Gui, Add, Text, x295 y290, Folder Path:
 Gui, Add, Edit, vfolderPath w100 x355 y290 h18, %folderPath%
+if(slowMotion)
+	Gui, Add, Checkbox, Checked vslowMotion x295 y310, Base Game Compatibility
+else
+	Gui, Add, Checkbox, vslowMotion x295 y310, Base Game Compatibility
 
 Gui, Add, Button, gOpenLink x15 y380 w120, Buy Me a Coffee <3
 Gui, Add, Button, gOpenDiscord x145 y380 w120, Join our Discord!
@@ -331,7 +335,6 @@ Start:
 	IniWrite, %folderPath%, Settings.ini, UserSettings, folderPath
 	IniWrite, %discordWebhookURL%, Settings.ini, UserSettings, discordWebhookURL
 	IniWrite, %discordUserId%, Settings.ini, UserSettings, discordUserId
-	IniWrite, %ChangeDate%, Settings.ini, UserSettings, ChangeDate
 	IniWrite, %Columns%, Settings.ini, UserSettings, Columns
 	IniWrite, %openPack%, Settings.ini, UserSettings, openPack
 	IniWrite, %godPack%, Settings.ini, UserSettings, godPack
@@ -360,6 +363,7 @@ Start:
 	IniWrite, %Pikachu%, Settings.ini, UserSettings, Pikachu
 	IniWrite, %Charizard%, Settings.ini, UserSettings, Charizard
 	IniWrite, %Mewtwo%, Settings.ini, UserSettings, Mewtwo
+	IniWrite, %slowMotion%, Settings.ini, UserSettings, slowMotion
 
 	; Loop to process each instance
 	Loop, %Instances%
