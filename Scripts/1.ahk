@@ -260,7 +260,7 @@ Loop {
 	if(nukeAccount && !injectMethod)
 		menuDelete()
 	else
-		RemoveFriends(friendsAdded)
+		RemoveFriends()
 
 	if(injectMethod)
 		loadedAccount := loadAccount()
@@ -291,7 +291,7 @@ Loop {
 }
 return
 
-RemoveFriends(added := 0) {
+RemoveFriends() {
 	global friendIDs, stopToggle, friended
 	failSafe := A_TickCount
 	failSafeTime := 0
@@ -318,32 +318,97 @@ RemoveFriends(added := 0) {
 		CreateStatusMessage("In failsafe for Social. " . failSafeTime "/90 seconds")
 	}
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
+	FindImageAndClick(205, 430, 255, 475, , "Search", 240, 120, 1500)
+	FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 	if(!friendIDs) {
-		if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-			FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
-			FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			adbInput(FriendID)
 			Delay(1)
-			adbClick(143, 503)
-			Delay(1)
-			Delay(1)
-		}
-	}
-	else {
-		removeX := friendIds.MaxIndex()
-		if(added > removeX)
-			removeX := added
-
-		Loop %removeX% {
-			if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
-				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
-				Delay(1)
-				adbClick(143, 503)
-				Delay(1)
-				Delay(1)
-			}
-			else {
+			if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+				FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+				EraseInput(1,1)
+			} else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
 				break
+			}
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for AddFriends1. " . failSafeTime "/45 seconds")
+		}
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			adbClick(232, 453)
+			if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+				break
+			} else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+				FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+				FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+				break
+			} else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+				FindImageAndClick(165, 250, 190, 275, , "Send", 193, 258, 500)
+				break
+			}
+			Sleep, 750
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for AddFriends2. " . failSafeTime "/45 seconds")
+		}
+		n := 1 ;how many friends added needed to return number for remove friends
+	} else {
+		;randomize friend id list to not back up mains if running in groups since they'll be sent in a random order.
+		n := friendIDs.MaxIndex()
+		Loop % n
+		{
+			i := n - A_Index + 1
+			Random, j, 1, %i%
+			; Force string assignment with quotes
+			temp := friendIDs[i] . ""  ; Concatenation ensures string type
+			friendIDs[i] := friendIDs[j] . ""
+			friendIDs[j] := temp . ""
+		}
+		for index, value in friendIDs {
+			if (StrLen(value) != 16) {
+				; Wrong id value
+				continue
+			}
+			failSafe := A_TickCount
+			failSafeTime := 0
+			Loop {
+				adbInput(value)
+				Delay(1)
+				if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+					FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+					EraseInput()
+				} else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
+					break
+				}
+				failSafeTime := (A_TickCount - failSafe) // 1000
+				CreateStatusMessage("In failsafe for AddFriends3. " . failSafeTime "/45 seconds")
+			}
+			failSafe := A_TickCount
+			failSafeTime := 0
+			Loop {
+				adbClick(232, 453)
+				if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+					adbClick(243, 258)
+					Delay(2)
+					break
+				} else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+					FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+					FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+					break
+				} else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+					FindImageAndClick(165, 250, 190, 275, , "Send", 193, 258, 500)
+					break
+				}
+				Sleep, 750
+				failSafeTime := (A_TickCount - failSafe) // 1000
+				CreateStatusMessage("In failsafe for AddFriends4. " . failSafeTime "/45 seconds")
+			}
+			if(index != friendIDs.maxIndex()) {
+				FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
+				FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+				EraseInput(index, n)
 			}
 		}
 	}
@@ -445,9 +510,9 @@ AddFriends(renew := false, getFC := false) {
 					else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
 						if(renew){
 							FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+							FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 							if(!friended)
 								ExitApp
-							FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 							Delay(2)
 							adbClick(243, 258)
 						}
@@ -505,8 +570,6 @@ AddFriends(renew := false, getFC := false) {
 						else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
 							if(renew){
 								FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
-								if(!friended)
-									ExitApp
 								FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 								Delay(2)
 								adbClick(243, 258)
@@ -1121,7 +1184,7 @@ CheckPack() {
 		if(2starCount > 1)
 			foundTS := "Double two star"
 	}
-	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundImmersive || foundCrown || PseudoGodPack) {
+	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundImmersive || foundCrown || 2starCount > 1) {
 		if(loadedAccount)
 			FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
 		if(foundGP)
@@ -1138,8 +1201,8 @@ FoundStars(star) {
 	accountFile := saveAccount(star)
 	friendCode := getFriendCode()
 	if(star = "Crown" || star = "Immersive")
-		RemoveFriends(friendsAdded)
-	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
+		RemoveFriends()
+	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
 	LogToDiscord(logMessage, screenShot, discordUserId)
@@ -1221,7 +1284,7 @@ FindGodPack() {
 			if(invalidGP) {
 				gpFound := true
 				GodPackFound("Invalid")
-				RemoveFriends(friendsAdded)
+				RemoveFriends()
 				break
 			}
 			else {
