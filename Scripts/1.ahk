@@ -346,7 +346,7 @@ RemoveFriends() {
 				FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 				break
 			} else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
-				FindImageAndClick(165, 250, 190, 275, , "Send", 193, 258, 500)
+				FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 500)
 				break
 			}
 			Sleep, 750
@@ -390,15 +390,13 @@ RemoveFriends() {
 			Loop {
 				adbClick(232, 453)
 				if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
-					adbClick(243, 258)
-					Delay(2)
 					break
 				} else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
 					FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
 					FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 					break
 				} else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
-					FindImageAndClick(165, 250, 190, 275, , "Send", 193, 258, 500)
+					FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 500)
 					break
 				}
 				Sleep, 750
