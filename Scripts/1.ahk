@@ -15,7 +15,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS
 scriptName := StrReplace(A_ScriptName, ".ahk")
 winTitle := scriptName
 foundGP := false
@@ -260,7 +260,7 @@ Loop {
 	if(nukeAccount && !injectMethod)
 		menuDelete()
 	else
-		RemoveFriends(friendsAdded)
+		RemoveFriends()
 
 	if(injectMethod)
 		loadedAccount := loadAccount()
@@ -291,7 +291,7 @@ Loop {
 }
 return
 
-RemoveFriends(added := 0) {
+RemoveFriends() {
 	global friendIDs, stopToggle, friended
 	failSafe := A_TickCount
 	failSafeTime := 0
@@ -318,32 +318,95 @@ RemoveFriends(added := 0) {
 		CreateStatusMessage("In failsafe for Social. " . failSafeTime "/90 seconds")
 	}
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
+	FindImageAndClick(205, 430, 255, 475, , "Search", 240, 120, 1500)
+	FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
 	if(!friendIDs) {
-		if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-			FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
-			FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			adbInput(FriendID)
 			Delay(1)
-			adbClick(143, 503)
-			Delay(1)
-			Delay(1)
-		}
-	}
-	else {
-		removeX := friendIds.MaxIndex()
-		if(added > removeX)
-			removeX := added
-
-		Loop %removeX% {
-			if(FindImageAndClick(75, 400, 105, 420, , "Friend", 138, 174, 500, 6)) {
-				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
-				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
-				Delay(1)
-				adbClick(143, 503)
-				Delay(1)
-				Delay(1)
-			}
-			else {
+			if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+				FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+				EraseInput(1,1)
+			} else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
 				break
+			}
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for AddFriends1. " . failSafeTime "/45 seconds")
+		}
+		failSafe := A_TickCount
+		failSafeTime := 0
+		Loop {
+			adbClick(232, 453)
+			if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+				break
+			} else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+				FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+				FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 2000)
+				break
+			} else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+				FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 2000)
+				break
+			}
+			Sleep, 750
+			failSafeTime := (A_TickCount - failSafe) // 1000
+			CreateStatusMessage("In failsafe for AddFriends2. " . failSafeTime "/45 seconds")
+		}
+		n := 1 ;how many friends added needed to return number for remove friends
+	} else {
+		;randomize friend id list to not back up mains if running in groups since they'll be sent in a random order.
+		n := friendIDs.MaxIndex()
+		Loop % n
+		{
+			i := n - A_Index + 1
+			Random, j, 1, %i%
+			; Force string assignment with quotes
+			temp := friendIDs[i] . ""  ; Concatenation ensures string type
+			friendIDs[i] := friendIDs[j] . ""
+			friendIDs[j] := temp . ""
+		}
+		for index, value in friendIDs {
+			if (StrLen(value) != 16) {
+				; Wrong id value
+				continue
+			}
+			failSafe := A_TickCount
+			failSafeTime := 0
+			Loop {
+				adbInput(value)
+				Delay(1)
+				if(FindOrLoseImage(205, 430, 255, 475, , "Search", 0, failSafeTime)) {
+					FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+					EraseInput()
+				} else if(FindOrLoseImage(205, 430, 255, 475, , "Search2", 0, failSafeTime)) {
+					break
+				}
+				failSafeTime := (A_TickCount - failSafe) // 1000
+				CreateStatusMessage("In failsafe for AddFriends3. " . failSafeTime "/45 seconds")
+			}
+			failSafe := A_TickCount
+			failSafeTime := 0
+			Loop {
+				adbClick(232, 453)
+				if(FindOrLoseImage(165, 250, 190, 275, , "Send", 0, failSafeTime)) {
+					break
+				} else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
+					FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+					FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
+					break
+				} else if(FindOrLoseImage(165, 240, 255, 270, , "Withdraw", 0, failSafeTime)) {
+					FindImageAndClick(165, 250, 190, 275, , "Send", 243, 258, 2000)
+					break
+				}
+				Sleep, 750
+				failSafeTime := (A_TickCount - failSafe) // 1000
+				CreateStatusMessage("In failsafe for AddFriends4. " . failSafeTime "/45 seconds")
+			}
+			if(index != friendIDs.maxIndex()) {
+				FindImageAndClick(205, 430, 255, 475, , "Search2", 150, 50, 1500)
+				FindImageAndClick(0, 475, 25, 495, , "OK2", 138, 454)
+				EraseInput(index, n)
 			}
 		}
 	}
@@ -445,9 +508,9 @@ AddFriends(renew := false, getFC := false) {
 					else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
 						if(renew){
 							FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
+							FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 							if(!friended)
 								ExitApp
-							FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 							Delay(2)
 							adbClick(243, 258)
 						}
@@ -505,8 +568,6 @@ AddFriends(renew := false, getFC := false) {
 						else if(FindOrLoseImage(165, 250, 190, 275, , "Accepted", 0, failSafeTime)) {
 							if(renew){
 								FindImageAndClick(135, 355, 160, 385, , "Remove", 193, 258, 500)
-								if(!friended)
-									ExitApp
 								FindImageAndClick(165, 250, 190, 275, , "Send", 200, 372, 500)
 								Delay(2)
 								adbClick(243, 258)
@@ -886,7 +947,7 @@ waitadb() {
 
 restartGameInstance(reason, RL := true){
 	global Delay, scriptName, adbShell, adbPath, adbPort, friended, loadedAccount
-	initializeAdbShell()
+	;initializeAdbShell()
 	CreateStatusMessage("Restarting game reason: `n" reason)
 
 	if(!RL || RL != "GodPack") {
@@ -905,15 +966,17 @@ restartGameInstance(reason, RL := true){
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
 		Reload
 	} else if(RL) {
-		menuDeleteStart()
+		if(menuDeleteStart()) {
+			logMessage := "\n" . username . "\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGot stuck getting friend code."
+			LogToFile(logMessage, "GPlog.txt")
+			LogToDiscord(logMessage, screenShot, discordUserId)
+		}
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
 		Reload
 	}
 }
 
 menuDelete() {
-	if(foundGP)
-		return
 	sleep, %Delay%
 	failSafe := A_TickCount
 	failSafeTime := 0
@@ -976,8 +1039,9 @@ menuDelete() {
 
 menuDeleteStart() {
 	global friended
-	if(foundGP)
-		return
+	if(gpFound) {
+		return gpFound
+	}
 	if(friended) {
 		FindImageAndClick(65, 195, 100, 215, , "Platin", 18, 109, 2000) ; click mod settings
 		if(setSpeed = 3)
@@ -1118,7 +1182,7 @@ CheckPack() {
 		if(2starCount > 1)
 			foundTS := "Double two star"
 	}
-	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundImmersive || foundCrown) {
+	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundImmersive || foundCrown || 2starCount > 1) {
 		if(loadedAccount)
 			FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
 		if(foundGP)
@@ -1135,8 +1199,8 @@ FoundStars(star) {
 	accountFile := saveAccount(star)
 	friendCode := getFriendCode()
 	if(star = "Crown" || star = "Immersive")
-		RemoveFriends(friendsAdded)
-	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
+		RemoveFriends()
+	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
 	LogToDiscord(logMessage, screenShot, discordUserId)
@@ -1179,7 +1243,6 @@ FindGodPack() {
 	}
 	borderCoords := [[20, 284, 90, 286]
 		,[103, 284, 173, 286]]
-	Sleep, 250 ; give time for cards to render
 	if(packs = 3)
 		packs := 0
 	Loop {
@@ -1217,14 +1280,14 @@ FindGodPack() {
 				}
 			}
 			if(invalidGP) {
-				GodPackFound("Invalid")
-				RemoveFriends(friendsAdded)
 				gpFound := true
+				GodPackFound("Invalid")
+				RemoveFriends()
 				break
 			}
 			else {
-				GodPackFound("Valid")
 				gpFound := true
+				GodPackFound("Valid")
 				break
 			}
 		}
@@ -1246,10 +1309,12 @@ GodPackFound(validity) {
 	starCount := 5 - FindBorders("1star")
 	screenShot := Screenshot(validity)
 	accountFile := saveAccount(validity)
+	logMessage := "\n" . username . "\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGetting friend code then sendind discord message."
+	godPackLog = GPlog.txt
+	LogToFile(logMessage, godPackLog)
+	CreateStatusMessage(logMessage)
 	friendCode := getFriendCode()
 	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
-	CreateStatusMessage(logMessage)
-	godPackLog = GPlog.txt
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
 	LogToDiscord(logMessage, screenShot, discordUserId)
@@ -1304,7 +1369,7 @@ loadAccount() {
 		} else return false
 	} else return false
 
-		initializeAdbShell()
+		;initializeAdbShell()
 
 	adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
 
@@ -1325,7 +1390,7 @@ loadAccount() {
 
 saveAccount(file := "Valid") {
 	global adbShell, adbPath, adbPort
-	initializeAdbShell()
+	;initializeAdbShell()
 	currentDate := A_Now
 	year := SubStr(currentDate, 1, 4)
 	month := SubStr(currentDate, 5, 2)
@@ -1388,12 +1453,27 @@ saveAccount(file := "Valid") {
 	return xmlFile
 }
 
+; adbClick(X, Y) {
+	; global adbShell, setSpeed, adbPath, adbPort
+	; initializeAdbShell()
+	; X := Round(X / 277 * 540)
+	; Y := Round((Y - 44) / 489 * 960)
+	; adbShell.StdIn.WriteLine("input tap " X " " Y)
+; }
+
 adbClick(X, Y) {
-	global adbShell, setSpeed, adbPath, adbPort
-	initializeAdbShell()
-	X := Round(X / 277 * 540)
-	Y := Round((Y - 44) / 489 * 960)
-	adbShell.StdIn.WriteLine("input tap " X " " Y)
+    global adbShell
+    static clickCommands := Object()
+    static convX := 540/277, convY := 960/489, offset := -44
+
+    key := X << 16 | Y 
+
+    if (!clickCommands.HasKey(key)) {
+        clickCommands[key] := Format("input tap {} {}"
+            , Round(X * convX)
+            , Round((Y + offset) * convY))
+    }
+    adbShell.StdIn.WriteLine(clickCommands[key])
 }
 
 ControlClick(X, Y) {
@@ -1443,7 +1523,7 @@ ReadFile(filename, numbers := false) {
 
 adbInput(input) {
 	global adbShell, adbPath, adbPort
-	initializeAdbShell()
+	;initializeAdbShell()
 	Delay(3)
 	adbShell.StdIn.WriteLine("input text " . input )
 	Delay(3)
@@ -1451,20 +1531,20 @@ adbInput(input) {
 
 adbInputEvent(event) {
 	global adbShell, adbPath, adbPort
-	initializeAdbShell()
+	;initializeAdbShell()
 	adbShell.StdIn.WriteLine("input keyevent " . event)
 }
 
 adbSwipeUp() {
 	global adbShell, adbPath, adbPort
-	initializeAdbShell()
+	;initializeAdbShell()
 	adbShell.StdIn.WriteLine("input swipe 309 816 309 355 60")
 	waitadb()
 }
 
 adbSwipe() {
 	global adbShell, setSpeed, swipeSpeed, adbPath, adbPort
-	initializeAdbShell()
+	;initializeAdbShell()
 	X1 := 35
 	Y1 := 327
 	X2 := 267
@@ -1503,7 +1583,7 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 
 	if(discordFriends) {
 		for index, value in discordFriends {
-			if(value = discordUserID)
+			if(value = discordUserId)
 				continue
 			discordPing .= "<@" . value . "> "
 		}
@@ -1756,43 +1836,58 @@ bboxAndPause(X1, Y1, X2, Y2, doPause := False) {
 	Gui, BoundingBox:Destroy
 }
 
-; Function to initialize ADB Shell
+
 initializeAdbShell() {
 	global adbShell, adbPath, adbPort
 	RetryCount := 0
 	MaxRetries := 10
 	BackoffTime := 1000  ; Initial backoff time in milliseconds
+	MaxBackoff := 5000   ; Prevent excessive waiting
 
 	Loop {
 		try {
-			if (!adbShell) {
+			if (!adbShell || adbShell.Status != 0) {
+				adbShell := ""  ; Reset before reattempting
+
 				; Validate adbPath and adbPort
 				if (!FileExist(adbPath)) {
-					throw "ADB path is invalid."
+					throw "ADB path is invalid: " . adbPath
 				}
-				if (adbPort < 0 || adbPort > 65535)
-					throw "ADB port is invalid."
+				if (adbPort < 0 || adbPort > 65535) {
+					throw "ADB port is invalid: " . adbPort
+				}
 
+				; Attempt to start adb shell
 				adbShell := ComObjCreate("WScript.Shell").Exec(adbPath . " -s 127.0.0.1:" . adbPort . " shell")
 
+				; Ensure adbShell is running before sending 'su'
+				Sleep, 500
+				if (adbShell.Status != 0) {
+					throw "Failed to start ADB shell."
+				}
+
 				adbShell.StdIn.WriteLine("su")
-			} else if (adbShell.Status != 0) {
-				Sleep, BackoffTime
-				BackoffTime += 1000 ; Increase the backoff time
-			} else {
+			}
+
+			; If adbShell is running, break loop
+			if (adbShell.Status = 0) {
 				break
 			}
 		} catch e {
 			RetryCount++
-			if (RetryCount > MaxRetries) {
-				CreateStatusMessage("Failed to connect to shell: " . e.message)
-				LogToFile("Failed to connect to shell: " . e.message)
+			LogToFile("ADB Shell Error: " . e.message)
+
+			if (RetryCount >= MaxRetries) {
+				CreateStatusMessage("Failed to connect to shell after multiple attempts: " . e.message)
 				Pause
 			}
 		}
+
 		Sleep, BackoffTime
+		BackoffTime := Min(BackoffTime + 1000, MaxBackoff)  ; Limit backoff time
 	}
 }
+
 ConnectAdb() {
 	global adbPath, adbPort, StatusText
 	MaxRetries := 5
@@ -2176,15 +2271,15 @@ DoTutorial() {
 		adbSwipeUp()
 		Sleep, 10
 		if (FindOrLoseImage(120, 70, 150, 95, , "SwipeUp", 0, failSafeTime)){
-		if(setSpeed > 1) {
-			if(setSpeed = 3)
-					FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
-			else
-					FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
-		}
-			adbClick(41, 296)
-				break
+			if(setSpeed > 1) {
+				if(setSpeed = 3)
+						FindImageAndClick(182, 170, 194, 190, , "Three", 187, 180) ; click mod settings
+				else
+						FindImageAndClick(100, 170, 113, 190, , "Two", 107, 180) ; click mod settings
 			}
+			adbClick(41, 296)
+			break
+		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
 		CreateStatusMessage("In failsafe for swipe up. " . failSafeTime "/45 seconds")
 		Delay(1)
@@ -2596,6 +2691,7 @@ HourglassOpening(HG := false) {
 getFriendCode() {
 	global friendCode
 	CreateStatusMessage("Getting friend code")
+	Sleep, 2000
 	FindImageAndClick(233, 486, 272, 519, , "Skip", 146, 494) ;click on next until skip button appears
 	failSafe := A_TickCount
 	failSafeTime := 0
