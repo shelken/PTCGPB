@@ -1317,7 +1317,13 @@ GodPackFound(validity) {
 	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
-	LogToDiscord(logMessage, screenShot, discordUserId)
+
+	; BallCity 2025.02.19 - Adjust the below to only send a 'ping' to Discord friends on Valid packs
+	if(validity = "Valid") {
+		LogToDiscord(logMessage, screenShot, discordUserId)
+	} else {
+		LogToDiscord(logMessage, screenShot)
+	}
 }
 
 loadAccount() {
@@ -1581,7 +1587,8 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
 
-	if(discordFriends) {
+	; BallCity - 20205.02.19 // Add the "ping != false && " piece below in the if statement
+	if(ping != false && discordFriends) {
 		for index, value in discordFriends {
 			if(value = discordUserId)
 				continue
