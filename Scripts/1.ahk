@@ -1,5 +1,9 @@
 #Include %A_ScriptDir%\Include\Gdip_All.ahk
 #Include %A_ScriptDir%\Include\Gdip_Imagesearch.ahk
+
+; BallCity - 2025.20.25 - Add OCR library for Username if Inject is on
+#Include %A_ScriptDir%\Include\OCR.ahk
+
 #SingleInstance on
 ;SetKeyDelay, -1, -1
 SetMouseDelay, -1
@@ -1325,6 +1329,24 @@ GodPackFound(validity) {
 	; BallCity 2025.02.19 - Pull screenshot of the Friend code page; wait so we don't get the clipboard pop up
 	Sleep, 8000
 	fcScreenshot := Screenshot("FRIENDCODE")
+
+	; BallCity 2025.02.20 - If we're doing the inject method, try to OCR our Username
+	if(injectMethod)
+	{
+		try {
+			ocrText := ocr(fcScreenshot, "en")
+			ocrLines := StrSplit(ocrText, "`n")
+			len := ocrLines.MaxIndex()
+			if(len > 1) {
+				playerName := ocrLines[1]
+				playerID := RegExReplace(ocrLines[2], "[^0-9]", "")
+				; playerID := SubStr(ocrLines[2], 1, 19)
+				username := playerName
+			}
+		} catch {
+			LogToFile("Failed to OCR the friend code")
+		}
+	}
 
 	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
 	LogToFile(logMessage, godPackLog)
