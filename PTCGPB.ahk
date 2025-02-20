@@ -17,9 +17,11 @@ if not A_IsAdmin
 	ExitApp
 }
 
+/*
 MsgBox, 64, The project is now licensed under CC BY-NC 4.0, The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community. `nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases.
 
 CheckForUpdate()
+*/
 
 KillADBProcesses()
 
@@ -400,7 +402,7 @@ Start:
 		mminutes := Floor(totalSeconds / 60)
 		if(total = 0)
 			total := "0                             "
-		packStatus := "Time: " . mminutes . "m Packs: " . total
+		packStatus := "Time: " . mminutes . "m Packs: " . total . " Avg: " . Round(total / mminutes, 2) . " packs/min"
 		CreateStatusMessage(packStatus, 287, 490)
 		if(heartBeat)
 			if((A_Index = 1 || (Mod(A_Index, 60) = 0))) {
