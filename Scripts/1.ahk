@@ -1198,12 +1198,19 @@ FoundStars(star) {
 	screenShot := Screenshot(star)
 	accountFile := saveAccount(star)
 	friendCode := getFriendCode()
+
+	; BallCity 2025.02.19 - Pull back screenshot of the friend code/name (good for inject method)
+	Sleep, 8000
+	fcScreenshot := Screenshot("FRIENDCODE")
+
 	if(star = "Crown" || star = "Immersive")
 		RemoveFriends()
 	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
-	LogToDiscord(logMessage, screenShot, discordUserId)
+
+	; BallCity 2025.02.19 - Add Friendcode Screenshot to Discord Log
+	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 }
 
 FindBorders(prefix) {
@@ -1314,13 +1321,19 @@ GodPackFound(validity) {
 	LogToFile(logMessage, godPackLog)
 	CreateStatusMessage(logMessage)
 	friendCode := getFriendCode()
+
+	; BallCity 2025.02.19 - Pull screenshot of the Friend code page; wait so we don't get the clipboard pop up
+	Sleep, 8000
+	fcScreenshot := Screenshot("FRIENDCODE")
+
 	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
 
 	; BallCity 2025.02.19 - Adjust the below to only send a 'ping' to Discord friends on Valid packs
 	if(validity = "Valid") {
-		LogToDiscord(logMessage, screenShot, discordUserId)
+		; BallCity 2025.02.19 - Send the friendcode screenshot to Discord
+		LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 	} else {
 		LogToDiscord(logMessage, screenShot)
 	}
@@ -1601,8 +1614,17 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 		RetryCount := 0
 		Loop {
 			try {
-				; If an image file is provided, send it
-				if (screenshotFile != "") {
+				; BallCity - 2025.02.19 - If TWO image files are provided, send them
+				if(screenshotFile != "" && screenshotFile2 != "" && FileExist(screenshotFile) && FileExist(screenshotFile2))
+				{
+					; Send the image using curl
+					curlCommand := "curl -k "
+						. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
+						. "-F ""file1=@" . screenshotFile . """ "
+						. "-F ""file2=@" . screenshotFile2 . """ "
+						. discordWebhookURL
+					RunWait, %curlCommand%,, Hide
+				} else if (screenshotFile != "") {
 					; Check if the file exists
 					if (FileExist(screenshotFile)) {
 						; Send the image using curl
