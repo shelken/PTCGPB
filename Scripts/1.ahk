@@ -1617,7 +1617,7 @@ Screenshot(filename := "Valid") {
 	return screenshotFile
 }
 
-LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
+LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screenshotFile2 := "") {
 	global discordUserId, discordWebhookURL, friendCode
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
