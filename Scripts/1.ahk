@@ -193,6 +193,7 @@ pToken := Gdip_Startup()
 packs := 0
 
 if(DeadCheck==1) {
+	LogToDiscord("Sup dudes. Not sure what happened, but a script died and I'm doing a menu delete and starting over.")
 	friended:= true
 	menuDeleteStart()
 	IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -236,6 +237,12 @@ if(DeadCheck==1) {
 		Delay(1)
 		packs := 0
 
+		; BallCity 2025.02.21 - Keep track of additional metrics
+		now := A_NowUTC
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastStartTimeUTC
+		EnvSub, now, 1970, seconds
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastStartEpoch
+
 		if(!injectMethod || !loadedAccount)
 			DoTutorial()
 
@@ -273,11 +280,17 @@ if(DeadCheck==1) {
 
 		if(nukeAccount && !injectMethod) {
 			menuDelete()
-			IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 		}else{
 			RemoveFriends()
-			IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 		}
+		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+
+		; BallCity 2025.02.21 - Keep track of additional metrics
+		now := A_NowUTC
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
+		EnvSub, now, 1970, seconds
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
+
 		if(injectMethod)
 			loadedAccount := loadAccount()
 
@@ -987,6 +1000,13 @@ restartGameInstance(reason, RL := true){
 	if(RL = "GodPack") {
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
 		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+
+		; BallCity 2025.02.21 - Keep track of additional metrics
+		now := A_NowUTC
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
+		EnvSub, now, 1970, seconds
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
+
 		Reload
 	} else if(RL) {
 		if(menuDeleteStart()) {
@@ -996,6 +1016,13 @@ restartGameInstance(reason, RL := true){
 			LogToDiscord(logMessage, screenShot, discordUserId)
 		}
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
+
+		; BallCity 2025.02.21 - Keep track of additional metrics
+		now := A_NowUTC
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
+		EnvSub, now, 1970, seconds
+		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
+
 		Reload
 	}
 }
