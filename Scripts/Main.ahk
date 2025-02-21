@@ -222,6 +222,8 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 	}
 	if(imageName = "Country" || imageName = "Social")
 		FSTime := 90
+	else if(imageName = "Button")
+		FSTime := 240
 	else
 		FSTime := 180
 	if (safeTime >= FSTime) {
