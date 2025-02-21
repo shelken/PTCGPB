@@ -80,6 +80,7 @@ IniRead, Pikachu, Settings.ini, UserSettings, Pikachu, 0
 IniRead, Charizard, Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
+IniRead, initialLaunchDelay, Settings.ini, UserSettings, initialLaunchDelay, 0
 
 Gui, Add, Text, x10 y10, Friend ID:
 ; Add input controls
@@ -384,6 +385,10 @@ Start:
 		Command := FileName
 
 		Run, %Command%
+
+		if(initialLaunchDelay > 0) {
+			Sleep, initialLaunchDelay
+		}
 	}
 	if(runMain) {
 		FileName := "Scripts\Main.ahk"
