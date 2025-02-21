@@ -1,1 +1,9 @@
 sample.png
+Monitor.ahk
+MonitorTEST.ahk
+Settings.ini
+HeartBeat.ini
+Screenshots/**/*.png
+Accounts/**/*.xml
+Logs/*
+!Logs/log1.txt
