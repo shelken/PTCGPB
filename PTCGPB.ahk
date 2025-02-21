@@ -305,6 +305,10 @@ ArrangeWindows:
 	GuiControlGet, Instances,, Instances
 	GuiControlGet, Columns,, Columns
 	GuiControlGet, SelectedMonitorIndex,, SelectedMonitorIndex
+	if (runMain) {
+		resetWindows("Main", SelectedMonitorIndex)
+		sleep, 10
+	}
 	Loop %Instances% {
 		resetWindows(A_Index, SelectedMonitorIndex)
 		sleep, 10
@@ -522,46 +526,23 @@ resetWindows(Title, SelectedMonitorIndex){
 	global Columns, runMain
 	RetryCount := 0
 	MaxRetries := 10
-	if(runMain){
-		if(Title = 1) {
-			Loop
-			{
-				try {
-					; Get monitor origin from index
-					SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
-					SysGet, Monitor, Monitor, %SelectedMonitorIndex%
-
-					rowHeight := 533  ; Adjust the height of each row
-					currentRow := Floor((Title - 1) / Columns)
-					y := currentRow * rowHeight
-					x := Mod((Title - 1), Columns) * scaleParam
-					Title := "Main"
-					WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
-					break
-				}
-				catch {
-					if (RetryCount > MaxRetries)
-						Pause
-				}
-				Sleep, 1000
-			}
-			Title := 1
-		}
-	}
 	Loop
 	{
 		try {
 			; Get monitor origin from index
 			SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 			SysGet, Monitor, Monitor, %SelectedMonitorIndex%
-			if(runMain)
-				Title := Title + 1
+			if(runMain) {
+				if (Title = "Main") {
+					instanceIndex := 1
+				} else {
+					instanceIndex := Title + 1
+				}
+			}
 			rowHeight := 533  ; Adjust the height of each row
-			currentRow := Floor((Title - 1) / Columns)
+			currentRow := Floor((instanceIndex - 1) / Columns)
 			y := currentRow * rowHeight
-			x := Mod((Title - 1), Columns) * scaleParam
-			if(runMain)
-				Title := Title - 1
+			x := Mod((instanceIndex - 1), Columns) * scaleParam
 			WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
 			break
 		}
