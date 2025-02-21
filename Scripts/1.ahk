@@ -1001,12 +1001,6 @@ restartGameInstance(reason, RL := true){
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
 		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
-		; BallCity 2025.02.21 - Keep track of additional metrics
-		now := A_NowUTC
-		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
-		EnvSub, now, 1970, seconds
-		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
-
 		Reload
 	} else if(RL) {
 		if(menuDeleteStart()) {
@@ -1016,12 +1010,6 @@ restartGameInstance(reason, RL := true){
 			LogToDiscord(logMessage, screenShot, discordUserId)
 		}
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
-
-		; BallCity 2025.02.21 - Keep track of additional metrics
-		now := A_NowUTC
-		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
-		EnvSub, now, 1970, seconds
-		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
 
 		Reload
 	}
