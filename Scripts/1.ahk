@@ -239,9 +239,9 @@ if(DeadCheck==1) {
 
 		; BallCity 2025.02.21 - Keep track of additional metrics
 		now := A_NowUTC
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastStartTimeUTC
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastStartTimeUTC
 		EnvSub, now, 1970, seconds
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastStartEpoch
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastStartEpoch
 
 		if(!injectMethod || !loadedAccount)
 			DoTutorial()
@@ -287,9 +287,9 @@ if(DeadCheck==1) {
 
 		; BallCity 2025.02.21 - Keep track of additional metrics
 		now := A_NowUTC
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
 		EnvSub, now, 1970, seconds
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
 
 		if(injectMethod)
 			loadedAccount := loadAccount()
@@ -1003,9 +1003,9 @@ restartGameInstance(reason, RL := true){
 
 		; BallCity 2025.02.21 - Keep track of additional metrics
 		now := A_NowUTC
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
 		EnvSub, now, 1970, seconds
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
 
 		Reload
 	} else if(RL) {
@@ -1019,9 +1019,9 @@ restartGameInstance(reason, RL := true){
 
 		; BallCity 2025.02.21 - Keep track of additional metrics
 		now := A_NowUTC
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndTimeUTC
 		EnvSub, now, 1970, seconds
-		IniWrite, now, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
+		IniWrite, %now%, %A_ScriptDir%\%scriptName%.ini, Metrics, LastEndEpoch
 
 		Reload
 	}
