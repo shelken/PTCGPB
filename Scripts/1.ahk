@@ -193,7 +193,7 @@ pToken := Gdip_Startup()
 packs := 0
 
 if(DeadCheck==1) {
-	LogToDiscord("Sup dudes. Not sure what happened, but a script died and I'm doing a menu delete and starting over.")
+	;LogToDiscord("Sup dudes. Not sure what happened, but a script died and I'm doing a menu delete and starting over.")
 	friended:= true
 	menuDeleteStart()
 	IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -441,7 +441,10 @@ RemoveFriends() {
 		}
 	}
 	if(stopToggle)
+	{
+		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 		ExitApp
+	}
 	friended := false
 }
 
