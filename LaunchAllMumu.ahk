@@ -60,9 +60,14 @@ killInstance(instanceNum := "")
 
 checkInstance(instanceNum := "")
 {
-    ; ret := WinExist(instanceNum)
-    WinGet, temp_pid, PID , %instanceNum%
-    return temp_pid
+    ret := WinExist(instanceNum)
+    if(ret)
+    {
+        WinGet, temp_pid, PID, ahk_id %ret%
+        return temp_pid
+    }
+    
+    return ""
 }
 
 launchInstance(instanceNum := "")

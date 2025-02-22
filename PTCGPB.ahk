@@ -399,6 +399,16 @@ Start:
 	SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 	SysGet, Monitor, Monitor, %SelectedMonitorIndex%
 	rerollTime := A_TickCount
+
+	typeMsg := "\nType: " . deleteMethod
+	injectMethod := false
+	if(InStr(deleteMethod, "Inject"))
+		injectMethod := true
+	if(packMethod)
+		typeMsg .= " (One Pack Method)"
+	if(nukeAccount && !injectMethod)
+		typeMsg .= " (Menu Delete)"
+
 	Loop {
 		Sleep, 30000
 		; Sum all variable values and write to total.json
@@ -445,9 +455,11 @@ Start:
 					offlineAHK := "Offline: none."
 				if(onlineAHK = "Online: ")
 					onlineAHK := "Online: none."
+				
+
 
 				discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
-				discMessage .= "\nType: " . deleteMethod . " "
+				discMessage .= typeMsg
 				if(heartBeatName)
 					discordUserID := heartBeatName
 				LogToDiscord(discMessage, , discordUserID)
