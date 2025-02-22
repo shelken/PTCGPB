@@ -2305,7 +2305,12 @@ DoTutorial() {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	Loop {
-		name := ReadFile("usernames")
+		fileName := A_ScriptDir . "\..\usernames.txt"
+		if(FileExist("usernames.txt"))
+			name := ReadFile("usernames")
+		else
+			name := ReadFile("usernames_default")
+
 		Random, randomIndex, 1, name.MaxIndex()
 		username := name[randomIndex]
 		username := SubStr(username, 1, 14)  ;max character limit
