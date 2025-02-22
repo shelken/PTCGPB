@@ -407,7 +407,8 @@ Start:
 		mminutes := Floor(totalSeconds / 60)
 		if(total = 0)
 			total := "0                             "
-		packStatus := "Time: " . mminutes . "m Packs: " . total . " Avg: " . Round(total / mminutes, 2) . " packs/min"
+		packStatus := "Time: " . mminutes . "m Packs: " . total
+		packStatus .= " Avg: " . Round(total / mminutes, 2) . " packs/min"
 		CreateStatusMessage(packStatus, 287, 490)
 		if(heartBeat)
 			if((A_Index = 1 || (Mod(A_Index, 60) = 0))) {
@@ -446,6 +447,7 @@ Start:
 					onlineAHK := "Online: none."
 
 				discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
+				discMessage .= "\nType: " . deleteMethod . " "
 				if(heartBeatName)
 					discordUserID := heartBeatName
 				LogToDiscord(discMessage, , discordUserID)
