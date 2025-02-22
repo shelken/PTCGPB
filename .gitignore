@@ -16,3 +16,4 @@ Scripts/*.ahk
 !Scripts/Main.ahk
 HeartBeat.ini
 Settings.ini
+usernames.txt
