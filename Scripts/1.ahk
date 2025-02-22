@@ -2,7 +2,7 @@
 #Include %A_ScriptDir%\Include\Gdip_Imagesearch.ahk
 
 ; BallCity - 2025.20.25 - Add OCR library for Username if Inject is on
-#Include %A_ScriptDir%\Include\OCR.ahk
+#Include *i %A_ScriptDir%\Include\OCR.ahk
 
 #SingleInstance on
 ;SetKeyDelay, -1, -1
@@ -1376,10 +1376,10 @@ GodPackFound(validity) {
 	fcScreenshot := Screenshot("FRIENDCODE")
 
 	; BallCity 2025.02.20 - If we're doing the inject method, try to OCR our Username
-	if(injectMethod)
+	if(injectMethod && IsFunc("ocr"))
 	{
 		try {
-			ocrText := ocr(fcScreenshot, "en")
+			ocrText := Func("ocr").Call(fcScreenshot, "en")
 			ocrLines := StrSplit(ocrText, "`n")
 			len := ocrLines.MaxIndex()
 			if(len > 1) {
