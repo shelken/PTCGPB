@@ -843,8 +843,7 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 				firstTime := false
 			}
 			if (ElapsedTime >= skip) {
-				Gdip_DisposeImage(pBitmap)
-				return false
+				confirmed := false
 				ElapsedTime := ElapsedTime/2
 				break
 			}
@@ -853,6 +852,7 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
 			break
 		}
 	}
+	Gdip_DisposeImage(pBitmap)
 	return confirmed
 }
 
