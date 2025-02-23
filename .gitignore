@@ -1,5 +1,6 @@
 sample.png
 MonitorTEST.ahk
+MonitorOnce.ahk
 
 Accounts/*
 !Accounts/Saved/1.txt

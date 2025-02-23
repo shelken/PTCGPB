@@ -2,12 +2,12 @@
 CoordMode, Mouse, Screen
 SetTitleMatchMode, 3
 
-;if not A_IsAdmin
-;{
-;    ; Relaunch script with admin rights
-;    Run *RunAs "%A_ScriptFullPath%"
-;    ExitApp
-;}
+if not A_IsAdmin
+{
+    ; Relaunch script with admin rights
+    Run *RunAs "%A_ScriptFullPath%"
+    ExitApp
+}
 
 IniRead, instanceLaunchDelay, Monitor.ini, Settings, instanceLaunchDelay, 5000
 IniRead, waitAfterBulkLaunch, Monitor.ini, Settings, waitAfterBulkLaunch, 20000
@@ -57,8 +57,10 @@ Loop {
 
                 Sleep, %waitAfterBulkLaunch%
 
-                Command := "Scripts\" . scriptName
-                Run, %Command%
+                ;Command := "Scripts\" . scriptName
+                ;Run, %Command%
+			    scriptPath = %A_ScriptDir%\Scripts\%scriptName%
+			    Run "%A_AhkPath%" /restart "%scriptPath%"
                 
                 ; Change the last end date to now so that we don't keep trying to restart this beast
                 IniWrite, %nowEpoch%, %A_ScriptDir%\Scripts\%instanceNum%.ini, Metrics, LastEndEpoch
@@ -86,9 +88,9 @@ killAHK(scriptName := "")
         {
             ID:=IDList%A_Index%
             WinGetTitle, ATitle, ahk_id %ID%
-            if InStr(ATitle, scriptName) {
+            if InStr(ATitle, "\" . scriptName) {
                 ; MsgBox, Killing: %ATitle%
-                WinClose, ahk_id %ID% ;kill
+                WinKill, ahk_id %ID% ;kill
                 ; WinClose, %fullScriptPath% ahk_class AutoHotkey
                 return
             }
@@ -124,7 +126,8 @@ launchInstance(instanceNum := "")
     if(instanceNum != "") {
         mumuNum := getMumuInstanceNumFromPlayerName(instanceNum)
         if(mumuNum != "") {
-            Run, %mumuFolder%\shell\MuMuPlayer.exe -v %mumuNum%
+            ; Run, %mumuFolder%\shell\MuMuPlayer.exe -v %mumuNum%
+			Run_(mumuFolder . "\shell\MuMuPlayer.exe", "-v " . mumuNum)
         }
     }
 }
@@ -161,4 +164,57 @@ getMumuInstanceNumFromPlayerName(scriptName := "") {
 			}
 		}
 	}
+}
+
+; Function to run as a NON-adminstrator, since MuMu has issues if run as Administrator
+; See: https://www.reddit.com/r/AutoHotkey/comments/bfd6o1/how_to_run_without_administrator_privileges/
+/*
+  ShellRun by Lexikos
+    requires: AutoHotkey v1.1
+    license: http://creativecommons.org/publicdomain/zero/1.0/
+
+  Credit for explaining this method goes to BrandonLive:
+  http://brandonlive.com/2008/04/27/getting-the-shell-to-run-an-application-for-you-part-2-how/
+ 
+  Shell.ShellExecute(File [, Arguments, Directory, Operation, Show])
+  http://msdn.microsoft.com/en-us/library/windows/desktop/gg537745
+*/
+Run_(target, args:="", workdir:="") {
+    try
+        ShellRun(target, args, workdir)
+    catch e
+        Run % args="" ? target : target " " args, % workdir
+}
+ShellRun(prms*)
+{
+    shellWindows := ComObjCreate("Shell.Application").Windows
+    VarSetCapacity(_hwnd, 4, 0)
+    desktop := shellWindows.FindWindowSW(0, "", 8, ComObj(0x4003, &_hwnd), 1)
+   
+    ; Retrieve top-level browser object.
+    if ptlb := ComObjQuery(desktop
+        , "{4C96BE40-915C-11CF-99D3-00AA004AE837}"  ; SID_STopLevelBrowser
+        , "{000214E2-0000-0000-C000-000000000046}") ; IID_IShellBrowser
+    {
+        ; IShellBrowser.QueryActiveShellView -> IShellView
+        if DllCall(NumGet(NumGet(ptlb+0)+15*A_PtrSize), "ptr", ptlb, "ptr*", psv:=0) = 0
+        {
+            ; Define IID_IDispatch.
+            VarSetCapacity(IID_IDispatch, 16)
+            NumPut(0x46000000000000C0, NumPut(0x20400, IID_IDispatch, "int64"), "int64")
+           
+            ; IShellView.GetItemObject -> IDispatch (object which implements IShellFolderViewDual)
+            DllCall(NumGet(NumGet(psv+0)+15*A_PtrSize), "ptr", psv
+                , "uint", 0, "ptr", &IID_IDispatch, "ptr*", pdisp:=0)
+           
+            ; Get Shell object.
+            shell := ComObj(9,pdisp,1).Application
+           
+            ; IShellDispatch2.ShellExecute
+            shell.ShellExecute(prms*)
+           
+            ObjRelease(psv)
+        }
+        ObjRelease(ptlb)
+    }
 }
