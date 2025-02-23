@@ -81,6 +81,7 @@ IniRead, Charizard, Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
 IniRead, initialLaunchDelay, Settings.ini, UserSettings, initialLaunchDelay, 0
+IniRead, autoLaunchMonitor, Monitor.ini, UserSettings, autoLaunchMonitor, 0
 
 Gui, Add, Text, x10 y10, Friend ID:
 ; Add input controls
@@ -405,11 +406,18 @@ Start:
 	if(InStr(deleteMethod, "Inject"))
 		injectMethod := true
 	if(packMethod)
-		typeMsg .= " (One Pack Method)"
+		typeMsg .= " (1P Method)"
 	if(nukeAccount && !injectMethod)
 		typeMsg .= " (Menu Delete)"
 
+	loops := 0
 	Loop {
+		loops := loops + 1
+		if(autoLaunchMonitor && loops = 20) {
+			if(FileExist("Monitor.ahk")) {
+				Run, Monitor.ahk
+			}
+		}
 		Sleep, 30000
 		; Sum all variable values and write to total.json
 		total := SumVariablesInJsonFile()
