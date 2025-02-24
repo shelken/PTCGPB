@@ -404,7 +404,19 @@ Start:
 			Sleep, instanceStartDelayMS
 		}
 
+		; Clear out the last run time so that our monitor script doesn't try to kill and refresh this instance right away
+		metricFile := A_ScriptDir . "\Scripts\" . A_Index . ".ini"
+		if (FileExist(metricFile)) {
+			IniWrite, 0, %metricFile%, Metrics, LastEndEpoch
+		}
+
 		Run, %Command%
+	}
+
+	if(autoLaunchMonitor) {
+		if(FileExist("Monitor.ahk")) {
+			Run, Monitor.ahk
+		}
 	}
 
 	if(inStr(FriendID, "https"))
@@ -422,14 +434,7 @@ Start:
 	if(nukeAccount && !injectMethod)
 		typeMsg .= " (Menu Delete)"
 
-	loops := 0
 	Loop {
-		loops := loops + 1
-		if(autoLaunchMonitor && loops = 20) {
-			if(FileExist("Monitor.ahk")) {
-				Run, Monitor.ahk
-			}
-		}
 		Sleep, 30000
 		; Sum all variable values and write to total.json
 		total := SumVariablesInJsonFile()
