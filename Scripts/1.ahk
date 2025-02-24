@@ -1511,15 +1511,15 @@ saveAccount(file := "Valid") {
 	Loop {
 		CreateStatusMessage("Attempting to save account XML. " . count . "/10")
 
+		adbShell.StdIn.WriteLine("rm /sdcard/deviceAccount.xml")
+
+		Sleep, 500
+
 		adbShell.StdIn.WriteLine("cp /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml /sdcard/deviceAccount.xml")
 
 		Sleep, 500
 
 		RunWait, % adbPath . " -s 127.0.0.1:" . adbPort . " pull /sdcard/deviceAccount.xml """ . filePath,, Hide
-
-		Sleep, 500
-
-		adbShell.StdIn.WriteLine("rm /sdcard/deviceAccount.xml")
 
 		Sleep, 500
 
