@@ -218,3 +218,5 @@ ShellRun(prms*)
         ObjRelease(ptlb)
     }
 }
+
+~+F7::ExitApp
