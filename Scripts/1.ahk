@@ -2744,17 +2744,19 @@ createAccountList(instance) {
 	if FileExist(outputTxt) {
 		FileGetTime, fileTime, %outputTxt%, M  ; Get last modified time
 		timeDiff := A_Now - fileTime  ; Calculate time difference
-
 		if (timeDiff > 86400)  ; 24 hours in seconds (60 * 60 * 24)
 			FileDelete, %outputTxt%
 	}
-	if (!FileExist(outputTxt))
+	if (!FileExist(outputTxt)) {
 		Loop, %saveDir%\*.xml {
-			xml := saveDir . "\" A_LoopFileName . ".xml"
+			xml := saveDir . "\" . A_LoopFileName
 			FileGetTime, fileTime, %xml%, M
-			if (timeDiff > 86400)  ; 24 hours in seconds (60 * 60 * 24)
-				FileAppend, % A_LoopFileName "`n", %outputTxt%  ; Append file path to output.txt
+			timeDiff := A_Now - fileTime  ; Calculate time difference
+			if (timeDiff > 86400) {  ; 24 hours in seconds (60 * 60 * 24) 
+				FileAppend, % A_LoopFileName "`n", %outputTxt%  ; Append file path to output.txt\
+			}
 		}
+	}
 }
 
 DoWonderPick() {
