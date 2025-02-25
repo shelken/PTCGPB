@@ -989,10 +989,8 @@ restartGameInstance(reason, RL := true){
 	if(!RL || RL != "GodPack") {
 		adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
 		waitadb()
-		if(!RL) {
-			if(DeadCheck==0)
-				adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
-		}
+		if(!RL && DeadCheck==0)
+			adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
 		;adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
 		waitadb()
 		adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
