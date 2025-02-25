@@ -82,7 +82,7 @@ IniRead, Charizard, Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
 
-IniRead, autoLaunchMonitor, Monitor.ini, UserSettings, autoLaunchMonitor, 0
+IniRead, autoLaunchMonitor, Monitor.ini, Settings, autoLaunchMonitor, 0
 
 Gui, Add, Text, x10 y10, Friend ID:
 ; Add input controls
@@ -414,8 +414,9 @@ Start:
 	}
 
 	if(autoLaunchMonitor) {
-		if(FileExist("Monitor.ahk")) {
-			Run, Monitor.ahk
+		monitorFile := "Monitor.ahk"
+		if(FileExist(monitorFile)) {
+			Run, %monitorFile%
 		}
 	}
 
