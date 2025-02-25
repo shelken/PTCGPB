@@ -5,7 +5,7 @@ SetTitleMatchMode, 3
 
 githubUser := "Arturo-1212"
 repoName := "PTCGPB"
-localVersion := "v6.3.10"
+localVersion := "v6.3.11"
 scriptFolder := A_ScriptDir
 zipPath := A_Temp . "\update.zip"
 extractPath := A_Temp . "\update"
@@ -540,6 +540,7 @@ resetWindows(Title, SelectedMonitorIndex){
 	MaxRetries := 10
 	Loop
 	{
+		msgbox %Title%
 		try {
 			; Get monitor origin from index
 			SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
@@ -550,11 +551,14 @@ resetWindows(Title, SelectedMonitorIndex){
 				} else {
 					instanceIndex := Title + 1
 				}
+			} else {
+				instanceIndex := Title
 			}
 			rowHeight := 533  ; Adjust the height of each row
 			currentRow := Floor((instanceIndex - 1) / Columns)
 			y := currentRow * rowHeight
 			x := Mod((instanceIndex - 1), Columns) * scaleParam
+			msgbox %Title% %x% %y% %scaleParam%
 			WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
 			break
 		}
