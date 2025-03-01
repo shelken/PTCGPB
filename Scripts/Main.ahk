@@ -1,5 +1,10 @@
 #Include %A_ScriptDir%\Include\Gdip_All.ahk
 #Include %A_ScriptDir%\Include\Gdip_Imagesearch.ahk
+
+#Include %A_ScriptDir%\Include\Gdip_Extra.ahk
+#Include %A_ScriptDir%\Include\StringCompare.ahk
+#Include %A_ScriptDir%\Include\OCR.ahk
+
 #SingleInstance on
 ;SetKeyDelay, -1, -1
 SetMouseDelay, -1
@@ -15,6 +20,7 @@ DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
 global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, skipInvalidGP, deleteXML, packs, FriendID, AddFriend, Instances, showStatus
+global triggerTestNeeded, testStartTime, firstRun
 
 deleteAccount := false
 scriptName := StrReplace(A_ScriptName, ".ahk")
@@ -83,16 +89,17 @@ Loop {
 		x4 := x + 5
 		y4 := y + 44
 
-		Gui, New, +Owner%OwnerWND% -AlwaysOnTop +ToolWindow -Caption
-		Gui, Default
-		Gui, Margin, 4, 4  ; Set margin for the GUI
-		Gui, Font, s5 cGray Norm Bold, Segoe UI  ; Normal font for input labels
-		Gui, Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (F5)
-		Gui, Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
-		Gui, Add, Button, x60 y0 w40 h25 gResumeScript, Resume (F6)
-		Gui, Add, Button, x100 y0 w30 h25 gStopScript, Stop (F7)
-		Gui, Add, Button, x130 y0 w40 h25 gShowStatusMessages, Status (F8)
-		Gui, Show, NoActivate x%x4% y%y4% AutoSize
+		Gui, Toolbar: New, +Owner%OwnerWND% -AlwaysOnTop +ToolWindow -Caption
+		Gui, Toolbar: Default
+		Gui, Toolbar: Margin, 4, 4  ; Set margin for the GUI
+		Gui, Toolbar: Font, s5 cGray Norm Bold, Segoe UI  ; Normal font for input labels
+		Gui, Toolbar: Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (F5)
+		Gui, Toolbar: Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
+		Gui, Toolbar: Add, Button, x60 y0 w30 h25 gResumeScript, Resume (F6)
+		Gui, Toolbar: Add, Button, x90 y0 w30 h25 gStopScript, Stop (F7)
+		Gui, Toolbar: Add, Button, x120 y0 w30 h25 gShowStatusMessages, Status (F8)
+		Gui, Toolbar: Add, Button, x150 y0 w30 h25 gTestScript, GP Test (F9) ; hoytdj Add
+		Gui, Toolbar: Show, NoActivate x%x4% y%y4% AutoSize
 		break
 	}
 	catch {
@@ -118,6 +125,14 @@ if(heartBeat)
 FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 1000, 150)
 firstRun := true
 Loop {
+	; hoytdj Add + 6
+	if (GPTest) {
+		if (triggerTestNeeded)
+			HoytdjTestScript()
+		Sleep, 1000
+		Continue
+	}
+
 	if(heartBeat)
 		IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 	Sleep, %Delay%
@@ -160,11 +175,13 @@ Loop {
 						adbClick(210, 210)
 					}
 				}
+				if (GPTest)
+					break
 				failSafeTime := (A_TickCount - failSafe) // 1000
 				CreateStatusMessage("Failsafe " . failSafeTime "/180 seconds")
 			}
 		}
-		if(done || fullList)
+		if(done || fullList|| GPTest)
 			break
 	}
 }
@@ -387,6 +404,7 @@ resetWindows(){
 restartGameInstance(reason, RL := true){
 	global Delay, scriptName, adbShell, adbPath, adbPort
 	initializeAdbShell()
+	; hoytdj DEBUG
 	CreateStatusMessage("Restarting game reason: " reason)
 
 	adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
@@ -419,7 +437,7 @@ CreateStatusMessage(Message, GuiName := 50, X := 0, Y := 80) {
 	if(!showStatus)
 		return
 	try {
-		GuiName := GuiName
+		;GuiName := GuiName ; hoytdj Removed
 		WinGetPos, xpos, ypos, Width, Height, %winTitle%
 		X := X + xpos + 5
 		Y := Y + ypos
@@ -429,11 +447,11 @@ CreateStatusMessage(Message, GuiName := 50, X := 0, Y := 80) {
 			Y := 0
 
 		; Create a new GUI with the given name, position, and message
-		Gui, %GuiName%:New, -AlwaysOnTop +ToolWindow -Caption
-		Gui, %GuiName%:Margin, 2, 2  ; Set margin for the GUI
-		Gui, %GuiName%:Font, s8  ; Set the font size to 8 (adjust as needed)
-		Gui, %GuiName%:Add, Text, vStatusText, %Message%
-		Gui, %GuiName%:Show, NoActivate x%X% y%Y% AutoSize, NoActivate %GuiName%
+		Gui, StatusMessage: New, -AlwaysOnTop +ToolWindow -Caption
+		Gui, StatusMessage: Margin, 2, 2  ; Set margin for the GUI
+		Gui, StatusMessage: Font, s8  ; Set the font size to 8 (adjust as needed)
+		Gui, StatusMessage: Add, Text, vStatusText, %Message%
+		Gui, StatusMessage: Show, NoActivate x%X% y%Y% AutoSize, NoActivate %GuiName%
 	}
 }
 
@@ -605,15 +623,23 @@ return
 
 ToggleTestScript()
 {
-	global GPTest
+	global GPTest, triggerTestNeeded, testStartTime, firstRun
 	if(!GPTest) {
-		CreateStatusMessage("In GP Test Mode")
 		GPTest := true
+		triggerTestNeeded := true
+		testStartTime := A_TickCount
+		CreateStatusMessage("In GP Test Mode")
 	}
 	else {
-		CreateStatusMessage("Exiting GP Test Mode")
-		;Winset, Alwaysontop, On, %winTitle%
 		GPTest := false
+		triggerTestNeeded := false
+		totalTestTime := (A_TickCount - testStartTime) // 1000
+		if (testStartTime != "" && (totalTestTime >= 180))
+		{
+			firstRun := True
+			testStartTime := ""
+		}
+		CreateStatusMessage("Exiting GP Test Mode")		
 	}
 }
 
@@ -742,6 +768,7 @@ from_window(ByRef image) {
 ~+F6::Pause
 ~+F7::ExitApp
 ~+F8::ToggleStatusMessages()
+~+F9::ToggleTestScript() ; hoytdj Add
 
 ToggleStatusMessages() {
 	if(showStatus)
@@ -960,4 +987,323 @@ IsLeapYear(year) {
 ; msgbox ss
 ; pToken := Gdip_Startup()
 ; Screenshot()
+; return
+
+cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, moveWindow := True, revertWindow := True, blowupPercent := 200)
+{
+    if(moveWindow) {
+        if(revertWindow) {
+            WinGetPos, srcX, srcY, srcW, srcH, %winTitle%
+        }
+
+        WinMove, %winTitle%, , 0, 0, 550, 1015
+        Sleep, 100
+    }
+    hwnd := WinExist(winTitle)
+    pBitmap := from_window(hwnd) ; Gdip_BitmapFromScreen( "hwnd: " . hwnd)
+    ;;;;Gdip_SaveBitmapToFile(pBitmap, "src.jpg")
+
+    pBitmap2 := Gdip_CropImage(pBitmap, x, y, width, height)
+    pBitmap3 := Gdip_ResizeBitmap(pBitmap2, blowupPercent, true)
+    hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap3)
+    ;;hBitmap2 := ToGrayscale(hBitmap)
+
+    ;;;; ret := SavePicture(hBitmap, "biggrey1.png")
+    pIRandomAccessStream := HBitmapToRandomAccessStream(hBitmap)
+    text := ocr(pIRandomAccessStream, "en")
+    ;;;; MsgBox %text%
+
+    DeleteObject(hBitmap)
+    ;;DeleteObject(hBitmap2)
+    Gdip_DisposeImage(pBitmap)
+    Gdip_DisposeImage(pBitmap2)
+    Gdip_DisposeImage(pBitmap3)
+
+    if(revertWindow && moveWindow) {
+        WinMove, %winTitle%, , srcX, srcY, srcW, srcH
+        Sleep, 100
+    }
+
+    return text
+}
+
+
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; ~~~ hoytdj Everying Below ~~~
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; TODO: Better isolate name spaces
+
+HoytdjTestScript() {
+	global triggerTestNeeded
+	triggerTestNeeded := false
+	RemoveNonVipFriends()
+
+	;test := GetCurrentFriendCount()
+	;test := GetFriendCode()
+	;MsgBox, % """" test """"
+}
+
+GetCurrentFriendCount()
+{
+	global winTitle
+	
+    ; Parse friendCount status from screen
+    ; Expected output something like "Number of friends 42/99"
+    ; friendCount := GetTextFromInstance(winTitle, 127, 108, 37, 22)
+    ; Remove "Number of friends", everything after "/", and trim spaces
+	friendCount := cropAndOcr("Main", 234, 172, 90, 40, True, True, 200)
+    friendCount := RegExReplace(RegExReplace(Trim(friendCount, " `t`r`n"), "^Number of friends\s*"), "\s*/.*$") + 0
+	Delay(3)
+    return friendCount
+}
+
+GetFriendCode(blowUp := 200)
+{
+	global winTitle
+	
+    ; Parse friendCode status from screen
+    ; Expected output something like "1234-5678-1234-5678"
+	GUI, Toolbar: Hide
+	GUI, StatusMessage: Hide
+    ; friendCode := GetTextFromInstance(winTitle, 174, 75, 98, 13, blowUp)
+	friendCount := cropAndOcr("Main", 234, 172, 90, 40, True, True, blowUp)
+	GUI, Toolbar: Show, NoActivate
+	GUI, StatusMessage: Show, NoActivate
+    friendCode := RegExReplace(Trim(friendCode, " `t`r`n"), "\D")
+	Delay(3)
+    return friendCode
+}
+
+IsVipId(inputString, vipIdsArray, ByRef matchedId)
+{
+    ; Initialize output to empty
+    matchedId := ""
+
+    ; Loop over each ID in the array
+	for index, id in vipIdsArray {
+		; Compare the line to the input string using SimilarityScore
+        similarity := SimilarityScore(inputString, id)
+
+		; If similarity is greater than 60%
+		if (similarity > 0.6) {
+			matchedId := id  ; Store the matched line in the matchedId variable
+			Return true  ; Return true if a match is found
+		}
+    }
+
+    ; Return false if no match is found
+    Return false
+}
+
+ReadIDsFromFile(filePath, ByRef idCount) {
+    ids := []  ; Initialize an empty array
+    idCount := 0  ; Initialize ID count
+
+    ; Check if file exists
+    if !FileExist(filePath) {
+        CreateStatusMessage("Error - File not found: " . filePath)
+        return ids
+    }
+
+    ; Read file line by line
+    Loop, Read, %filePath%
+    {
+        trimmedLine := Trim(A_LoopReadLine)  ; Remove leading/trailing spaces
+        if (trimmedLine != "") {  ; Ignore empty lines
+            ids.Push(trimmedLine)  ; Add ID to the array
+            idCount++
+        }
+    }
+
+    return ids
+}
+
+RemoveNonVipFriends() {
+	global GPTest
+	failSafe := A_TickCount
+	failSafeTime := 0
+	Loop {
+		adbClick(143, 518)
+		if(FindOrLoseImage(120, 500, 155, 530, , "Social", 0, failSafeTime))
+			break
+		else if(FindOrLoseImage(175, 165, 255, 235, , "Hourglass3", 0)) {
+			Delay(3)
+			adbClick(146, 441) ; 146 440
+			Delay(3)
+			adbClick(146, 441)
+			Delay(3)
+			adbClick(146, 441)
+			Delay(3)
+
+			FindImageAndClick(98, 184, 151, 224, , "Hourglass1", 168, 438, 500, 5) ;stop at hourglasses tutorial 2
+			Delay(1)
+
+			adbClick(203, 436) ; 203 436
+		}
+		Sleep, 500
+		failSafeTime := (A_TickCount - failSafe) // 1000
+		CreateStatusMessage("In failsafe for Social. " . failSafeTime "/90 seconds")
+	}
+	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
+	Delay(3)
+
+	; Get VIP IDs and target friend count using ReadIDsFromFile()
+	vipIdsArray := ReadIDsFromFile(A_ScriptDir . "\..\vip_ids.txt", vipIdCount)
+	if (vipIdCount = 0) {
+		CreateStatusMessage("Error - No IDs found in vip_ids.txt")
+		return
+	}
+
+	friendIndex := 0
+	repeatFriendCodes := 0
+	recentFriendCodes := []
+	Loop {
+		; ; Get GetCurrentFriendCount and compare to target friend count
+		; ; Removing all this and relying on duplicate FC parsing.
+		; failSafe := A_TickCount
+		; failSafeTime := 0
+		; Loop {
+		; 	currentFriendCount := GetCurrentFriendCount()
+		; 	if (RegExMatch(currentFriendCount, "^\d{1,2}$")) {
+		; 		break
+		; 	}
+		; 	failSafeTime := (A_TickCount - failSafe) // 1000
+		; 	if (failSafeTime > 5) {
+		; 		CreateStatusMessage("Couldn't parse friend count. Abandoning...`nParsed friend count: " . currentFriendCount)
+		; 		return
+		; 	}
+		; }
+		; if (currentFriendCount <= vipIdCount) {
+		; 	CreateStatusMessage("Current friend count: " . currentFriendCount . "`nTarget friend count: " . vipIdCount . "`nReady to test.")
+		; 	break
+		; }
+
+		friendClickY := 195 + (95 * friendIndex)
+		if (FindImageAndClick(75, 400, 105, 420, , "Friend", 138, friendClickY, 500, 3)) {
+			Delay(1)
+			; Get the friend code
+			failSafe := A_TickCount
+			failSafeTime := 0
+			Loop {
+				blowUp := [200, 200, 500, 1000, 2000, 100]
+				friendCode := GetFriendCode(blowUp[A_Index])
+				if (RegExMatch(friendCode, "^\d{14,17}$")) {
+					break
+				}
+				failSafeTime := (A_TickCount - failSafe) // 1000
+				if (failSafeTime > 5) {
+					CreateStatusMessage("Couldn't parse friend code. Abandoning...`nParsed friend code: " . friendCode)
+					return
+				}
+			}
+			; Check if this is a repeat
+			if (IsRecentlyCheckedId(friendCode, recentFriendCodes)) {
+				repeatFriendCodes++
+			}
+			else {
+				repeatFriendCodes := 0
+			}
+			if (repeatFriendCodes > 2) {
+				;CreateStatusMessage("Parsed the same friend code 3 times. Abandoning...`nParsed friend code: " . friendCode)
+				CreateStatusMessage("End of list - parsed the same friend codes multiple times.`nReady to test.")
+				adbClick(143, 507)
+				return
+			}
+			if (true || IsVipId(friendCode, vipIdsArray, matchedId)) {
+				; If it's a VIP friend, skip removal
+				CreateStatusMessage("Parsed friend code: " . friendCode . "`nMatched friend code: " . matchedId . "`nSkipping VIP...")
+				Delay(4) ; DEBUG
+				FindImageAndClick(226, 100, 270, 135, , "Add", 143, 507, 500)
+				Delay(2)
+				if (friendIndex < 2)
+					friendIndex++
+				else {
+					adbSwipeFriend()
+					;adbGestureFriend()
+					friendIndex := 0
+				}
+			}
+			else {
+				; If NOT a VIP remove the friend
+				CreateStatusMessage("Parsed friend code: " . friendCode . "`nNo match VIP match found.`nRemoving friend...")
+				Delay(4) ; DEBUG
+				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
+				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
+				Delay(1)
+				FindImageAndClick(226, 100, 270, 135, , "Add", 143, 507, 500)
+				Delay(3)
+			}
+		}
+		else {
+			; Handling for account not currently in use
+			FindImageAndClick(226, 100, 270, 135, , "Add", 143, 508, 500)
+			Delay(3)
+		}
+		if (!GPTest) {
+			Return
+		}
+	}
+}
+
+; Function to check if ID exists in the list and update it
+; Parameters:
+;   id - The ID to check
+;   IDList - The list of IDs (passed by reference and updated)
+; Returns true if ID is found, false otherwise
+IsRecentlyCheckedId(id, ByRef IDList) {
+    ; Check if the ID is already in the list
+    for index, value in IDList {
+        if (value = id) {
+            return true  ; ID found
+        }
+    }
+
+    ; If the ID is not found, replace the oldest entry
+    if (IDList.MaxIndex() > 5) {
+        ; Remove the oldest ID (first item)
+        IDList.Remove(1)
+    }
+
+    ; Add the new ID to the end of the list
+    IDList.Push(id)
+
+    return false  ; ID was not found and has been added
+}
+
+Delay(n) {
+	global Delay
+	msTime := Delay * n
+	Sleep, msTime
+}
+
+adbSwipeFriend() {
+	global adbShell
+	initializeAdbShell()
+	X1 := 138
+	Y1 := 380
+	X2 := 138
+	Y2 := 200
+
+	adbShell.StdIn.WriteLine("input swipe " . X1 . " " . Y1 . " " . X2 . " " . Y2 . " " . 300)
+	Sleep, 1000
+ }
+
+adbGestureFriend() {
+	; The idea is to drag up and hold, in order to scroll in a controlled way
+	; Unfortunately, touchscreen gesture doesn't seem to be supported
+	global adbShell
+	initializeAdbShell()
+	X := 138
+	Y1 := 380
+	Y2 := 90
+	duration := 2000
+
+	adbShell.StdIn.WriteLine("input touchscreen gesture 0 " . duration . " " . X . " " . Y1 . " " . X . " " . Y2 . " " . X . " " . Y2)
+	Delay(1)
+}
+
+; DEBUG
+; F1::
+; 	MouseGetPos, mouseX, mouseY  ; Retrieves the mouse cursor's X and Y positions
+; 	CreateStatusMessage("Mouse coordinates - X: " . mouseX . " Y: " . mouseY )
 ; return
