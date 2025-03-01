@@ -35,8 +35,46 @@ If (!pToken := Gdip_Startup())
 	Return
 }
 
+friendId := cropAndOcr("Main", 122, 483, 300, 33) ;, True, True, 200)
+friendName := cropAndOcr("Main", 336, 106, 188, 20)
+msgbox, %friendId% `n %friendName%
+ExitApp
+
 ; 330 100 180 20 
 
+
+if(true)
+{
+;;    WinMove, Main, , 0,0, 520, 960
+;; pBitmap2 := Gdip_CropImage(pBitmap, 315, 102, 180, 20)
+    WinMove, Main, , 0, 0, 550, 1015
+    hwnd := WinExist("Main")
+    pBitmap := from_window(hwnd) ; Gdip_BitmapFromScreen( "hwnd: " . hwnd)
+    Gdip_SaveBitmapToFile(pBitmap, "src.jpg")
+
+
+    ;;pBitmap2 := Gdip_CropImage(pBitmap, 174, 74, 100, 15)
+    pBitmap2 := Gdip_CropImage(pBitmap, 122, 483, 300, 33)
+    ;;pBitmap2 := Gdip_CropImage(pBitmap, 0, 0, 500, 800)
+    pBitmap3 := Gdip_ResizeBitmap(pBitmap2, 200, true)
+    hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap3)
+    ;;hBitmap2 := ToGrayscale(hBitmap)
+
+    ret := SavePicture(hBitmap, "biggrey1.png")
+    pIRandomAccessStream := HBitmapToRandomAccessStream(hBitmap)
+    text := ocr(pIRandomAccessStream, "en")
+    MsgBox %text%
+
+    DeleteObject(hBitmap)
+    DeleteObject(hBitmap2)
+    Gdip_DisposeImage(pBitmap)
+    Gdip_DisposeImage(pBitmap2)
+    Gdip_DisposeImage(pBitmap3)
+
+    ExitApp	
+}
+
+; Below works well for Friend ID
 if(true)
 {
 ;;    WinMove, Main, , 0,0, 520, 960
@@ -252,4 +290,44 @@ from_window(ByRef image) {
 	DllCall("DeleteDC",	 "ptr", hdc)
 
 	return pBitmap
+}
+
+
+
+cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, moveWindow := True, revertWindow := True, blowupPercent := 200)
+{
+    if(moveWindow) {
+        if(revertWindow) {
+            WinGetPos, srcX, srcY, srcW, srcH, %winTitle%
+        }
+
+        WinMove, %winTitle%, , 0, 0, 550, 1015
+        Sleep, 200
+    }
+    hwnd := WinExist(winTitle)
+    pBitmap := from_window(hwnd) ; Gdip_BitmapFromScreen( "hwnd: " . hwnd)
+    ;;;;Gdip_SaveBitmapToFile(pBitmap, "src.jpg")
+
+    pBitmap2 := Gdip_CropImage(pBitmap, x, y, width, height)
+    pBitmap3 := Gdip_ResizeBitmap(pBitmap2, blowupPercent, true)
+    hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap3)
+    ;;hBitmap2 := ToGrayscale(hBitmap)
+
+    ;;;; ret := SavePicture(hBitmap, "biggrey1.png")
+    pIRandomAccessStream := HBitmapToRandomAccessStream(hBitmap)
+    text := ocr(pIRandomAccessStream, "en")
+    ;;;; MsgBox %text%
+
+    DeleteObject(hBitmap)
+    ;;DeleteObject(hBitmap2)
+    Gdip_DisposeImage(pBitmap)
+    Gdip_DisposeImage(pBitmap2)
+    Gdip_DisposeImage(pBitmap3)
+
+    if(revertWindow && moveWindow) {
+        WinMove, %winTitle%, , srcX, srcY, srcW, srcH
+        Sleep, 200
+    }
+
+    return text
 }
