@@ -1066,7 +1066,7 @@ GetFriendCode(blowUp := 200)
 	GUI, Toolbar: Hide
 	GUI, StatusMessage: Hide
     ; friendCode := GetTextFromInstance(winTitle, 174, 75, 98, 13, blowUp)
-	friendCount := cropAndOcr("Main", 234, 172, 90, 40, True, True, blowUp)
+	friendCount := cropAndOcr("Main", 336, 106, 188, 20, True, True, blowUp)
 	GUI, Toolbar: Show, NoActivate
 	GUI, StatusMessage: Show, NoActivate
     friendCode := RegExReplace(Trim(friendCode, " `t`r`n"), "\D")
