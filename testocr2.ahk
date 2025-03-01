@@ -35,10 +35,10 @@ If (!pToken := Gdip_Startup())
 	Return
 }
 
-;;;friendId := cropAndOcr("Main", 122, 483, 300, 33) ;, True, True, 200)
-;;;friendName := cropAndOcr("Main", 336, 106, 188, 20)
-;;;msgbox, %friendId% `n %friendName%
-;;;ExitApp
+friendCode := cropAndOcr("Main", 336, 106, 188, 20)
+friendName := cropAndOcr("Main", 122, 483, 300, 33) ;, True, True, 200)
+msgbox, %friendCode% `n %friendName%
+ExitApp
 
 
 
