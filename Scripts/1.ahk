@@ -5,11 +5,8 @@
 #Include *i %A_ScriptDir%\Include\OCR.ahk
 
 #SingleInstance on
-;SetKeyDelay, -1, -1
 SetMouseDelay, -1
 SetDefaultMouseSpeed, 0
-;SetWinDelay, -1
-;SetControlDelay, -1
 SetBatchLines, -1
 SetTitleMatchMode, 3
 CoordMode, Pixel, Screen
@@ -40,7 +37,6 @@ IniRead, discordUserId, %A_ScriptDir%\..\Settings.ini, UserSettings, discordUser
 IniRead, Columns, %A_ScriptDir%\..\Settings.ini, UserSettings, Columns, 5
 IniRead, godPack, %A_ScriptDir%\..\Settings.ini, UserSettings, godPack, Continue
 IniRead, Instances, %A_ScriptDir%\..\Settings.ini, UserSettings, Instances, 1
-;IniRead, setSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, setSpeed, 1x/3x
 IniRead, defaultLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, defaultLanguage, Scale125
 IniRead, SelectedMonitorIndex, %A_ScriptDir%\..\Settings.ini, UserSettings, SelectedMonitorIndex, 1
 IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 300
@@ -69,22 +65,16 @@ IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 
 
-packArray :=[]
+pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus"]
 
-if(Palkia)
-	packArray.push("Palkia")
-if(Dialga)
-	packArray.push("Dialga")
-if(Mew)
-	packArray.push("Mew")
-if(Pikachu)
-	packArray.push("Pikachu")
-if(Charizard)
-	packArray.push("Charizard")
-if(Mewtwo)
-	packArray.push("Mewtwo")
-if(Arceus)
-	packArray.push("Arceus")
+packArray := []  ; Initialize an empty array
+
+Loop, % pokemonList.MaxIndex()  ; Loop through the array
+{
+    pokemon := pokemonList[A_Index]  ; Get the variable name as a string
+    if (%pokemon%)  ; Dereference the variable using %pokemon%
+        packArray.push(pokemon)  ; Add the name to packArray
+}
 
 changeDate := getChangeDateTime() ; get server reset time
 
@@ -107,9 +97,7 @@ if(!adbPort) {
 }
 
 ; connect adb
-instanceSleep := scriptName * 1000
-Sleep, %instanceSleep%
-
+Sleep, % scriptName * 1000
 ; Attempt to connect to ADB
 ConnectAdb()
 
@@ -2555,13 +2543,13 @@ SelectPack(HG := false) {
 	}
 	FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
 	if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard") {
-		packy := 440
+		packy := 442
 		if(openPack = "Pikachu"){
-			packx := 125
+			packx := 264
 		} else if(openPack = "Mewtwo"){
-			packx := 65
+			packx := 206
 		} else if(openPack = "Charizard"){
-			packx := 26
+			packx := 180
 		}
 		FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 245, 475)
 		FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
