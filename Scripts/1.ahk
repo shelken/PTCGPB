@@ -65,7 +65,6 @@ IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
 
-
 pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus"]
 
 packArray := []  ; Initialize an empty array
@@ -619,6 +618,14 @@ AddFriends(renew := false, getFC := false) {
 		count++
 	}
 	return n ;return added friends so we can dynamically update the .txt in the middle of a run without leaving friends at the end
+}
+
+ChooseTag() {
+	FindImageAndClick(120, 500, 155, 530, , "Social", 143, 518, 500)
+	FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500) 212 276 230 294
+	FindImageAndClick(203, 272, 237, 300, , "Profile", 143, 95, 500)
+	FindImageAndClick(205, 310, 220, 319, , "ChosenTag", 143, 306, 1000)
+	FindImageAndClick(53, 218, 63, 228, , "Badge", 143, 466, 500)
 }
 
 EraseInput(num := 0, total := 0) {
@@ -1245,6 +1252,8 @@ FoundStars(star) {
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
 	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
+	if(star != "Crown" && star != "Immersive")
+		ChooseTag()
 }
 
 FindBorders(prefix) {
@@ -1390,6 +1399,7 @@ GodPackFound(validity) {
 	; Adjust the below to only send a 'ping' to Discord friends on Valid packs
 	if(validity = "Valid") {
 		LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
+		ChooseTag()
 	} else {
 		LogToDiscord(logMessage, screenShot)
 	}
