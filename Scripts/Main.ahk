@@ -1,9 +1,9 @@
 #Include %A_ScriptDir%\Include\Gdip_All.ahk
 #Include %A_ScriptDir%\Include\Gdip_Imagesearch.ahk
 
-#Include %A_ScriptDir%\Include\Gdip_Extra.ahk
-#Include %A_ScriptDir%\Include\StringCompare.ahk
-#Include %A_ScriptDir%\Include\OCR.ahk
+#Include *i %A_ScriptDir%\Include\Gdip_Extra.ahk
+#Include *i %A_ScriptDir%\Include\StringCompare.ahk
+#Include *i %A_ScriptDir%\Include\OCR.ahk
 
 #SingleInstance on
 ;SetKeyDelay, -1, -1
@@ -1029,21 +1029,6 @@ cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, move
     return text
 }
 
-/*
-Loop {
-	blowUp := [200, 200, 500, 1000, 2000, 100]
-	friendCode := GetFriendCode(blowUp[A_Index])
-	if (RegExMatch(friendCode, "^\d{14,17}$")) {
-		break
-	}
-	failSafeTime := (A_TickCount - failSafe) // 1000
-	if (failSafeTime > 5) {
-		CreateStatusMessage("Couldn't parse friend code. Abandoning...`nParsed friend code: " . friendCode)
-		return
-	}
-}
-*/
-
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; ~~~ hoytdj Everying Below ~~~
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1175,16 +1160,16 @@ RemoveNonVipFriends() {
 
 
 
-GetFriendCode() {
+GetFriendCode(blowupPercent := 200) {
 	global winTitle
-	ocrText := cropAndOcr(winTitle, 336, 106, 188, 20, True, True)
+	ocrText := cropAndOcr(winTitle, 336, 106, 188, 20, True, True, blowupPercent)
 	friendCode := RegExReplace(Trim(ocrText, " `t`r`n"), "\D")
 	return friendCode
 }
 
-GetFriendName() {
+GetFriendName(blowupPercent := 200) {
 	global winTitle
-	ocrText := cropAndOcr(winTitle, 122, 483, 300, 33, True, True)
+	ocrText := cropAndOcr(winTitle, 122, 483, 300, 33, True, True, blowupPercent)
 	friendName := Trim(ocrText, " `t`r`n")
 	return friendName
 }
@@ -1247,8 +1232,9 @@ ParseFriendCode(ByRef friendCode) {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	parseFriendCodeResult := False
+	blowUp := [200, 200, 500, 1000, 2000, 100, 250, 300, 350, 400, 450, 550, 600, 700, 800, 900]
 	Loop {
-		friendCode := GetFriendCode()
+		friendCode := GetFriendCode(blowUp[A_Index])
 		if (RegExMatch(friendCode, "^\d{14,17}$")) {
 			parseFriendCodeResult := True
 			break
@@ -1266,8 +1252,9 @@ ParseFriendName(ByRef friendName) {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	parseFriendNameResult := False
+	blowUp := [200, 200, 500, 1000, 2000, 100, 250, 300, 350, 400, 450, 550, 600, 700, 800, 900]
 	Loop {
-		friendName := GetFriendName()
+		friendName := GetFriendName(blowUp[A_Index])
 		if (RegExMatch(friendName, "^[a-zA-Z0-9]{5,20}$")) {
 			parseFriendNameResult := True
 			break
