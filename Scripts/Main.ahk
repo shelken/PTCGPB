@@ -999,7 +999,7 @@ cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, move
         }
 
         WinMove, %winTitle%, , 0, 0, 550, 1015
-        Sleep, 100
+        Delay(1)
     }
     hwnd := WinExist(winTitle)
     pBitmap := from_window(hwnd) ; Gdip_BitmapFromScreen( "hwnd: " . hwnd)
@@ -1023,7 +1023,7 @@ cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, move
 
     if(revertWindow && moveWindow) {
         WinMove, %winTitle%, , srcX, srcY, srcW, srcH
-        Sleep, 100
+        Delay(1)
     }
 
     return text
@@ -1069,10 +1069,10 @@ RemoveNonVipFriends() {
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
 	Delay(3)
 
-	;if (vipIdsURL != "" && !DownloadFile(vipIdsURL, "vip_ids.txt")) {
-	;	CreateStatusMessage("Failed to download vip_ids.txt. Aborting test...")
-	;	return
-	;}
+	if (vipIdsURL != "" && !DownloadFile(vipIdsURL, "vip_ids.txt")) {
+		CreateStatusMessage("Failed to download vip_ids.txt. Aborting test...")
+		return
+	}
 
 	includesIdsAndNames := false
 	vipFriendsArray :=  ParseFriendAccounts(A_ScriptDir . "\..\vip_ids.txt", includesIdsAndNames)
@@ -1114,8 +1114,10 @@ RemoveNonVipFriends() {
 			isVipResult := IsFriendAccountInList(friendAccount, vipFriendsArray, matchedFriend)
 			if (isVipResult || !parseFriendResult) {
 				; If we couldn't parse the friend, skip removal
-				if (!parseFriendResult)
+				if (!parseFriendResult) {
 					CreateStatusMessage("Couldn't parse friend. Skipping friend...`nParsed friend: " . friendAccount.ToString())
+					LogToFile("Friend skipped: " . friendAccount.ToString() . ". Couldn't parse identifiers.", "GPTestLog.txt")
+				}
 				; If it's a VIP friend, skip removal	
 				if (isVipResult)
 					CreateStatusMessage("Parsed friend: " . friendAccount.ToString() . "`nMatched VIP: " . matchedFriend.ToString() . "`nSkipping VIP...")
@@ -1133,6 +1135,7 @@ RemoveNonVipFriends() {
 			else {
 				; If NOT a VIP remove the friend
 				CreateStatusMessage("Parsed friend: " . friendAccount.ToString() . "`nNo VIP match found.`nRemoving friend...")
+				LogToFile("Friend removed: " . friendAccount.ToString() . ". No VIP match found.", "GPTestLog.txt")
 				Sleep, 1500 ; Time to read
 				FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)
 				FindImageAndClick(70, 395, 100, 420, , "Send2", 200, 372, 500)
@@ -1377,6 +1380,7 @@ adbSwipeFriend() {
 	Y1 := 380
 	Y2 := 200
 
+	Delay(1)
 	adbShell.StdIn.WriteLine("input swipe " . X . " " . Y1 . " " . X . " " . Y2 . " " . 300)
 	Sleep, 1000
  }
@@ -1388,6 +1392,7 @@ adbSwipeFriend() {
 	Y1 := 380
 	Y2 := 355
 
+	Delay(1)
 	adbShell.StdIn.WriteLine("input swipe " . X . " " . Y1 . " " . X . " " . Y2 . " " . 200)
 	Sleep, 500
  }
@@ -1411,6 +1416,26 @@ Delay(n) {
 	global Delay
 	msTime := Delay * n
 	Sleep, msTime
+}
+
+DownloadFile(url, filename) {
+	url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+	localPath = %A_ScriptDir%\..\%filename% ; Change to the folder you want to save the file
+	errored := false
+	try {
+		whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+		whr.Open("GET", url, true)
+		whr.Send()
+		whr.WaitForResponse()
+		contents := whr.ResponseText
+	} catch {
+		errored := true
+	}
+	if(!errored) {
+		FileDelete, %localPath%
+		FileAppend, %contents%, %localPath%
+	}
+	return !errored
 }
 
 
