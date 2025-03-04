@@ -428,7 +428,7 @@ Start:
 		}
 	}
 
-	if(inStr(FriendID, "https"))
+	if(inStr(FriendID, "http"))
 		DownloadFile(FriendID, "ids.txt")
 	SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 	SysGet, Monitor, Monitor, %SelectedMonitorIndex%
