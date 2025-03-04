@@ -49,6 +49,7 @@ IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 1
 if(heartBeat)
 	IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 IniRead, vipIdsURL, %A_ScriptDir%\..\Settings.ini, UserSettings, vipIdsURL
+IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, "en"
 
 adbPort := findAdbPorts(folderPath)
 
@@ -994,6 +995,8 @@ IsLeapYear(year) {
 ; friendCode := cropAndOcr("Main", 336, 106, 188, 20, True, True, blowUp)
 cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, moveWindow := True, revertWindow := True, blowupPercent := 200)
 {
+	global ocrLanguage
+
     if(moveWindow) {
         if(revertWindow) {
             WinGetPos, srcX, srcY, srcW, srcH, %winTitle%
@@ -1013,7 +1016,7 @@ cropAndOcr(winTitle := "Main", x := 0, y := 0, width := 200, height := 200, move
 
     ;;;; ret := SavePicture(hBitmap, "biggrey1.png")
     pIRandomAccessStream := HBitmapToRandomAccessStream(hBitmap)
-    text := ocr(pIRandomAccessStream, "en")
+    text := ocr(pIRandomAccessStream, ocrLanguage)
     ;;;; MsgBox %text%
 
     DeleteObject(hBitmap)
