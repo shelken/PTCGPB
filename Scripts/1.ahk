@@ -1367,10 +1367,10 @@ GodPackFound(validity) {
 	fcScreenshot := Screenshot("FRIENDCODE")
 
 	; BallCity 2025.02.20 - If we're doing the inject method, try to OCR our Username
-	if(injectMethod && IsFunc("ocr"))
+	if(injectMethod && IsFunc("ocr_from_file"))
 	{
 		try {
-			ocrText := Func("ocr").Call(fcScreenshot, "en")
+			ocrText := Func("ocr_from_file").Call(fcScreenshot, "en")
 			ocrLines := StrSplit(ocrText, "`n")
 			len := ocrLines.MaxIndex()
 			if(len > 1) {
