@@ -48,6 +48,7 @@ IniRead, sendXML, %A_ScriptDir%\..\Settings.ini, UserSettings, sendXML, 0
 IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 1
 if(heartBeat)
 	IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
+IniRead, vipIdsURL, %A_ScriptDir%\..\Settings.ini, UserSettings, vipIdsURL
 
 adbPort := findAdbPorts(folderPath)
 
@@ -1088,7 +1089,7 @@ RemoveNonVipFriends() {
 		friendClickY := 195 + (95 * friendIndex)
 		if (FindImageAndClick(75, 400, 105, 420, , "Friend", 138, friendClickY, 500, 3)) {
 			Delay(1)
-			
+
 			; Get the friend account
 			friendCode := ""
 			friendName := ""
