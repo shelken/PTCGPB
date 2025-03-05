@@ -63,6 +63,7 @@ IniRead, Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
+IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, "en"
 
 
 pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus"]
@@ -1339,7 +1340,7 @@ FindGodPack() {
 }
 
 GodPackFound(validity) {
-	global scriptName, DeadCheck
+	global scriptName, DeadCheck, ocrLanguage
 
 	if(validity = "Valid") {
 		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -1370,7 +1371,7 @@ GodPackFound(validity) {
 	if(injectMethod && IsFunc("ocr_from_file"))
 	{
 		try {
-			ocrText := Func("ocr_from_file").Call(fcScreenshot, "en")
+			ocrText := Func("ocr_from_file").Call(fcScreenshot, ocrLanguage)
 			ocrLines := StrSplit(ocrText, "`n")
 			len := ocrLines.MaxIndex()
 			if(len > 1) {
