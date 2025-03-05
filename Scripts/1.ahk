@@ -1462,6 +1462,9 @@ loadAccount() {
 	adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
 	waitadb()
 	Sleep, 1000
+
+	FileSetTime,, loadDir
+
 	return loadDir
 }
 
