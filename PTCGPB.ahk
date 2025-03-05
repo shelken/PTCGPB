@@ -152,15 +152,15 @@ else if (deleteMethod = "3 Pack")
     defaultDelete := 2
 else if (deleteMethod = "Inject")
     defaultDelete := 3
-Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x270 y43 w100 Background2A2A2A cWhite, 5 Pack|3 Pack|Inject
-Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x270 y70 c39FF14", 1 Pack Method
-Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x270 y95 c39FF14", Menu Delete Account
+Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x325 y40 w100 Background2A2A2A cWhite, 5 Pack|3 Pack|Inject
+Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x265 y70 c39FF14", 1 Pack Method
+Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x265 y95 c39FF14", Menu Delete Account
 
 ; Pack Selection Section
 Gui, Add, GroupBox, x255 y120 w240 h120 cFFD700, Pack Selection ; Gold
-Gui, Add, Checkbox, % (Arceus ? "Checked" : "") " vArceus x270 y145 cFFD700", Arceus
-Gui, Add, Checkbox, % (Palkia ? "Checked" : "") " vPalkia x270 y165 cFFD700", Palkia
-Gui, Add, Checkbox, % (Dialga ? "Checked" : "") " vDialga x270 y185 cFFD700", Dialga
+Gui, Add, Checkbox, % (Arceus ? "Checked" : "") " vArceus x265 y145 cFFD700", Arceus
+Gui, Add, Checkbox, % (Palkia ? "Checked" : "") " vPalkia x265 y165 cFFD700", Palkia
+Gui, Add, Checkbox, % (Dialga ? "Checked" : "") " vDialga x265 y185 cFFD700", Dialga
 Gui, Add, Checkbox, % (Pikachu ? "Checked" : "") " vPikachu x350 y145 cFFD700", Pikachu
 Gui, Add, Checkbox, % (Charizard ? "Checked" : "") " vCharizard x350 y165 cFFD700", Charizard
 Gui, Add, Checkbox, % (Mewtwo ? "Checked" : "") " vMewtwo x350 y185 cFFD700", Mewtwo
@@ -168,12 +168,12 @@ Gui, Add, Checkbox, % (Mew ? "Checked" : "") " vMew x350 y205 cFFD700", Mew
 
 ; Card Detection Section
 Gui, Add, GroupBox, x255 y240 w240 h120 cFF4500, Card Detection ; Orange Red
-Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x270 y270 cFF4500", Single Full Art
-Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x270 y290 cFF4500", Single Trainer
-Gui, Add, Checkbox, % (RainbowCheck ? "Checked" : "") " vRainbowCheck x270 y310 cFF4500", Single Rainbow
-Gui, Add, Checkbox, % (PseudoGodPack ? "Checked" : "") " vPseudoGodPack x270 y330 cFF4500", Double 2 Star
-Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x370 y270 cFF4500", Save Crowns
-Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x370 y290 cFF4500", Save Immersives
+Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x265 y265 cFF4500", Single Full Art
+Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x265 y285 cFF4500", Single Trainer
+Gui, Add, Checkbox, % (RainbowCheck ? "Checked" : "") " vRainbowCheck x265 y305 cFF4500", Single Rainbow
+Gui, Add, Checkbox, % (PseudoGodPack ? "Checked" : "") " vPseudoGodPack x265 y325 cFF4500", Double 2 Star
+Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x370 y265 cFF4500", Save Crowns
+Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x370 y285 cFF4500", Save Immersives
 
 ; OCR Section
 Gui, Add, GroupBox, x255 y360 w240 h60 cWhite, OCR Detection ; Orange Red
