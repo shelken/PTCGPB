@@ -101,7 +101,7 @@ else
     Gui, Add, Edit, vFriendID w180 x35 y15 h20 -E0x200 Background2A2A2A cWhite, %FriendID%
 
 ; Instance Settings Section
-Gui, Add, GroupBox, x5 y40 w240 h120 cWhite, Instance Settings
+Gui, Add, GroupBox, x5 y40 w240 h125 cWhite, Instance Settings
 Gui, Add, Text, x20 y65 cWhite, Instances:
 Gui, Add, Edit, vInstances w50 x110 y63 h20 -E0x200 Background2A2A2A cWhite Center, %Instances%
 Gui, Add, Text, x20 y90 cWhite, Start Delay:
@@ -111,17 +111,17 @@ Gui, Add, Edit, vColumns w50 x110 y113 h20 -E0x200 Background2A2A2A cWhite Cente
 Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain x20 y140 cWhite", Run Main
 
 ; Time Settings Section
-Gui, Add, GroupBox, x5 y160 w240 h120 c9370DB, Time Settings ; Purple
-Gui, Add, Text, x20 y185 c9370DB, Delay:
-Gui, Add, Edit, vDelay w70 x110 y183 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
-Gui, Add, Text, x20 y215 c9370DB, Wait Time:
-Gui, Add, Edit, vwaitTime w70 x110 y213 h20 -E0x200 Background2A2A2A cWhite Center, %waitTime%
-Gui, Add, Text, x20 y245 c9370DB, Swipe Speed:
-Gui, Add, Edit, vswipeSpeed w70 x110 y243 h20 -E0x200 Background2A2A2A cWhite Center, %swipeSpeed%
+Gui, Add, GroupBox, x5 y165 w240 h125 c9370DB, Time Settings ; Purple
+Gui, Add, Text, x20 y190 c9370DB, Delay:
+Gui, Add, Edit, vDelay w70 x110 y188 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
+Gui, Add, Text, x20 y220 c9370DB, Wait Time:
+Gui, Add, Edit, vwaitTime w70 x110 y218 h20 -E0x200 Background2A2A2A cWhite Center, %waitTime%
+Gui, Add, Text, x20 y250 c9370DB, Swipe Speed:
+Gui, Add, Edit, vswipeSpeed w70 x110 y248 h20 -E0x200 Background2A2A2A cWhite Center, %swipeSpeed%
 
 ; System Settings Section
-Gui, Add, GroupBox, x5 y280 w240 h140 c4169E1, System Settings ; Royal Blue
-Gui, Add, Text, x20 y305 c4169E1, Monitor:
+Gui, Add, GroupBox, x5 y290 w240 h130 c4169E1, System Settings ; Royal Blue
+Gui, Add, Text, x20 y310 c4169E1, Monitor:
 SysGet, MonitorCount, MonitorCount
 MonitorOptions := ""
 Loop, %MonitorCount% {
@@ -130,9 +130,9 @@ Loop, %MonitorCount% {
     MonitorOptions .= (A_Index > 1 ? "|" : "") "" A_Index ": (" MonitorRight - MonitorLeft "x" MonitorBottom - MonitorTop ")"
 }
 SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
-Gui, Add, DropDownList, x20 y325 w200 vSelectedMonitorIndex Choose%SelectedMonitorIndex% Background2A2A2A cWhite, %MonitorOptions%
-Gui, Add, Text, x20 y355 c4169E1, Folder Path:
-Gui, Add, Edit, vfolderPath w200 x20 y375 h20 -E0x200 Background2A2A2A cWhite, %folderPath%
+Gui, Add, DropDownList, x20 y330 w200 vSelectedMonitorIndex Choose%SelectedMonitorIndex% Background2A2A2A cWhite, %MonitorOptions%
+Gui, Add, Text, x20 y360 c4169E1, Folder Path:
+Gui, Add, Edit, vfolderPath w200 x20 y380 h20 -E0x200 Background2A2A2A cWhite, %folderPath%
 
 ;if(slowMotion)
 	;Gui, Add, Checkbox, Checked vslowMotion x270 y375, Base Game Compatibility
@@ -233,7 +233,7 @@ if (heartBeat) {
 }
 
 ; ========== Download Settings Section (full width) ========== 
-Gui, Add, GroupBox, x5 y420 w740 h120 cWhite, Download Settings ;
+Gui, Add, GroupBox, x5 y425 w740 h120 cWhite, Download Settings ;
 
 if(StrLen(mainIdsURL) < 3)
     mainIdsURL =
