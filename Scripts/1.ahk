@@ -1463,7 +1463,7 @@ loadAccount() {
 	waitadb()
 	Sleep, 1000
 
-	FileSetTime,, loadDir
+	FileSetTime,, %loadDir%
 
 	return loadDir
 }
