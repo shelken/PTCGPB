@@ -85,6 +85,7 @@ IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
 
 IniRead, autoLaunchMonitor, Monitor.ini, Settings, autoLaunchMonitor, 0
 IniRead, mainIdsURL, Settings.ini, UserSettings, mainIdsURL, ""
+IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -212,11 +213,11 @@ Gui, Add, Text, x510 y195 c4169E1, Folder Path:
 Gui, Add, Edit, vfolderPath w200 x510 y215 h20 -E0x200 Background2A2A2A cWhite, %folderPath%
 
 ; ========== Action Buttons ==========
-Gui, Add, Button, gOpenLink x495 y300 w115 h30 +Default, Buy Me a Coffee 
-Gui, Add, Button, gOpenDiscord x495 y340 w115 h30, Join Discord 
-Gui, Add, Button, gCheckForUpdates x620 y300 w115 h30, Check Updates 
-Gui, Add, Button, gArrangeWindows x620 y340 w115 h30, Arrange Windows 
-Gui, Add, Button, gStart x495 y380 w240 h40 +Default Background39FF14 cBlack, START BOT 
+Gui, Add, Button, gOpenLink x495 y250 w115 h30 +Default, Buy Me a Coffee 
+Gui, Add, Button, gOpenDiscord x495 y290 w115 h30, Join Discord 
+Gui, Add, Button, gCheckForUpdates x620 y250 w115 h30, Check Updates 
+Gui, Add, Button, gArrangeWindows x620 y290 w115 h30, Arrange Windows 
+Gui, Add, Button, gStart x495 y330 w240 h40 +Default Background39FF14 cBlack, START BOT 
 
 if (defaultLanguage = "Scale125") {
     defaultLang := 1
@@ -225,6 +226,15 @@ if (defaultLanguage = "Scale125") {
     defaultLang := 2  
     scaleParam := 287
 }
+
+; ========== Download Settings Section ==========
+Gui, Add, GroupBox, x5 y420 w730 h120  cWhite, Download Settings ;
+Gui, Add, Text, x20 y440 cWhite, ids.txt API:
+Gui, Add, Edit, vmainIdsURL w540 x20 y460 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
+
+Gui, Add, Text, x20 y480 cWhite, vip_ids.txt (GP Test Mode) API:
+Gui, Add, Edit, vvipIdsURL w540 x20 y500 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
+
 
 Gui, Show, , %localVersion% PTCGPB Bot Setup [Non-Commercial 4.0 International License]
 Return
@@ -330,6 +340,8 @@ Start:
 	IniWrite, %Charizard%, Settings.ini, UserSettings, Charizard
 	IniWrite, %Mewtwo%, Settings.ini, UserSettings, Mewtwo
 	IniWrite, %slowMotion%, Settings.ini, UserSettings, slowMotion
+	IniWrite, %mainIdsURL%, Settings.ini, UserSettings, mainIdsURL
+	IniWrite, %vipIdsURL%, Settings.ini, UserSettings, vipIdsURL
 
 	; Download a new Main ID file prior to running the rest of the below
 	if(mainIdsURL != "") {
