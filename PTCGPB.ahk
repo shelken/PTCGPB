@@ -84,7 +84,7 @@ IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
 IniRead, ocrLanguage, Settings.ini, UserSettings, ocrLanguage, en
 
-IniRead, autoLaunchMonitor, Monitor.ini, Settings, autoLaunchMonitor, 0
+IniRead, autoLaunchMonitor, Settings.ini, UserSettings, autoLaunchMonitor, 1
 IniRead, mainIdsURL, Settings.ini, UserSettings, mainIdsURL, ""
 IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
 
@@ -368,9 +368,12 @@ Start:
 	IniWrite, %Charizard%, Settings.ini, UserSettings, Charizard
 	IniWrite, %Mewtwo%, Settings.ini, UserSettings, Mewtwo
 	IniWrite, %slowMotion%, Settings.ini, UserSettings, slowMotion
+
 	IniWrite, %ocrLanguage%, Settings.ini, UserSettings, ocrLanguage
 	IniWrite, %mainIdsURL%, Settings.ini, UserSettings, mainIdsURL
 	IniWrite, %vipIdsURL%, Settings.ini, UserSettings, vipIdsURL
+	IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
+
 
 	; Download a new Main ID file prior to running the rest of the below
 	if(mainIdsURL != "") {
