@@ -240,10 +240,10 @@ if(StrLen(mainIdsURL) < 3)
 if(StrLen(vipIdsURL) < 3)
     vipIdsURL = 
 
-Gui, Add, Text, x20 y440 cWhite, ids.txt API:
-Gui, Add, Edit, vmainIdsURL w700 x20 y460 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
-Gui, Add, Text, x20 y480 cWhite, vip_ids.txt (GP Test Mode) API:
-Gui, Add, Edit, vvipIdsURL w700 x20 y500 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
+Gui, Add, Text, x20 y445 cWhite, ids.txt API:
+Gui, Add, Edit, vmainIdsURL w700 x20 y465 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
+Gui, Add, Text, x20 y485 cWhite, vip_ids.txt (GP Test Mode) API:
+Gui, Add, Edit, vvipIdsURL w700 x20 y505 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
 
 ; ========== Action Buttons (bottom) ==========
 Gui, Add, Button, gOpenLink x505 y390 w115 h30 +Default, Buy Me a Coffee 
