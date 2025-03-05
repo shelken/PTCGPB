@@ -93,8 +93,9 @@ ocr(file, lang := "FirstFromAvailableLanguages")
       }
       if (OcrEngine = 0)
       {
-         msgbox Can not use language "%lang%" for OCR, please install language pack.
-         ExitApp
+;         msgbox Can not use language "%lang%" for OCR, please install language pack.
+;         ExitApp
+         return False
       }
       CurrentLanguage := lang
    }
@@ -106,8 +107,9 @@ ocr(file, lang := "FirstFromAvailableLanguages")
    DllCall(NumGet(NumGet(BitmapFrame+0)+13*A_PtrSize), "ptr", BitmapFrame, "uint*", height)   ; get_PixelHeight
    if (width > MaxDimension) or (height > MaxDimension)
    {
-      msgbox Image is too big - %width%x%height%.`nIt should be maximum - %MaxDimension% pixels
-      ExitApp
+;      msgbox Image is too big - %width%x%height%.`nIt should be maximum - %MaxDimension% pixels
+;      ExitApp
+      return False
    }
    BitmapFrameWithSoftwareBitmap := ComObjQuery(BitmapDecoder, IBitmapFrameWithSoftwareBitmap := "{FE287C9A-420C-4963-87AD-691436E08383}")
    DllCall(NumGet(NumGet(BitmapFrameWithSoftwareBitmap+0)+6*A_PtrSize), "ptr", BitmapFrameWithSoftwareBitmap, "ptr*", SoftwareBitmap)   ; GetSoftwareBitmapAsync
@@ -191,8 +193,9 @@ ocr_from_file(file, lang := "FirstFromAvailableLanguages")
       }
       if (OcrEngine = 0)
       {
-         msgbox Can not use language "%lang%" for OCR, please install language pack.
-         ExitApp
+;         msgbox Can not use language "%lang%" for OCR, please install language pack.
+;         ExitApp
+         return False
       }
       CurrentLanguage := lang
    }
@@ -200,8 +203,9 @@ ocr_from_file(file, lang := "FirstFromAvailableLanguages")
       file := A_ScriptDir "\" file
    if !FileExist(file) or InStr(FileExist(file), "D")
    {
-      msgbox File "%file%" does not exist
-      ExitApp
+;      msgbox File "%file%" does not exist
+;      ExitApp
+      return False
    }
    VarSetCapacity(GUID, 16)
    DllCall("ole32\CLSIDFromString", "wstr", IID_RandomAccessStream := "{905A0FE1-BC53-11DF-8C49-001E4FC686DA}", "ptr", &GUID)
@@ -213,8 +217,9 @@ ocr_from_file(file, lang := "FirstFromAvailableLanguages")
    DllCall(NumGet(NumGet(BitmapFrame+0)+13*A_PtrSize), "ptr", BitmapFrame, "uint*", height)   ; get_PixelHeight
    if (width > MaxDimension) or (height > MaxDimension)
    {
-      msgbox Image is too big - %width%x%height%.`nIt should be maximum - %MaxDimension% pixels
-      ExitApp
+;      msgbox Image is too big - %width%x%height%.`nIt should be maximum - %MaxDimension% pixels
+;      ExitApp
+      return False
    }
    BitmapFrameWithSoftwareBitmap := ComObjQuery(BitmapDecoder, IBitmapFrameWithSoftwareBitmap := "{FE287C9A-420C-4963-87AD-691436E08383}")
    DllCall(NumGet(NumGet(BitmapFrameWithSoftwareBitmap+0)+6*A_PtrSize), "ptr", BitmapFrameWithSoftwareBitmap, "ptr*", SoftwareBitmap)   ; GetSoftwareBitmapAsync
@@ -289,8 +294,9 @@ WaitForAsync(ByRef Object)
          if (status != 1)
          {
             DllCall(NumGet(NumGet(AsyncInfo+0)+8*A_PtrSize), "ptr", AsyncInfo, "uint*", ErrorCode)   ; IAsyncInfo.ErrorCode
-            msgbox AsyncInfo status error: %ErrorCode%
-            ExitApp
+;            msgbox AsyncInfo status error: %ErrorCode%
+;            ExitApp
+            return False
          }
          ObjRelease(AsyncInfo)
          break

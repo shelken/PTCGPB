@@ -1073,6 +1073,7 @@ RemoveNonVipFriends() {
 	FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
 	Delay(3)
 
+	CreateStatusMessage("Downloading vip_ids.txt.")
 	if (vipIdsURL != "" && !DownloadFile(vipIdsURL, "vip_ids.txt")) {
 		CreateStatusMessage("Failed to download vip_ids.txt. Aborting test...")
 		return
