@@ -91,7 +91,7 @@ IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
 Gui, Font, s10 cWhite, Segoe UI ; Modern font
 
-; ========== Colonna 1 ========== 
+; ========== Column 1 ========== 
 ; Friend ID Section
 Gui, Add, GroupBox, x5 y0 w240 h40 cWhite, Friend ID
 if(FriendID = "ERROR" || FriendID = "")
@@ -102,21 +102,21 @@ else
 ; Instance Settings Section
 Gui, Add, GroupBox, x5 y45 w240 h120 cWhite, Instance Settings
 Gui, Add, Text, x20 y65 cWhite, Instances:
-Gui, Add, Edit, vInstances w50 x100 y63 h20 -E0x200 Background2A2A2A cWhite Center, %Instances%
+Gui, Add, Edit, vInstances w50 x110 y63 h20 -E0x200 Background2A2A2A cWhite Center, %Instances%
 Gui, Add, Text, x20 y90 cWhite, Start Delay:
-Gui, Add, Edit, vinstanceStartDelay w50 x100 y88 h20 -E0x200 Background2A2A2A cWhite Center, %instanceStartDelay%
+Gui, Add, Edit, vinstanceStartDelay w50 x110 y88 h20 -E0x200 Background2A2A2A cWhite Center, %instanceStartDelay%
 Gui, Add, Text, x20 y115 cWhite, Columns:
-Gui, Add, Edit, vColumns w50 x100 y113 h20 -E0x200 Background2A2A2A cWhite Center, %Columns%
+Gui, Add, Edit, vColumns w50 x110 y113 h20 -E0x200 Background2A2A2A cWhite Center, %Columns%
 Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain x20 y140 cWhite", Run Main
 
 ; Time Settings Section
 Gui, Add, GroupBox, x5 y170 w240 h120 c9370DB, Time Settings ; Purple
 Gui, Add, Text, x20 y190 c9370DB, Delay:
-Gui, Add, Edit, vDelay w70 x100 y188 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
+Gui, Add, Edit, vDelay w70 x110 y188 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
 Gui, Add, Text, x20 y220 c9370DB, Wait Time:
-Gui, Add, Edit, vwaitTime w70 x100 y218 h20 -E0x200 Background2A2A2A cWhite Center, %waitTime%
+Gui, Add, Edit, vwaitTime w70 x110 y218 h20 -E0x200 Background2A2A2A cWhite Center, %waitTime%
 Gui, Add, Text, x20 y250 c9370DB, Swipe Speed:
-Gui, Add, Edit, vswipeSpeed w70 x100 y248 h20 -E0x200 Background2A2A2A cWhite Center, %swipeSpeed%
+Gui, Add, Edit, vswipeSpeed w70 x110 y248 h20 -E0x200 Background2A2A2A cWhite Center, %swipeSpeed%
 
 ; System Settings Section
 Gui, Add, GroupBox, x5 y295 w240 h120 c4169E1, System Settings ; Royal Blue
@@ -133,13 +133,13 @@ Gui, Add, DropDownList, x20 y335 w200 vSelectedMonitorIndex Choose%SelectedMonit
 Gui, Add, Text, x20 y365 c4169E1, Folder Path:
 Gui, Add, Edit, vfolderPath w200 x20 y385 h20 -E0x200 Background2A2A2A cWhite, %folderPath%
 
-if(slowMotion)
-	Gui, Add, Checkbox, Checked vslowMotion x270 y375, Base Game Compatibility
-else
-	Gui, Add, Checkbox, vslowMotion x270 y375, Base Game Compatibility
+;if(slowMotion)
+	;Gui, Add, Checkbox, Checked vslowMotion x270 y375, Base Game Compatibility
+;else
+	;Gui, Add, Checkbox, vslowMotion x270 y375, Base Game Compatibility
 
 
-; ========== Colonna 2 ========== 
+; ========== Column 2 ========== 
 ; God Pack Settings Section
 Gui, Add, GroupBox, x255 y0 w240 h120 c39FF14, God Pack Settings ; Neon green
 Gui, Add, Text, x270 y20 c39FF14, Min. 2 Stars:
@@ -174,7 +174,7 @@ Gui, Add, Checkbox, % (PseudoGodPack ? "Checked" : "") " vPseudoGodPack x270 y33
 Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x370 y270 cFF4500", Save Crowns
 Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x370 y290 cFF4500", Save Immersives
 
-; ========== Colonna 3 ========== 
+; ========== Column 3 ========== 
 ; Discord Settings Section
 Gui, Add, GroupBox, x505 y0 w240 h120 cFF69B4, Discord Settings ; Hot pink
 if(StrLen(discordUserID) < 3)
@@ -182,9 +182,9 @@ if(StrLen(discordUserID) < 3)
 if(StrLen(discordWebhookURL) < 3)
     discordWebhookURL = 
 Gui, Add, Text, x520 y20 cFF69B4, Discord ID:
-Gui, Add, Edit, vdiscordUserId w180 x520 y40 h20 -E0x200 Background2A2A2A cWhite, %discordUserId%
+Gui, Add, Edit, vdiscordUserId w210 x520 y40 h20 -E0x200 Background2A2A2A cWhite, %discordUserId%
 Gui, Add, Text, x520 y70 cFF69B4, Webhook URL:
-Gui, Add, Edit, vdiscordWebhookURL w180 x520 y90 h20 -E0x200 Background2A2A2A cWhite, %discordWebhookURL%
+Gui, Add, Edit, vdiscordWebhookURL w210 x520 y90 h20 -E0x200 Background2A2A2A cWhite, %discordWebhookURL%
 
 ; Heartbeat Settings Section
 Gui, Add, GroupBox, x505 y125 w240 h160 c00FFFF, Heartbeat Settings ; Cyan
@@ -197,18 +197,18 @@ if(StrLen(heartBeatWebhookURL) < 3)
 
 if (heartBeat) {
     Gui, Add, Text, vhbName x520 y175 c00FFFF, Name:
-    Gui, Add, Edit, vheartBeatName w150 x520 y200 h20 -E0x200 Background2A2A2A cWhite, %heartBeatName%
+    Gui, Add, Edit, vheartBeatName w210 x520 y200 h20 -E0x200 Background2A2A2A cWhite, %heartBeatName%
     Gui, Add, Text, vhbURL x520 y225 c00FFFF, Webhook URL:
-    Gui, Add, Edit, vheartBeatWebhookURL w150 x520 y250 h20 -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
+    Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y250 h20 -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
 } else {
     Gui, Add, Text, vhbName x520 y175 Hidden c00FFFF, Name:
-    Gui, Add, Edit, vheartBeatName w150 x520 y200 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatName%
+    Gui, Add, Edit, vheartBeatName w210 x520 y200 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatName%
     Gui, Add, Text, vhbURL x520 y225 Hidden c00FFFF, Webhook URL:
-    Gui, Add, Edit, vheartBeatWebhookURL w150 x520 y250 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
+    Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y250 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
 }
 
 ; ========== Download Settings Section (full width) ========== 
-Gui, Add, GroupBox, x5 y420 w730 h120 cWhite, Download Settings ;
+Gui, Add, GroupBox, x5 y420 w740 h120 cWhite, Download Settings ;
 
 if(StrLen(mainIdsURL) < 3)
     mainIdsURL =
