@@ -1563,7 +1563,7 @@ Screenshot(filename := "Valid") {
 	return screenshotFile
 }
 
-LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
+LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screenshotFile2 := "") {
 	global discordUserId, discordWebhookURL, friendCode
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
@@ -1581,8 +1581,16 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 		RetryCount := 0
 		Loop {
 			try {
-				; If an image file is provided, send it
-				if (screenshotFile != "") {
+				if(screenshotFile != "" && screenshotFile2 != "" && FileExist(screenshotFile) && FileExist(screenshotFile2))
+				{
+					; Send the image using curl
+					curlCommand := "curl -k "
+						. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
+						. "-F ""file1=@" . screenshotFile . """ "
+						. "-F ""file2=@" . screenshotFile2 . """ "
+						. discordWebhookURL
+					RunWait, %curlCommand%,, Hide
+				} else if (screenshotFile != "") {
 					; Check if the file exists
 					if (FileExist(screenshotFile)) {
 						; Send the image using curl
