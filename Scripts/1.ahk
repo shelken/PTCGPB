@@ -1568,7 +1568,7 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
 
-	if(discordFriends) {
+	if(ping != false && discordFriends) {
 		for index, value in discordFriends {
 			if(value = discordUserId)
 				continue
