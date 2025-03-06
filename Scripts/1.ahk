@@ -115,11 +115,11 @@ Loop {
 		Gui, Default
 		Gui, Margin, 4, 4  ; Set margin for the GUI
 		Gui, Font, s5 cGray Norm Bold, Segoe UI  ; Normal font for input labels
-		Gui, Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (F5)
-		Gui, Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
-		Gui, Add, Button, x60 y0 w40 h25 gResumeScript, Resume (F6)
-		Gui, Add, Button, x100 y0 w30 h25 gStopScript, Stop (F7)
-		Gui, Add, Button, x130 y0 w40 h25 gShowStatusMessages, Status (F8)
+		Gui, Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (Shift+F5)
+		Gui, Add, Button, x40 y0 w30 h25 gPauseScript, Pause (Shift+F6)
+		Gui, Add, Button, x80 y0 w40 h25 gResumeScript, Resume (Shift+F6)
+		Gui, Add, Button, x120 y0 w30 h25 gStopScript, Stop (Shift+F7)
+		Gui, Add, Button, x160 y0 w40 h25 gShowStatusMessages, Status (Shift+F8)
 		Gui, Show, NoActivate x%x4% y%y4% AutoSize
 		break
 	}
