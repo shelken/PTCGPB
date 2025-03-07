@@ -1185,23 +1185,20 @@ CheckPack() {
 }
 
 FoundStars(star) {
-	global injectMethod
 	screenShot := Screenshot(star)
 	accountFile := saveAccount(star)
 	friendCode := getFriendCode()
-	if (injectMethod){
-		Sleep, 3000
-		friendCodeScreenshot := Screenshot("FriendCode")
-		}		
+
+	; Pull back screenshot of the friend code/name (good for inject method)
+	Sleep, 8000
+	fcScreenshot := Screenshot("FRIENDCODE")
+
 	if(star = "Crown" || star = "Immersive")
 		RemoveFriends()
 	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
-	LogToDiscord(logMessage, screenShot, discordUserId)
-	if (injectMethod) {
-		LogToDiscord("Friend Code Screenshot:", friendCodeScreenshot, discordUserId)
-	}		
+	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 }
 
 FindBorders(prefix) {
@@ -1294,7 +1291,6 @@ FindGodPack() {
 }
 
 GodPackFound(validity) {
-	global injectMethod
 	if(validity = "Valid") {
 		Praise := ["Congrats!", "Congratulations!", "GG!", "Whoa!", "Praise Helix! ༼ つ ◕_◕ ༽つ", "Way to go!", "You did it!", "Awesome!", "Nice!", "Cool!", "You deserve it!", "Keep going!", "This one has to be live!", "No duds, no duds, no duds!", "Fantastic!", "Bravo!", "Excellent work!", "Impressive!", "You're amazing!", "Well done!", "You're crushing it!", "Keep up the great work!", "You're unstoppable!", "Exceptional!", "You nailed it!", "Hats off to you!", "Sweet!", "Kudos!", "Phenomenal!", "Boom! Nailed it!", "Marvelous!", "Outstanding!", "Legendary!", "Youre a rock star!", "Unbelievable!", "Keep shining!", "Way to crush it!", "You're on fire!", "Killing it!", "Top-notch!", "Superb!", "Epic!", "Cheers to you!", "Thats the spirit!", "Magnificent!", "Youre a natural!", "Gold star for you!", "You crushed it!", "Incredible!", "Shazam!", "You're a genius!", "Top-tier effort!", "This is your moment!", "Powerful stuff!", "Wicked awesome!", "Props to you!", "Big win!", "Yesss!", "Champion vibes!", "Spectacular!"]
 		invalid := ""
@@ -1313,17 +1309,15 @@ GodPackFound(validity) {
 	LogToFile(logMessage, godPackLog)
 	CreateStatusMessage(logMessage)
 	friendCode := getFriendCode()
-	if (validity = "Valid" && injectMethod){
-		Sleep, 3000
-		friendCodeScreenshot := Screenshot("FriendCode")
-		}
+
+	; Pull screenshot of the Friend code page; wait so we don't get the clipboard pop up; good for the inject method
+	Sleep, 8000
+	fcScreenshot := Screenshot("FRIENDCODE")
+
 	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
-	LogToDiscord(logMessage, screenShot, discordUserId)
-	if (validity = "Valid" && InjectMethod) {
-		LogToDiscord("Friend Code Screenshot:", friendCodeScreenshot, discordUserId)
-	}
+	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 }
 
 loadAccount() {
@@ -1579,12 +1573,12 @@ Screenshot(filename := "Valid") {
 	return screenshotFile
 }
 
-LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
+LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screenshotFile2 := "") {
 	global discordUserId, discordWebhookURL, friendCode
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
 
-	if(discordFriends) {
+	if(ping != false && discordFriends) {
 		for index, value in discordFriends {
 			if(value = discordUserId)
 				continue
@@ -1597,8 +1591,16 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "") {
 		RetryCount := 0
 		Loop {
 			try {
-				; If an image file is provided, send it
-				if (screenshotFile != "") {
+				if(screenshotFile != "" && screenshotFile2 != "" && FileExist(screenshotFile) && FileExist(screenshotFile2))
+				{
+					; Send the image using curl
+					curlCommand := "curl -k "
+						. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
+						. "-F ""file1=@" . screenshotFile . """ "
+						. "-F ""file2=@" . screenshotFile2 . """ "
+						. discordWebhookURL
+					RunWait, %curlCommand%,, Hide
+				} else if (screenshotFile != "") {
 					; Check if the file exists
 					if (FileExist(screenshotFile)) {
 						; Send the image using curl
