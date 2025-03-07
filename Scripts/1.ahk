@@ -124,11 +124,11 @@ Loop {
 		Gui, Default
 		Gui, Margin, 4, 4  ; Set margin for the GUI
 		Gui, Font, s5 cGray Norm Bold, Segoe UI  ; Normal font for input labels
-		Gui, Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (F5)
-		Gui, Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
-		Gui, Add, Button, x60 y0 w40 h25 gResumeScript, Resume (F6)
-		Gui, Add, Button, x100 y0 w30 h25 gStopScript, Stop (F7)
-		Gui, Add, Button, x130 y0 w40 h25 gShowStatusMessages, Status (F8)
+		Gui, Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (Shift+F5)
+		Gui, Add, Button, x40 y0 w30 h25 gPauseScript, Pause (Shift+F6)
+		Gui, Add, Button, x80 y0 w40 h25 gResumeScript, Resume (Shift+F6)
+		Gui, Add, Button, x120 y0 w30 h25 gStopScript, Stop (Shift+F7)
+		Gui, Add, Button, x160 y0 w40 h25 gShowStatusMessages, Status (Shift+F8)
 		Gui, Show, NoActivate x%x4% y%y4% AutoSize
 		break
 	}
@@ -1235,7 +1235,7 @@ FoundStars(star) {
 	friendCode := getFriendCode()
 	IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
-	; BallCity 2025.02.19 - Pull back screenshot of the friend code/name (good for inject method)
+	; Pull back screenshot of the friend code/name (good for inject method)
 	Sleep, 8000
 	fcScreenshot := Screenshot("FRIENDCODE")
 
@@ -1244,8 +1244,6 @@ FoundStars(star) {
 	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
-
-	; BallCity 2025.02.19 - Add Friendcode Screenshot to Discord Log
 	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 }
 
@@ -1363,7 +1361,7 @@ GodPackFound(validity) {
 	friendCode := getFriendCode()
 	IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
-	; BallCity 2025.02.19 - Pull screenshot of the Friend code page; wait so we don't get the clipboard pop up
+	; Pull screenshot of the Friend code page; wait so we don't get the clipboard pop up; good for the inject method
 	Sleep, 8000
 	fcScreenshot := Screenshot("FRIENDCODE")
 
@@ -1389,9 +1387,8 @@ GodPackFound(validity) {
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
 
-	; BallCity 2025.02.19 - Adjust the below to only send a 'ping' to Discord friends on Valid packs
+	; Adjust the below to only send a 'ping' to Discord friends on Valid packs
 	if(validity = "Valid") {
-		; BallCity 2025.02.19 - Send the friendcode screenshot to Discord
 		LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 	} else {
 		LogToDiscord(logMessage, screenShot)
@@ -1659,7 +1656,6 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screen
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
 
-	; BallCity - 20205.02.19 // Add the "ping != false && " piece below in the if statement
 	if(ping != false && discordFriends) {
 		for index, value in discordFriends {
 			if(value = discordUserId)
@@ -1673,7 +1669,6 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screen
 		RetryCount := 0
 		Loop {
 			try {
-				; BallCity - 2025.02.19 - If TWO image files are provided, send them
 				if(screenshotFile != "" && screenshotFile2 != "" && FileExist(screenshotFile) && FileExist(screenshotFile2))
 				{
 					; Send the image using curl
