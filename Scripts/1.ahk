@@ -1390,13 +1390,7 @@ GodPackFound(validity) {
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
 
-	; BallCity 2025.02.19 - Adjust the below to only send a 'ping' to Discord friends on Valid packs
-	if(validity = "Valid" || !skipPingOnInvalid) {
-		; BallCity 2025.02.19 - Send the friendcode screenshot to Discord
-		LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
-	} else {
-		LogToDiscord(logMessage, screenShot)
-	}
+	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 }
 
 loadAccount() {
@@ -1656,17 +1650,19 @@ Screenshot(filename := "Valid") {
 }
 
 LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screenshotFile2 := "") {
-	global discordUserId, discordWebhookURL, friendCode
+	global discordUserId, discordWebhookURL, friendCode, skipPingOnInvalid
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
 
-	; BallCity - 20205.02.19 // Add the "ping != false && " piece below in the if statement
-	if(ping != false && discordFriends) {
+	if(!skipPingOnInvalid && ping != false && discordFriends) {
 		for index, value in discordFriends {
 			if(value = discordUserId)
 				continue
 			discordPing .= "<@" . value . "> "
 		}
+	}
+	else {
+		discordPing := ""
 	}
 
 	if (discordWebhookURL != "") {
