@@ -86,7 +86,6 @@ IniRead, ocrLanguage, Settings.ini, UserSettings, ocrLanguage, en
 IniRead, autoLaunchMonitor, Settings.ini, UserSettings, autoLaunchMonitor, 1
 IniRead, mainIdsURL, Settings.ini, UserSettings, mainIdsURL, ""
 IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
-IniRead, skipPingOnInvalid, Settings.ini, UserSettings, skipPingOnInvalid, 0
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -191,7 +190,7 @@ Gui, Add, Checkbox, % (Mewtwo ? "Checked" : "") " vMewtwo x365 y185 cFFD700", Me
 Gui, Add, Checkbox, % (Mew ? "Checked" : "") " vMew x365 y205 cFFD700", Mew
 
 ; Card Detection Section
-Gui, Add, GroupBox, x255 y230 w240 h150 cFF4500, Card Detection ; Orange Red
+Gui, Add, GroupBox, x255 y230 w240 h155 cFF4500, Card Detection ; Orange Red
 Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x280 y255 cFF4500", Single Full Art
 Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x280 y275 cFF4500", Single Trainer
 Gui, Add, Checkbox, % (RainbowCheck ? "Checked" : "") " vRainbowCheck x280 y295 cFF4500", Single Rainbow
@@ -203,7 +202,7 @@ Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x280 y
 
 ; ========== Column 3 ========== 
 ; Discord Settings Section
-Gui, Add, GroupBox, x505 y0 w240 h150 cFF69B4, Discord Settings ; Hot pink
+Gui, Add, GroupBox, x505 y0 w240 h120 cFF69B4, Discord Settings ; Hot pink
 if(StrLen(discordUserID) < 3)
     discordUserID =
 if(StrLen(discordWebhookURL) < 3)
@@ -212,11 +211,10 @@ Gui, Add, Text, x520 y20 cFF69B4, Discord ID:
 Gui, Add, Edit, vdiscordUserId w210 x520 y40 h20 -E0x200 Background2A2A2A cWhite, %discordUserId%
 Gui, Add, Text, x520 y70 cFF69B4, Webhook URL:
 Gui, Add, Edit, vdiscordWebhookURL w210 x520 y90 h20 -E0x200 Background2A2A2A cWhite, %discordWebhookURL%
-Gui, Add, Checkbox, % (skipPingOnInvalid ? "Checked" : "") " vskipPingOnInvalid x520 y120 cFF69B4", Skip ping on Invalid GPs
 
 ; Heartbeat Settings Section
-Gui, Add, GroupBox, x505 y150 w240 h160 c00FFFF, Heartbeat Settings ; Cyan
-Gui, Add, Checkbox, % (heartBeat ? "Checked" : "") " vheartBeat x520 y175 gdiscordSettings c00FFFF", Discord Heartbeat
+Gui, Add, GroupBox, x505 y120 w240 h160 c00FFFF, Heartbeat Settings ; Cyan
+Gui, Add, Checkbox, % (heartBeat ? "Checked" : "") " vheartBeat x520 y145 gdiscordSettings c00FFFF", Discord Heartbeat
 
 if(StrLen(heartBeatName) < 3)
     heartBeatName =
@@ -224,23 +222,23 @@ if(StrLen(heartBeatWebhookURL) < 3)
     heartBeatWebhookURL = 
 
 if (heartBeat) {
-    Gui, Add, Text, vhbName x520 y200 c00FFFF, Name:
-    Gui, Add, Edit, vheartBeatName w210 x520 y225 h20 -E0x200 Background2A2A2A cWhite, %heartBeatName%
-    Gui, Add, Text, vhbURL x520 y250 c00FFFF, Webhook URL:
-    Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y275 h20 -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
+    Gui, Add, Text, vhbName x520 y170 c00FFFF, Name:
+    Gui, Add, Edit, vheartBeatName w210 x520 y195 h20 -E0x200 Background2A2A2A cWhite, %heartBeatName%
+    Gui, Add, Text, vhbURL x520 y220 c00FFFF, Webhook URL:
+    Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y245 h20 -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
 } else {
-    Gui, Add, Text, vhbName x520 y200 Hidden c00FFFF, Name:
-    Gui, Add, Edit, vheartBeatName w210 x520 y225 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatName%
-    Gui, Add, Text, vhbURL x520 y250 Hidden c00FFFF, Webhook URL:
-    Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y275 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
+    Gui, Add, Text, vhbName x520 y170 Hidden c00FFFF, Name:
+    Gui, Add, Edit, vheartBeatName w210 x520 y195 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatName%
+    Gui, Add, Text, vhbURL x520 y220 Hidden c00FFFF, Webhook URL:
+    Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y245 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
 }
 
 ; ========== Action Buttons (bottom) ==========
-Gui, Add, Button, gOpenLink x505 y395 w115 h20 +Default, Buy Me a Coffee 
-Gui, Add, Button, gOpenDiscord x630 y395 w115 h20, Join Discord 
-Gui, Add, Button, gCheckForUpdates x505 y365 w115 h25, Check Updates 
-Gui, Add, Button, gArrangeWindows x630 y365 w115 h25, Arrange Windows 
-Gui, Add, Button, gStart x505 y320 w240 h40 +Default Background39FF14 cBlack, START BOT
+Gui, Add, Button, gOpenLink x505 y365 w115 h20 +Default, Buy Me a Coffee 
+Gui, Add, Button, gOpenDiscord x630 y365 w115 h20, Join Discord 
+Gui, Add, Button, gCheckForUpdates x505 y335 w115 h25, Check Updates 
+Gui, Add, Button, gArrangeWindows x630 y335 w115 h25, Arrange Windows 
+Gui, Add, Button, gStart x505 y290 w240 h40 +Default Background39FF14 cBlack, START BOT
 
 ; ========== Download Settings Section (full width) ========== 
 Gui, Add, GroupBox, x5 y415 w740 h120 cWhite, Download Settings ;
@@ -377,7 +375,6 @@ Start:
 	IniWrite, %mainIdsURL%, Settings.ini, UserSettings, mainIdsURL
 	IniWrite, %vipIdsURL%, Settings.ini, UserSettings, vipIdsURL
 	IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
-	IniWrite, %skipPingOnInvalid%, Settings.ini, UserSettings, skipPingOnInvalid
 
 
 	; Download a new Main ID file prior to running the rest of the below

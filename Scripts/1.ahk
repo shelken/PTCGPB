@@ -64,7 +64,6 @@ IniRead, Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
-IniRead, skipPingOnInvalid, %A_ScriptDir%\..\Settings.ini, UserSettings, skipPingOnInvalid, 0
 
 
 pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus"]
@@ -1391,7 +1390,7 @@ GodPackFound(validity) {
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
 
 	; BallCity 2025.02.19 - Adjust the below to only send a 'ping' to Discord friends on Valid packs
-	if(validity = "Valid" || !skipPingOnInvalid) {
+	if(validity = "Valid") {
 		; BallCity 2025.02.19 - Send the friendcode screenshot to Discord
 		LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
 	} else {
