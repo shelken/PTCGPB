@@ -83,7 +83,7 @@ IniRead, Charizard, Settings.ini, UserSettings, Charizard, 0
 IniRead, Mewtwo, Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, Settings.ini, UserSettings, slowMotion, 0
 IniRead, ocrLanguage, Settings.ini, UserSettings, ocrLanguage, en
-IniRead, autoLaunchMonitor, Settings.ini, UserSettings, autoLaunchMonitor, 1
+IniRead, autoLaunchMonitor, Settings.ini, UserSettings, autoLaunchMonitor, 0
 IniRead, mainIdsURL, Settings.ini, UserSettings, mainIdsURL, ""
 IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
 
@@ -110,7 +110,7 @@ Gui, Add, Edit, vColumns w50 x105 y113 h20 -E0x200 Background2A2A2A cWhite Cente
 Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain x35 y140 cWhite", Run Main
 
 ; Time Settings Section
-Gui, Add, GroupBox, x5 y165 w240 h100 c9370DB, Time Settings ; Purple
+Gui, Add, GroupBox, x5 y165 w240 h110 c9370DB, Time Settings ; Purple
 Gui, Add, Text, x20 y190 c9370DB, Delay:
 Gui, Add, Edit, vDelay w70 x105 y188 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
 Gui, Add, Text, x20 y215 c9370DB, Wait Time:
@@ -119,8 +119,8 @@ Gui, Add, Text, x20 y240 c9370DB, Swipe Speed:
 Gui, Add, Edit, vswipeSpeed w70 x105 y238 h20 -E0x200 Background2A2A2A cWhite Center, %swipeSpeed%
 
 ; System Settings Section
-Gui, Add, GroupBox, x5 y265 w240 h150 c4169E1, System Settings ; Royal Blue
-Gui, Add, Text, x20 y285 c4169E1, Monitor:
+Gui, Add, GroupBox, x5 y275 w240 h180 c4169E1, System Settings ; Royal Blue
+Gui, Add, Text, x20 y295 c4169E1, Monitor:
 SysGet, MonitorCount, MonitorCount
 MonitorOptions := ""
 Loop, %MonitorCount% {
@@ -129,23 +129,22 @@ Loop, %MonitorCount% {
     MonitorOptions .= (A_Index > 1 ? "|" : "") "" A_Index ": (" MonitorRight - MonitorLeft "x" MonitorBottom - MonitorTop ")"
 }
 SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
-Gui, Add, DropDownList, x20 y305 w200 vSelectedMonitorIndex Choose%SelectedMonitorIndex% Background2A2A2A cWhite, %MonitorOptions%
-Gui, Add, Text, x20 y335 c4169E1, Folder Path:
-Gui, Add, Edit, vfolderPath w200 x20 y355 h20 -E0x200 Background2A2A2A cWhite, %folderPath%
+Gui, Add, DropDownList, x20 y315 w200 vSelectedMonitorIndex Choose%SelectedMonitorIndex% Background2A2A2A cWhite, %MonitorOptions%
+Gui, Add, Text, x20 y345 c4169E1, Folder Path:
+Gui, Add, Edit, vfolderPath w200 x20 y365 h20 -E0x200 Background2A2A2A cWhite, %folderPath%
 
 ;if(slowMotion)
 	;Gui, Add, Checkbox, Checked vslowMotion x270 y375, Base Game Compatibility
 ;else
 	;Gui, Add, Checkbox, vslowMotion x270 y375, Base Game Compatibility
 
-Gui, Add, Text, x20 y385 c4169E1, Language Pack:
+Gui, Add, Text, x20 y395 c4169E1, Language Pack:
 
 ; Language Pack list
 languageList := "en|zh|es|de|fr|ja|ru|pt|ko|it|tr|pl|nl|sv|ar|uk|id|vi|th|he|cs|no|da|fi|hu|el|zh-TW"
 
 if (ocrLanguage != "")
 {
-    ; Trova l'indice corrispondente nella lista
     Loop, Parse, languageList, |
     {
         index++
@@ -158,7 +157,8 @@ if (ocrLanguage != "")
 }
 
 
-Gui, Add, DropDownList, vocrLanguage choose%defaultOcrLang% x120 y380 w50 Background2A2A2A cWhite, %languageList%
+Gui, Add, DropDownList, vocrLanguage choose%defaultOcrLang% x120 y390 w50 Background2A2A2A cWhite, %languageList%
+Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor x35 y420 cWhite", Auto Launch Monitor
 
 
 
@@ -213,7 +213,7 @@ Gui, Add, Text, x520 y70 cFF69B4, Webhook URL:
 Gui, Add, Edit, vdiscordWebhookURL w210 x520 y90 h20 -E0x200 Background2A2A2A cWhite, %discordWebhookURL%
 
 ; Heartbeat Settings Section
-Gui, Add, GroupBox, x505 y120 w240 h160 c00FFFF, Heartbeat Settings ; Cyan
+Gui, Add, GroupBox, x505 y120 w240 h155 c00FFFF, Heartbeat Settings ; Cyan
 Gui, Add, Checkbox, % (heartBeat ? "Checked" : "") " vheartBeat x520 y145 gdiscordSettings c00FFFF", Discord Heartbeat
 
 if(StrLen(heartBeatName) < 3)
@@ -233,26 +233,30 @@ if (heartBeat) {
     Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y245 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
 }
 
-; ========== Action Buttons (bottom) ==========
-Gui, Add, Button, gOpenLink x505 y365 w115 h20 +Default, Buy Me a Coffee 
-Gui, Add, Button, gOpenDiscord x630 y365 w115 h20, Join Discord 
-Gui, Add, Button, gCheckForUpdates x505 y335 w115 h25, Check Updates 
-Gui, Add, Button, gArrangeWindows x630 y335 w115 h25, Arrange Windows 
-Gui, Add, Button, gStart x505 y290 w240 h40 +Default Background39FF14 cBlack, START BOT
 
-; ========== Download Settings Section (full width) ========== 
-Gui, Add, GroupBox, x5 y415 w740 h120 cWhite, Download Settings ;
+; Download Settings Section
+Gui, Add, GroupBox, x505 y275 w240 h110 cWhite, Download Settings ;
 
 if(StrLen(mainIdsURL) < 3)
     mainIdsURL =
 if(StrLen(vipIdsURL) < 3)
     vipIdsURL = 
 
-Gui, Add, Text, x20 y445 cWhite, ids.txt API:
-Gui, Add, Edit, vmainIdsURL w700 x20 y465 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
-Gui, Add, Text, x20 y485 cWhite, vip_ids.txt (GP Test Mode) API:
-Gui, Add, Edit, vvipIdsURL w700 x20 y505 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
+Gui, Add, Text, x520 y295 cWhite, ids.txt API:
+Gui, Add, Edit, vmainIdsURL w210 x520 y315 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
+Gui, Add, Text, x520 y335 cWhite, vip_ids.txt (GP Test Mode) API:
+Gui, Add, Edit, vvipIdsURL w210 x520 y355 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
 
+
+
+
+; ========== Action Buttons (bottom) ==========
+Gui, Add, Button, gOpenLink x255 y390 w240 h30 +Default, Buy Me a Coffee 
+Gui, Add, Button, gCheckForUpdates x255 y425 w115 h30, Check Updates 
+Gui, Add, Button, gOpenDiscord x380 y425 w115 h30, Join Discord 
+Gui, Add, Button, gStart x505 y390 w240 h30 +Default Background39FF14 cBlack, START BOT
+Gui, Add, Button, gArrangeWindows x630 y425 w115 h30, Arrange Windows 
+Gui, Add, Button, gLaunchAllMumu x505 y425 w115 h30, Launch All Mumu
 
 if (defaultLanguage = "Scale125") {
 	defaultLang := 1
@@ -314,6 +318,21 @@ ArrangeWindows:
 	Loop %Instances% {
 		resetWindows(A_Index, SelectedMonitorIndex)
 		sleep, 10
+	}
+return
+
+LaunchAllMumu:
+	GuiControlGet, Instances,, Instances
+	GuiControlGet, folderPath,, folderPath
+	GuiControlGet, runMain,, runMain
+
+	IniWrite, %Instances%, Settings.ini, UserSettings, Instances
+	IniWrite, %folderPath%, Settings.ini, UserSettings, folderPath
+	IniWrite, %runMain%, Settings.ini, UserSettings, runMain
+
+	launchAllFile := "LaunchAllMumu.ahk"
+	if(FileExist(launchAllFile)) {
+		Run, %launchAllFile%
 	}
 return
 
