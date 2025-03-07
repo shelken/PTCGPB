@@ -2,8 +2,8 @@
 CoordMode, Mouse, Screen
 SetTitleMatchMode, 3
 
-IniRead, instanceLaunchDelay, Monitor.ini, Settings, instanceLaunchDelay, 5000
-IniRead, waitAfterBulkLaunch, Monitor.ini, Settings, waitAfterBulkLaunch, 20000
+IniRead, instanceLaunchDelay, Settings.ini, UserSettings, instanceLaunchDelay, 5
+IniRead, waitAfterBulkLaunch, Settings.ini, UserSettings, waitAfterBulkLaunch, 20000
 IniRead, Instances, Settings.ini, UserSettings, Instances, 1
 IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 IniRead, runMain, Settings.ini, UserSettings, runMain, 1
@@ -26,7 +26,8 @@ if(runMain)
     if not pID {
         launchInstance(instanceNum)
 
-        Sleep, %instanceLaunchDelay%
+        sleepTime := instanceLaunchDelay * 1000
+        Sleep, % sleepTime
         launched := launched + 1
     }
 }
@@ -37,7 +38,8 @@ Loop %Instances% {
     if not pID {
         launchInstance(instanceNum)
 
-        Sleep, %instanceLaunchDelay%
+        sleepTime := instanceLaunchDelay * 1000
+        Sleep, % sleepTime
         launched := launched + 1
     }
 }

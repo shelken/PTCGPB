@@ -9,8 +9,8 @@ if not A_IsAdmin
     ExitApp
 }
 
-IniRead, instanceLaunchDelay, Monitor.ini, Settings, instanceLaunchDelay, 5000
-IniRead, waitAfterBulkLaunch, Monitor.ini, Settings, waitAfterBulkLaunch, 20000
+IniRead, instanceLaunchDelay, Settings.ini, UserSettings, instanceLaunchDelay, 5000
+IniRead, waitAfterBulkLaunch, Settings.ini, UserSettings, waitAfterBulkLaunch, 20000
 IniRead, Instances, Settings.ini, UserSettings, Instances, 1
 IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 mumuFolder = %folderPath%\MuMuPlayerGlobal-12.0

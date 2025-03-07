@@ -86,20 +86,25 @@ IniRead, ocrLanguage, Settings.ini, UserSettings, ocrLanguage, en
 IniRead, autoLaunchMonitor, Settings.ini, UserSettings, autoLaunchMonitor, 0
 IniRead, mainIdsURL, Settings.ini, UserSettings, mainIdsURL, ""
 IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
+IniRead, instanceLaunchDelay, Settings.ini, UserSettings, instanceLaunchDelay, 5
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
 Gui, Font, s10 cWhite, Segoe UI ; Modern font
 
+
+
 ; ========== Column 1 ========== 
-; Friend ID Section
+; ==============================
+
+; ========== Friend ID Section ==========
 Gui, Add, GroupBox, x5 y0 w240 h40 cWhite, Friend ID
 if(FriendID = "ERROR" || FriendID = "")
     Gui, Add, Edit, vFriendID w180 x35 y15 h20 -E0x200 Background2A2A2A cWhite
 else 
     Gui, Add, Edit, vFriendID w180 x35 y15 h20 -E0x200 Background2A2A2A cWhite, %FriendID%
 
-; Instance Settings Section
+; ========== Instance Settings Section ==========
 Gui, Add, GroupBox, x5 y40 w240 h125 cWhite, Instance Settings
 Gui, Add, Text, x20 y65 cWhite, Instances:
 Gui, Add, Edit, vInstances w50 x105 y63 h20 -E0x200 Background2A2A2A cWhite Center, %Instances%
@@ -109,7 +114,7 @@ Gui, Add, Text, x20 y115 cWhite, Columns:
 Gui, Add, Edit, vColumns w50 x105 y113 h20 -E0x200 Background2A2A2A cWhite Center, %Columns%
 Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain x35 y140 cWhite", Run Main
 
-; Time Settings Section
+; ========== Time Settings Section ==========
 Gui, Add, GroupBox, x5 y165 w240 h110 c9370DB, Time Settings ; Purple
 Gui, Add, Text, x20 y190 c9370DB, Delay:
 Gui, Add, Edit, vDelay w70 x105 y188 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
@@ -118,8 +123,8 @@ Gui, Add, Edit, vwaitTime w70 x105 y213 h20 -E0x200 Background2A2A2A cWhite Cent
 Gui, Add, Text, x20 y240 c9370DB, Swipe Speed:
 Gui, Add, Edit, vswipeSpeed w70 x105 y238 h20 -E0x200 Background2A2A2A cWhite Center, %swipeSpeed%
 
-; System Settings Section
-Gui, Add, GroupBox, x5 y275 w240 h180 c4169E1, System Settings ; Royal Blue
+; ========== System Settings Section ==========
+Gui, Add, GroupBox, x5 y275 w240 h220 c4169E1, System Settings ; Royal Blue
 Gui, Add, Text, x20 y295 c4169E1, Monitor:
 SysGet, MonitorCount, MonitorCount
 MonitorOptions := ""
@@ -140,7 +145,7 @@ Gui, Add, Edit, vfolderPath w200 x20 y365 h20 -E0x200 Background2A2A2A cWhite, %
 
 Gui, Add, Text, x20 y395 c4169E1, Language Pack:
 
-; Language Pack list
+; ========== Language Pack list ==========
 languageList := "en|zh|es|de|fr|ja|ru|pt|ko|it|tr|pl|nl|sv|ar|uk|id|vi|th|he|cs|no|da|fi|hu|el|zh-TW"
 
 if (ocrLanguage != "")
@@ -158,13 +163,16 @@ if (ocrLanguage != "")
 
 
 Gui, Add, DropDownList, vocrLanguage choose%defaultOcrLang% x120 y390 w50 Background2A2A2A cWhite, %languageList%
-Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor x35 y420 cWhite", Auto Launch Monitor
-
+Gui, Add, Text, x20 y425 c4169E1, Launch All Mumu Delay:
+Gui, Add, Edit, vinstanceLaunchDelay w50 x175 y425 h20 -E0x200 Background2A2A2A cWhite Center, %instanceLaunchDelay%
+Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor x35 y455 cWhite", Auto Launch Monitor
 
 
 
 ; ========== Column 2 ========== 
-; God Pack Settings Section
+; ==============================
+
+; ========== God Pack Settings Section ==========
 Gui, Add, GroupBox, x255 y0 w240 h120 c39FF14, God Pack Settings ; Neon green
 Gui, Add, Text, x270 y25 c39FF14, Min. 2 Stars:
 Gui, Add, Edit, vminStars w50 x350 y23 h20 -E0x200 Background2A2A2A cWhite Center, %minStars%
@@ -179,7 +187,7 @@ Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x325
 Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x280 y75 c39FF14", 1 Pack Method
 Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x280 y95 c39FF14", Menu Delete Account
 
-; Pack Selection Section
+; ========== Pack Selection Section ==========
 Gui, Add, GroupBox, x255 y120 w240 h110 cFFD700, Pack Selection ; Gold
 Gui, Add, Checkbox, % (Arceus ? "Checked" : "") " vArceus x280 y145 cFFD700", Arceus
 Gui, Add, Checkbox, % (Palkia ? "Checked" : "") " vPalkia x280 y165 cFFD700", Palkia
@@ -189,7 +197,7 @@ Gui, Add, Checkbox, % (Charizard ? "Checked" : "") " vCharizard x365 y165 cFFD70
 Gui, Add, Checkbox, % (Mewtwo ? "Checked" : "") " vMewtwo x365 y185 cFFD700", Mewtwo
 Gui, Add, Checkbox, % (Mew ? "Checked" : "") " vMew x365 y205 cFFD700", Mew
 
-; Card Detection Section
+; ========== Card Detection Section ==========
 Gui, Add, GroupBox, x255 y230 w240 h155 cFF4500, Card Detection ; Orange Red
 Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x280 y255 cFF4500", Single Full Art
 Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x280 y275 cFF4500", Single Trainer
@@ -201,7 +209,9 @@ Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x280 y
 
 
 ; ========== Column 3 ========== 
-; Discord Settings Section
+; ============================== 
+
+; ========== Discord Settings Section ==========
 Gui, Add, GroupBox, x505 y0 w240 h120 cFF69B4, Discord Settings ; Hot pink
 if(StrLen(discordUserID) < 3)
     discordUserID =
@@ -212,7 +222,7 @@ Gui, Add, Edit, vdiscordUserId w210 x520 y40 h20 -E0x200 Background2A2A2A cWhite
 Gui, Add, Text, x520 y70 cFF69B4, Webhook URL:
 Gui, Add, Edit, vdiscordWebhookURL w210 x520 y90 h20 -E0x200 Background2A2A2A cWhite, %discordWebhookURL%
 
-; Heartbeat Settings Section
+; ========== Heartbeat Settings Section ==========
 Gui, Add, GroupBox, x505 y120 w240 h155 c00FFFF, Heartbeat Settings ; Cyan
 Gui, Add, Checkbox, % (heartBeat ? "Checked" : "") " vheartBeat x520 y145 gdiscordSettings c00FFFF", Discord Heartbeat
 
@@ -233,30 +243,28 @@ if (heartBeat) {
     Gui, Add, Edit, vheartBeatWebhookURL w210 x520 y245 h20 Hidden -E0x200 Background2A2A2A cWhite, %heartBeatWebhookURL%
 }
 
+; ========== Action Buttons ==========
+Gui, Add, Button, gOpenLink x505 y350 w76 h35, Buy Me a Coffee 
+Gui, Add, Button, gCheckForUpdates x588 y350 w77 h35, Check Updates 
+Gui, Add, Button, gOpenDiscord x670 y350 w75 h35, Join Discord 
+Gui, Add, Button, gStart x505 y280 w240 h30, START BOT
+Gui, Add, Button, gArrangeWindows x630 y315 w115 h30, Arrange Windows 
+Gui, Add, Button, gLaunchAllMumu x505 y315 w115 h30, Launch All Mumu
 
-; Download Settings Section
-Gui, Add, GroupBox, x505 y275 w240 h110 cWhite, Download Settings ;
+
+; ========== Download Settings Section (Bottom right) ==========
+Gui, Add, GroupBox, x255 y385 w490 h110 cWhite, Download Settings ;
 
 if(StrLen(mainIdsURL) < 3)
     mainIdsURL =
 if(StrLen(vipIdsURL) < 3)
     vipIdsURL = 
 
-Gui, Add, Text, x520 y295 cWhite, ids.txt API:
-Gui, Add, Edit, vmainIdsURL w210 x520 y315 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
-Gui, Add, Text, x520 y335 cWhite, vip_ids.txt (GP Test Mode) API:
-Gui, Add, Edit, vvipIdsURL w210 x520 y355 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
+Gui, Add, Text, x270 y405 cWhite, ids.txt API:
+Gui, Add, Edit, vmainIdsURL w460 x270 y425 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
+Gui, Add, Text, x270 y445 cWhite, vip_ids.txt (GP Test Mode) API:
+Gui, Add, Edit, vvipIdsURL w460 x270 y465 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
 
-
-
-
-; ========== Action Buttons (bottom) ==========
-Gui, Add, Button, gOpenLink x255 y390 w76 h35, Buy Me a Coffee 
-Gui, Add, Button, gCheckForUpdates x337 y390 w77 h35, Check Updates 
-Gui, Add, Button, gOpenDiscord x419 y390 w76 h35, Join Discord 
-Gui, Add, Button, gStart x505 y390 w240 h65, START BOT
-Gui, Add, Button, gArrangeWindows x380 y430 w115 h25, Arrange Windows 
-Gui, Add, Button, gLaunchAllMumu x255 y430 w115 h25, Launch All Mumu
 
 if (defaultLanguage = "Scale125") {
 	defaultLang := 1
@@ -325,10 +333,12 @@ LaunchAllMumu:
 	GuiControlGet, Instances,, Instances
 	GuiControlGet, folderPath,, folderPath
 	GuiControlGet, runMain,, runMain
+	GuiControlGet, instanceLaunchDelay,, instanceLaunchDelay
 
 	IniWrite, %Instances%, Settings.ini, UserSettings, Instances
 	IniWrite, %folderPath%, Settings.ini, UserSettings, folderPath
 	IniWrite, %runMain%, Settings.ini, UserSettings, runMain
+	IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
 
 	launchAllFile := "LaunchAllMumu.ahk"
 	if(FileExist(launchAllFile)) {
@@ -394,6 +404,7 @@ Start:
 	IniWrite, %mainIdsURL%, Settings.ini, UserSettings, mainIdsURL
 	IniWrite, %vipIdsURL%, Settings.ini, UserSettings, vipIdsURL
 	IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
+	IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
 
 
 	; Download a new Main ID file prior to running the rest of the below
