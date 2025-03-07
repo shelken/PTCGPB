@@ -1385,7 +1385,7 @@ adbSwipeFriend() {
 	Y1 := 380
 	Y2 := 200
 
-	Delay(5)
+	Delay(10)
 	adbShell.StdIn.WriteLine("input swipe " . X . " " . Y1 . " " . X . " " . Y2 . " " . 300)
 	Sleep, 1000
  }
