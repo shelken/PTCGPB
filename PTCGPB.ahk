@@ -251,12 +251,12 @@ Gui, Add, Edit, vvipIdsURL w210 x520 y355 h20 -E0x200 Background2A2A2A cWhite, %
 
 
 ; ========== Action Buttons (bottom) ==========
-Gui, Add, Button, gOpenLink x255 y390 w240 h30 +Default, Buy Me a Coffee 
-Gui, Add, Button, gCheckForUpdates x255 y425 w115 h30, Check Updates 
-Gui, Add, Button, gOpenDiscord x380 y425 w115 h30, Join Discord 
-Gui, Add, Button, gStart x505 y390 w240 h30 +Default Background39FF14 cBlack, START BOT
-Gui, Add, Button, gArrangeWindows x630 y425 w115 h30, Arrange Windows 
-Gui, Add, Button, gLaunchAllMumu x505 y425 w115 h30, Launch All Mumu
+Gui, Add, Button, gOpenLink x255 y390 w76 h35, Buy Me a Coffee 
+Gui, Add, Button, gCheckForUpdates x337 y390 w77 h35, Check Updates 
+Gui, Add, Button, gOpenDiscord x419 y390 w76 h35, Join Discord 
+Gui, Add, Button, gStart x505 y390 w240 h65, START BOT
+Gui, Add, Button, gArrangeWindows x380 y430 w115 h25, Arrange Windows 
+Gui, Add, Button, gLaunchAllMumu x255 y430 w115 h25, Launch All Mumu
 
 if (defaultLanguage = "Scale125") {
 	defaultLang := 1
