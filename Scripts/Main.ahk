@@ -95,12 +95,12 @@ Loop {
 		Gui, Toolbar: Default
 		Gui, Toolbar: Margin, 4, 4  ; Set margin for the GUI
 		Gui, Toolbar: Font, s5 cGray Norm Bold, Segoe UI  ; Normal font for input labels
-		Gui, Toolbar: Add, Button, x0 y0 w30 h25 gReloadScript, Reload  (F5)
-		Gui, Toolbar: Add, Button, x30 y0 w30 h25 gPauseScript, Pause (F6)
-		Gui, Toolbar: Add, Button, x60 y0 w30 h25 gResumeScript, Resume (F6)
-		Gui, Toolbar: Add, Button, x90 y0 w30 h25 gStopScript, Stop (F7)
-		Gui, Toolbar: Add, Button, x120 y0 w30 h25 gShowStatusMessages, Status (F8)
-		Gui, Toolbar: Add, Button, x150 y0 w30 h25 gTestScript, GP Test (F9) ; hoytdj Add
+		Gui, Toolbar: Add, Button, x0 y0 w35 h25 gReloadScript, Reload  (Shift+F5)
+		Gui, Toolbar: Add, Button, x35 y0 w35 h25 gPauseScript, Pause (Shift+F6)
+		Gui, Toolbar: Add, Button, x70 y0 w35 h25 gResumeScript, Resume (Shift+F6)
+		Gui, Toolbar: Add, Button, x105 y0 w35 h25 gStopScript, Stop (Shift+F7)
+		Gui, Toolbar: Add, Button, x140 y0 w35 h25 gShowStatusMessages, Status (Shift+F8)
+		Gui, Toolbar: Add, Button, x175 y0 w35 h25 gTestScript, GP Test (Shift+F9) ; hoytdj Add
 		Gui, Toolbar: Show, NoActivate x%x4% y%y4% AutoSize
 		break
 	}
