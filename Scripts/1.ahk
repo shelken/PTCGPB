@@ -1229,7 +1229,7 @@ CheckPack() {
 }
 
 FoundStars(star) {
-	global scriptName, DeadCheck
+	global scriptName, DeadCheck, ocrLanguage
 	screenShot := Screenshot(star)
 	accountFile := saveAccount(star)
 	friendCode := getFriendCode()
@@ -1260,7 +1260,7 @@ FoundStars(star) {
 			LogToFile("Failed to OCR the friend code: " . e.message, "BC.txt")
 		}
 	}
-	
+
 	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
