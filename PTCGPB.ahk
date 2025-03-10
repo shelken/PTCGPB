@@ -470,6 +470,22 @@ Start:
 	if(nukeAccount && !injectMethod)
 		typeMsg .= " (Menu Delete)"
 
+	selectMsg := "\nSelect: "
+	if(Arceus)
+		selectMsg .= "Arceus, "
+	if(Palkia)
+		selectMsg .= "Palkia, "
+	if(Dialga)
+		selectMsg .= "Dialga, "
+	if(Mew)
+		selectMsg .= "Mew, "
+	if(Pikachu)
+		selectMsg .= "Pikachu, "
+	if(Charizard)
+		selectMsg .= "Charizard, "
+	if(Mewtwo)
+		selectMsg .= "Mewtwo, "
+
 	Loop {
 		Sleep, 30000
 
@@ -527,6 +543,7 @@ Start:
 
 				discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
 				discMessage .= typeMsg
+				discMessage .= selectMsg
 				if(heartBeatName)
 					discordUserID := heartBeatName
 				LogToDiscord(discMessage, , discordUserID)
