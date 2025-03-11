@@ -1274,7 +1274,7 @@ CheckPack() {
 }
 
 FoundStars(star) {
-	global scriptName, DeadCheck, ocrLanguage
+	global scriptName, DeadCheck, ocrLanguage, injectMethod
 	screenShot := Screenshot(star)
 	accountFile := saveAccount(star)
 	friendCode := getFriendCode()
@@ -1287,7 +1287,7 @@ FoundStars(star) {
 	if(star = "Crown" || star = "Immersive")
 		RemoveFriends()
 	else {
-		; BallCity+fanto 2025.03.10 - If we're doing the inject method, try to OCR our Username
+		; If we're doing the inject method, try to OCR our Username
 		try {
 			if(injectMethod && IsFunc("ocr_from_file"))
 			{
@@ -1405,7 +1405,7 @@ FindGodPack() {
 }
 
 GodPackFound(validity) {
-	global scriptName, DeadCheck, ocrLanguage
+	global scriptName, DeadCheck, ocrLanguage, injectMethod
 
 	if(validity = "Valid") {
 		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -1432,7 +1432,7 @@ GodPackFound(validity) {
 	Sleep, 8000
 	fcScreenshot := Screenshot("FRIENDCODE")
 
-	; BallCity 2025.02.20 - If we're doing the inject method, try to OCR our Username
+	; If we're doing the inject method, try to OCR our Username
 	try {
 		if(injectMethod && IsFunc("ocr_from_file"))
 		{
