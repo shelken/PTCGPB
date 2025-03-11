@@ -470,6 +470,22 @@ Start:
 	if(nukeAccount && !injectMethod)
 		typeMsg .= " (Menu Delete)"
 
+	selectMsg := "\nSelect: "
+	if(Arceus)
+		selectMsg .= "Arceus, "
+	if(Palkia)
+		selectMsg .= "Palkia, "
+	if(Dialga)
+		selectMsg .= "Dialga, "
+	if(Mew)
+		selectMsg .= "Mew, "
+	if(Pikachu)
+		selectMsg .= "Pikachu, "
+	if(Charizard)
+		selectMsg .= "Charizard, "
+	if(Mewtwo)
+		selectMsg .= "Mewtwo, "
+
 	Loop {
 		Sleep, 30000
 
@@ -527,6 +543,7 @@ Start:
 
 				discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus
 				discMessage .= typeMsg
+				discMessage .= selectMsg
 				if(heartBeatName)
 					discordUserID := heartBeatName
 				LogToDiscord(discMessage, , discordUserID)
@@ -656,12 +673,14 @@ CreateStatusMessage(Message, X := 0, Y := 80) {
 			GuiControl, , PacksText, %Message%
 		} else {			OwnerWND := WinExist(1)
 			if(!OwnerWND)
-				Gui, %GuiName%:New, +ToolWindow -Caption
+				Gui, %GuiName%:New, +ToolWindow -Caption +LastFound
 			else
-				Gui, %GuiName%:New, +Owner%OwnerWND% +ToolWindow -Caption
+				Gui, %GuiName%:New, +Owner%OwnerWND% +ToolWindow -Caption +LastFound
 			Gui, %GuiName%:Margin, 2, 2  ; Set margin for the GUI
 			Gui, %GuiName%:Font, s8  ; Set the font size to 8 (adjust as needed)
 			Gui, %GuiName%:Add, Text, vPacksText, %Message%
+			DllCall("SetWindowPos", "Ptr", WinExist(), "Ptr", WinExist("A")  ; set behind active window
+				, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x13)  ; SWP_NOSIZE, SWP_NOMOVE, SWP_NOACTIVATE
 			Gui, %GuiName%:Show, NoActivate x%X% y%Y%, NoActivate %GuiName%
 		}
 	}
