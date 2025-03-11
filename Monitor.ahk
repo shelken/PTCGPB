@@ -9,8 +9,8 @@ if not A_IsAdmin
     ExitApp
 }
 
-IniRead, instanceLaunchDelay, Settings.ini, UserSettings, instanceLaunchDelay, 5000
-IniRead, waitAfterBulkLaunch, Settings.ini, UserSettings, waitAfterBulkLaunch, 20000
+IniRead, instanceLaunchDelay, Settings.ini, UserSettings, instanceLaunchDelay, 5
+IniRead, waitAfterBulkLaunch, Settings.ini, UserSettings, waitAfterBulkLaunch, 40000
 IniRead, Instances, Settings.ini, UserSettings, Instances, 1
 IniRead, folderPath, Settings.ini, UserSettings, folderPath, C:\Program Files\Netease
 mumuFolder = %folderPath%\MuMuPlayerGlobal-12.0
@@ -40,19 +40,16 @@ Loop {
             
             scriptName := instanceNum . ".ahk"
 
-            pID := checkInstance(instanceNum)
-            if(pID)
-            {
-                killAHK(scriptName)
-                killInstance(instanceNum)
-                Sleep, 3000
-            }
+            killedAHK := killAHK(scriptName)
+            killedInstance := killInstance(instanceNum)
+            Sleep, 3000
             
             pID := checkInstance(instanceNum)
             if not pID {
                 launchInstance(instanceNum)
         
-                Sleep, %instanceLaunchDelay%
+                sleepTime := instanceLaunchDelay * 1000
+                Sleep, % sleepTime
                 launched := launched + 1
 
                 Sleep, %waitAfterBulkLaunch%
@@ -81,6 +78,8 @@ LogToFile(message, logFile) {
 
 killAHK(scriptName := "")
 {
+    killed := 0
+
     if(scriptName != "") {
         DetectHiddenWindows, On
         WinGet, IDList, List, ahk_class AutoHotkey
@@ -92,19 +91,25 @@ killAHK(scriptName := "")
                 ; MsgBox, Killing: %ATitle%
                 WinKill, ahk_id %ID% ;kill
                 ; WinClose, %fullScriptPath% ahk_class AutoHotkey
-                return
+                killed := killed + 1
             }
         }
     }
+
+    return killed
 }
 
 killInstance(instanceNum := "")
 {
-    
+    killed := 0
+
     pID := checkInstance(instanceNum)
     if pID {
         Process, Close, %pID%
+        killed := killed + 1
     }
+
+    return killed
 }
 
 checkInstance(instanceNum := "")
