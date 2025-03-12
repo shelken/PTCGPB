@@ -140,9 +140,22 @@ global 99Configs := {}
 99Configs["ko"] := {leftx: 65, rightx: 100}
 99Configs["cn"] := {leftx: 63, rightx: 102}
 
-99Path := "99" . ocrLanguage
-99Leftx := 99Configs[ocrLanguage].leftx
-99Rightx := 99Configs[ocrLanguage].rightx
+; Map all dropdown language codes to available 99Config language codes
+global langMap := {}
+langMap["en"] := "en", langMap["es"] := "es", langMap["de"] := "de"
+langMap["fr"] := "fr", langMap["it"] := "it", langMap["pt"] := "pt" 
+langMap["ja"] := "jp", langMap["ko"] := "ko", langMap["zh"] := "cn"
+langMap["zh-TW"] := "cn", langMap["ru"] := "en", langMap["tr"] := "en"
+langMap["pl"] := "en", langMap["nl"] := "de", langMap["sv"] := "en"
+langMap["ar"] := "en", langMap["uk"] := "en", langMap["id"] := "en"
+langMap["vi"] := "en", langMap["th"] := "en", langMap["he"] := "en"
+langMap["cs"] := "en", langMap["no"] := "en", langMap["da"] := "en"
+langMap["fi"] := "en", langMap["hu"] := "en", langMap["el"] := "en"
+
+mappedLang := langMap.HasKey(ocrLanguage) ? langMap[ocrLanguage] : "en"
+99Path := "99" . mappedLang
+99Leftx := 99Configs[mappedLang].leftx
+99Rightx := 99Configs[mappedLang].rightx
 
 Loop {
 	; hoytdj Add + 6
@@ -233,7 +246,7 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 			Y2 := 260
 		}
 	}
-	;bboxAndPause(X1, Y1, X2, Y2)
+	bboxAndPause(X1, Y1, X2, Y2)
 
 	; ImageSearch within the region
 	vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, X1, Y1, X2, Y2, searchVariation)
