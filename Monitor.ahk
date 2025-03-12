@@ -43,9 +43,10 @@ Loop {
             killedAHK := killAHK(scriptName)
             killedInstance := killInstance(instanceNum)
             Sleep, 3000
-            
+
+            cntAHK := checkAHK(scriptName)            
             pID := checkInstance(instanceNum)
-            if not pID {
+            if not pID && not cntAHK {
                 launchInstance(instanceNum)
         
                 sleepTime := instanceLaunchDelay * 1000
@@ -97,6 +98,26 @@ killAHK(scriptName := "")
     }
 
     return killed
+}
+
+checkAHK(scriptName := "")
+{
+    cnt := 0
+
+    if(scriptName != "") {
+        DetectHiddenWindows, On
+        WinGet, IDList, List, ahk_class AutoHotkey
+        Loop %IDList%
+        {
+            ID:=IDList%A_Index%
+            WinGetTitle, ATitle, ahk_id %ID%
+            if InStr(ATitle, "\" . scriptName) {
+                cnt := cnt + 1
+            }
+        }
+    }
+
+    return cnt
 }
 
 killInstance(instanceNum := "")
