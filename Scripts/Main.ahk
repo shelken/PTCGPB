@@ -246,7 +246,7 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
 			Y2 := 260
 		}
 	}
-	bboxAndPause(X1, Y1, X2, Y2)
+	;bboxAndPause(X1, Y1, X2, Y2)
 
 	; ImageSearch within the region
 	vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, X1, Y1, X2, Y2, searchVariation)
