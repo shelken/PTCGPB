@@ -50,6 +50,7 @@ if(heartBeat)
 	IniWrite, 1, %A_ScriptDir%\..\HeartBeat.ini, HeartBeat, Main
 IniRead, vipIdsURL, %A_ScriptDir%\..\Settings.ini, UserSettings, vipIdsURL
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
+IniRead, clientLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, clientLanguage, en
 
 adbPort := findAdbPorts(folderPath)
 
@@ -140,22 +141,9 @@ global 99Configs := {}
 99Configs["ko"] := {leftx: 65, rightx: 100}
 99Configs["cn"] := {leftx: 63, rightx: 102}
 
-; Map all dropdown language codes to available 99Config language codes
-global langMap := {}
-langMap["en"] := "en", langMap["es"] := "es", langMap["de"] := "de"
-langMap["fr"] := "fr", langMap["it"] := "it", langMap["pt"] := "pt" 
-langMap["ja"] := "jp", langMap["ko"] := "ko", langMap["zh"] := "cn"
-langMap["zh-TW"] := "cn", langMap["ru"] := "en", langMap["tr"] := "en"
-langMap["pl"] := "en", langMap["nl"] := "de", langMap["sv"] := "en"
-langMap["ar"] := "en", langMap["uk"] := "en", langMap["id"] := "en"
-langMap["vi"] := "en", langMap["th"] := "en", langMap["he"] := "en"
-langMap["cs"] := "en", langMap["no"] := "en", langMap["da"] := "en"
-langMap["fi"] := "en", langMap["hu"] := "en", langMap["el"] := "en"
-
-mappedLang := langMap.HasKey(ocrLanguage) ? langMap[ocrLanguage] : "en"
-99Path := "99" . mappedLang
-99Leftx := 99Configs[mappedLang].leftx
-99Rightx := 99Configs[mappedLang].rightx
+99Path := "99" . clientLanguage
+99Leftx := 99Configs[clientLanguage].leftx
+99Rightx := 99Configs[clientLanguage].rightx
 
 Loop {
 	; hoytdj Add + 6
