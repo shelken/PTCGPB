@@ -576,11 +576,13 @@ Start:
 		total := SumVariablesInJsonFile()
 		totalSeconds := Round((A_TickCount - rerollTime) / 1000) ; Total time in seconds
 		mminutes := Floor(totalSeconds / 60)
-		if(total = 0)
-			total := "0                             "
+
 		packStatus := "Time: " . mminutes . "m Packs: " . total
-		packStatus .= " Avg: " . Round(total / mminutes, 2) . " packs/min"
-		CreateStatusMessage(packStatus, 287, 490)
+		packStatus .= "   |   Avg: " . Round(total / mminutes, 2) . " packs/min"
+
+		; Display pack status at the bottom of the first reroll instance
+		CreateStatusMessage(packStatus, ((Mains * scaleParam) + 5), 490)
+
 		if(heartBeat)
 			if((A_Index = 1 || (Mod(A_Index, 60) = 0))) {
 				onlineAHK := "Online: "
