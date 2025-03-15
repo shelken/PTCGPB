@@ -23,7 +23,7 @@ CheckForUpdate()
 
 KillADBProcesses()
 
-global Instances, instanceStartDelay, jsonFileName, PacksText, runMain, scaleParam
+global Instances, instanceStartDelay, jsonFileName, PacksText, runMain, Mains, scaleParam
 
 totalFile := A_ScriptDir . "\json\total.json"
 backupFile := A_ScriptDir . "\json\total-backup.json"
@@ -60,6 +60,7 @@ IniRead, SelectedMonitorIndex, Settings.ini, UserSettings, SelectedMonitorIndex,
 IniRead, swipeSpeed, Settings.ini, UserSettings, swipeSpeed, 300
 IniRead, deleteMethod, Settings.ini, UserSettings, deleteMethod, 3 Pack
 IniRead, runMain, Settings.ini, UserSettings, runMain, 1
+IniRead, Mains, Settings.ini, UserSettings, Mains, 1
 IniRead, heartBeat, Settings.ini, UserSettings, heartBeat, 0
 IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, ""
 IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
@@ -111,7 +112,8 @@ Gui, Add, Text, x20 y90 cWhite, Start Delay:
 Gui, Add, Edit, vinstanceStartDelay w50 x105 y88 h20 -E0x200 Background2A2A2A cWhite Center, %instanceStartDelay%
 Gui, Add, Text, x20 y115 cWhite, Columns:
 Gui, Add, Edit, vColumns w50 x105 y113 h20 -E0x200 Background2A2A2A cWhite Center, %Columns%
-Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain x35 y140 cWhite", Run Main
+Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain gmainSettings x35 y140 cWhite", Run Main(s)
+Gui, Add, Edit, % "vMains w50 x135 y138 h20 -E0x200 Background2A2A2A cWhite Center" . (runMain ? "" : " Hidden"), %Mains%
 
 ; ========== Time Settings Section ==========
 Gui, Add, GroupBox, x5 y165 w240 h110 c9370DB, Time Settings ; Purple
@@ -309,6 +311,17 @@ CheckForUpdates:
 	CheckForUpdate()
 return
 
+mainSettings:
+	Gui, Submit, NoHide
+
+	if (runMain) {
+		GuiControl, Show, Mains
+	}
+	else {
+		GuiControl, Hide, Mains
+	}
+return
+
 discordSettings:
 	Gui, Submit, NoHide
 
@@ -357,11 +370,13 @@ LaunchAllMumu:
 	GuiControlGet, Instances,, Instances
 	GuiControlGet, folderPath,, folderPath
 	GuiControlGet, runMain,, runMain
+	GuiControlGet, Mains,, Mains
 	GuiControlGet, instanceLaunchDelay,, instanceLaunchDelay
 
 	IniWrite, %Instances%, Settings.ini, UserSettings, Instances
 	IniWrite, %folderPath%, Settings.ini, UserSettings, folderPath
 	IniWrite, %runMain%, Settings.ini, UserSettings, runMain
+	IniWrite, %Mains%, Settings.ini, UserSettings, Mains
 	IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
 
 	launchAllFile := "LaunchAllMumu.ahk"
@@ -403,6 +418,7 @@ Start:
 	IniWrite, %swipeSpeed%, Settings.ini, UserSettings, swipeSpeed
 	IniWrite, %deleteMethod%, Settings.ini, UserSettings, deleteMethod
 	IniWrite, %runMain%, Settings.ini, UserSettings, runMain
+	IniWrite, %Mains%, Settings.ini, UserSettings, Mains
 	IniWrite, %heartBeat%, Settings.ini, UserSettings, heartBeat
 	IniWrite, %heartBeatWebhookURL%, Settings.ini, UserSettings, heartBeatWebhookURL
 	IniWrite, %heartBeatName%, Settings.ini, UserSettings, heartBeatName
