@@ -1669,11 +1669,6 @@ DownloadFile(url, filename) {
 }
 
 ReadFile(filename, numbers := false) {
-	global FriendID
-	if(InStr(FriendID, "http")) {
-		DownloadFile(FriendID, "ids.txt")
-		Delay(1)
-	}
 	FileRead, content, %A_ScriptDir%\..\%filename%.txt
 
 	if (!content)

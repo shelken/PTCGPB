@@ -432,8 +432,20 @@ Start:
 	IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
 
 
+	; Using FriendID field to provide a URL to download ids.txt is deprecated.
+    if (inStr(FriendID, "http")) {
+    	MsgBox, To provide a URL for friend IDs, please use the ids.txt API field and leave the Friend ID field empty.
+
+    	if (mainIdsURL = "") {
+			IniWrite, "", Settings.ini, UserSettings, FriendID
+			IniWrite, %FriendID%, Settings.ini, UserSettings, mainIdsURL
+		}
+
+    	Reload
+    }
+
 	; Download a new Main ID file prior to running the rest of the below
-	if(mainIdsURL != "") {
+	if (mainIdsURL != "") {
 		DownloadFile(mainIdsURL, "ids.txt")
 	}
 
@@ -482,8 +494,6 @@ Start:
 		}
 	}
 
-	if(inStr(FriendID, "http"))
-		DownloadFile(FriendID, "ids.txt")
 	SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 	SysGet, Monitor, Monitor, %SelectedMonitorIndex%
 	rerollTime := A_TickCount
