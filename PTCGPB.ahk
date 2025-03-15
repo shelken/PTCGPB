@@ -471,8 +471,29 @@ Start:
 
 	; Run main before instances to account for instance start delay
 	if (runMain) {
-		FileName := "Scripts\Main.ahk"
-		Run, %FileName%
+		Loop, %Mains%
+		{
+			if (A_Index != 1) {
+				SourceFile := "Scripts\Main.ahk" ; Path to the source .ahk file
+				TargetFolder := "Scripts\" ; Path to the target folder
+				TargetFile := TargetFolder . "Main" . A_Index . ".ahk" ; Generate target file path
+				FileDelete, %TargetFile%
+				FileCopy, %SourceFile%, %TargetFile%, 1 ; Copy source file to target
+				if (ErrorLevel)
+					MsgBox, Failed to create %TargetFile%. Ensure permissions and paths are correct.
+			}
+
+			mainInstanceName := "Main" . (A_Index > 1 ? A_Index : "")
+			FileName := "Scripts\" . mainInstanceName . ".ahk"
+			Command := FileName
+
+			if (A_Index > 1 && instanceStartDelay > 0) {
+				instanceStartDelayMS := instanceStartDelay * 1000
+				Sleep, instanceStartDelayMS
+			}
+
+			Run, %Command%
+		}
 	}
 
 	; Loop to process each instance
@@ -493,7 +514,7 @@ Start:
 		FileName := "Scripts\" . A_Index . ".ahk"
 		Command := FileName
 
-		if (A_Index != 1 && instanceStartDelay > 0) {
+		if ((Mains > 1 || A_Index > 1) && instanceStartDelay > 0) {
 			instanceStartDelayMS := instanceStartDelay * 1000
 			Sleep, instanceStartDelayMS
 		}
