@@ -353,12 +353,16 @@ return
 
 ArrangeWindows:
 	GuiControlGet, runMain,, runMain
+	GuiControlGet, Mains,, Mains
 	GuiControlGet, Instances,, Instances
 	GuiControlGet, Columns,, Columns
 	GuiControlGet, SelectedMonitorIndex,, SelectedMonitorIndex
 	if (runMain) {
-		resetWindows("Main", SelectedMonitorIndex)
-		sleep, 10
+		Loop %Mains% {
+			mainInstanceName := "Main" . (A_Index > 1 ? A_Index : "")
+			resetWindows(mainInstanceName, SelectedMonitorIndex)
+			sleep, 10
+		}
 	}
 	Loop %Instances% {
 		resetWindows(A_Index, SelectedMonitorIndex)
@@ -676,8 +680,8 @@ DownloadFile(url, filename) {
 
 }
 
-resetWindows(Title, SelectedMonitorIndex){
-	global Columns, runMain
+resetWindows(Title, SelectedMonitorIndex) {
+	global Columns, runMain, Mains
 	RetryCount := 0
 	MaxRetries := 10
 	Loop
@@ -686,11 +690,13 @@ resetWindows(Title, SelectedMonitorIndex){
 			; Get monitor origin from index
 			SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 			SysGet, Monitor, Monitor, %SelectedMonitorIndex%
-			if(runMain) {
-				if (Title = "Main") {
-					instanceIndex := 1
+			if (runMain) {
+				if (InStr(Title, "Main") = 1) {
+					instanceIndex := StrReplace(Title, "Main", "")
+					if (instanceIndex = "")
+						instanceIndex := 1
 				} else {
-					instanceIndex := Title + 1
+					instanceIndex := (Mains - 1) + Title + 1
 				}
 			} else {
 				instanceIndex := Title

@@ -16,7 +16,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS
 global DeadCheck
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
@@ -42,6 +42,7 @@ IniRead, SelectedMonitorIndex, %A_ScriptDir%\..\Settings.ini, UserSettings, Sele
 IniRead, swipeSpeed, %A_ScriptDir%\..\Settings.ini, UserSettings, swipeSpeed, 300
 IniRead, deleteMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, deleteMethod, 3 Pack
 IniRead, runMain, %A_ScriptDir%\..\Settings.ini, UserSettings, runMain, 1
+IniRead, Mains, %A_ScriptDir%\..\Settings.ini, UserSettings, Mains, 1
 IniRead, heartBeat, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeat, 0
 IniRead, heartBeatWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeatWebhookURL, ""
 IniRead, heartBeatName, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeatName, ""
@@ -920,7 +921,7 @@ LevelUp() {
 }
 
 resetWindows(){
-	global Columns, winTitle, SelectedMonitorIndex, scaleParam, FriendID
+	global Columns, winTitle, SelectedMonitorIndex, scaleParam
 	CreateStatusMessage("Arranging window positions and sizes")
 	RetryCount := 0
 	MaxRetries := 10
@@ -931,33 +932,17 @@ resetWindows(){
 			SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
 			SysGet, Monitor, Monitor, %SelectedMonitorIndex%
 			Title := winTitle
-			rowHeight := 533  ; Height of each row
 
-			if(runMain) {
-				; Calculate currentRow
-				if (winTitle <= Columns - 1) {
-					currentRow := 0  ; First row has (Columns - 1) windows
-				} else {
-					; For rows after the first, adjust calculation
-					adjustedWinTitle := winTitle - (Columns - 1)
-					currentRow := Floor((adjustedWinTitle - 1) / Columns) + 1
-				}
-
-				; Calculate x position
-				if (currentRow == 0) {
-					x := winTitle * scaleParam  ; First row uses (Columns - 1) columns
-				} else {
-					adjustedWinTitle := winTitle - (Columns - 1)
-					x := Mod(adjustedWinTitle - 1, Columns) * scaleParam  ; Subsequent rows use full Columns
-				}
+			if (runMain) {
+				instanceIndex := (Mains - 1) + Title + 1
 			} else {
-				currentRow := Floor((winTitle - 1) / Columns)
-				x := Mod((winTitle - 1), Columns) * scaleParam
+				instanceIndex := Title
 			}
 
+			rowHeight := 533  ; Adjust the height of each row
+			currentRow := Floor((instanceIndex - 1) / Columns)
 			y := currentRow * rowHeight
-
-			; Move the window
+			x := Mod((instanceIndex - 1), Columns) * scaleParam
 			WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 537
 			break
 		}
