@@ -639,7 +639,11 @@ ChooseTag() {
 	FindImageAndClick(20, 500, 55, 530, , "Home", 40, 516, 500) 212 276 230 294
 	FindImageAndClick(203, 272, 237, 300, , "Profile", 143, 95, 500)
 	FindImageAndClick(205, 310, 220, 319, , "ChosenTag", 143, 306, 1000)
-	FindImageAndClick(53, 218, 63, 228, , "Badge", 143, 466, 500)
+	FindImageAndClick(203, 272, 237, 300, , "Profile", 143, 505, 1000)
+	if(FindOrLoseImage(145, 140, 157, 155, , "Eevee", 1)) {
+		FindImageAndClick(163, 200, 173, 207, , "ChooseEevee", 147, 207, 1000)
+		FindImageAndClick(53, 218, 63, 228, , "Badge", 143, 466, 500)
+	}
 }
 
 EraseInput(num := 0, total := 0) {
@@ -2378,7 +2382,15 @@ DoTutorial() {
 			adbClick(41, 296)
 		}
 	FindImageAndClick(190, 241, 225, 270, , "Name", 189, 438) ;wait for name input screen
-
+	;choose any
+	Delay(1)
+	if(FindOrLoseImage(147, 160, 157, 169, , "Erika", 1)) {
+		AdbClick(143, 207)
+		Delay(1)
+		AdbClick(143, 207)
+		FindImageAndClick(165, 294, 173, 301, , "ChooseErika", 143, 306)
+		FindImageAndClick(190, 241, 225, 270, , "Name", 143, 462) ;wait for name input screen
+	}
 	FindImageAndClick(0, 476, 40, 502, , "OK", 139, 257) ;wait for name input screen
 
 	failSafe := A_TickCount
