@@ -1289,7 +1289,7 @@ ParseFriendCode(ByRef friendCode) {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	parseFriendCodeResult := False
-	blowUp := [200, 200, 500, 1000, 2000, 100, 250, 300, 350, 400, 450, 550, 600, 700, 800, 900]
+	blowUp := [200, 500, 1000, 2000, 100, 250, 300, 350, 400, 450, 550, 600, 700, 800, 900]
 	Loop {
 		friendCode := GetFriendCode(blowUp[A_Index])
 		if (RegExMatch(friendCode, "^\d{14,17}$")) {
@@ -1297,7 +1297,7 @@ ParseFriendCode(ByRef friendCode) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
-		if (failSafeTime > 3) {
+		if (failSafeTime > 4) {
 			parseFriendCodeResult := False
 			break
 		}
@@ -1309,7 +1309,7 @@ ParseFriendName(ByRef friendName) {
 	failSafe := A_TickCount
 	failSafeTime := 0
 	parseFriendNameResult := False
-	blowUp := [200, 200, 500, 1000, 2000, 100, 250, 300, 350, 400, 450, 550, 600, 700, 800, 900]
+	blowUp := [200, 500, 1000, 2000, 100, 250, 300, 350, 400, 450, 550, 600, 700, 800, 900]
 	Loop {
 		friendName := GetFriendName(blowUp[A_Index])
 		if (RegExMatch(friendName, "^[a-zA-Z0-9]{5,20}$")) {
@@ -1317,7 +1317,7 @@ ParseFriendName(ByRef friendName) {
 			break
 		}
 		failSafeTime := (A_TickCount - failSafe) // 1000
-		if (failSafeTime > 2) {
+		if (failSafeTime > 4) {
 			parseFriendNameResult := False
 			break
 		}
