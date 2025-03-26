@@ -2627,24 +2627,36 @@ DoTutorial() {
 SelectPack(HG := false) {
 	global openPack, packArray
 	packy := 196
-	if(openPack = "Mew") {
-		packx := 80
-	} else if(openPack = "Shining") {
-		packx := 145
+	if(openPack = "Shining") {
+		packx := 145 ;TODO verify that shining is where arceus was
 	} else if(openPack = "Arceus") {
 		packx := 145
+		;packx := 200 ;TODO replace and verify that arceus went to where dialga was
+	} else if(openPack = "Mew") {   ;TODO remove and verify that mew is not in home screen
+		packx := 80   ;TODO remove and verify that mew is not in home screen
 	} else {
-		packx := 200
+		packx := 200 
+		;packx := 80 ;TODO replace and verify that dialga went to where mew was
 	}
 	FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
-	if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard") {
+	if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard") { ;TODO remove
+	;if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard" || openPack = "Mew") { ;TODO uncomment
 		packy := 442
+		if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard"){
+			; adbSwipeUp() ; TODO uncomment 
+			;TODO find new y. maybe not even needed
+		}
 		if(openPack = "Pikachu"){
             packx := 245
+            ; packx := 125 ;TODO replace and verify 
         } else if(openPack = "Mewtwo"){
-            packx := 205
+            packx := 205 
+            ; packx := 85 ;TODO replace and verify 
         } else if(openPack = "Charizard"){
-            packx := 165
+            packx := 165 
+            ; packx := 45 ;TODO replace and verify 
+        } else if(openPack = "Mew"){
+            packx := 205 ;TODO verify that mew went to where mewtwo was
         }
 		FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 245, 475)
 		FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
