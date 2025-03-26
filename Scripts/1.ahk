@@ -58,7 +58,8 @@ IniRead, PseudoGodPack, %A_ScriptDir%\..\Settings.ini, UserSettings, PseudoGodPa
 IniRead, minStars, %A_ScriptDir%\..\Settings.ini, UserSettings, minStars, 0
 IniRead, Palkia, %A_ScriptDir%\..\Settings.ini, UserSettings, Palkia, 0
 IniRead, Dialga, %A_ScriptDir%\..\Settings.ini, UserSettings, Dialga, 0
-IniRead, Arceus, %A_ScriptDir%\..\Settings.ini, UserSettings, Arceus, 1
+IniRead, Arceus, %A_ScriptDir%\..\Settings.ini, UserSettings, Arceus, 0
+IniRead, Shining, %A_ScriptDir%\..\Settings.ini, UserSettings, Shining, 1
 IniRead, Mew, %A_ScriptDir%\..\Settings.ini, UserSettings, Mew, 0
 IniRead, Pikachu, %A_ScriptDir%\..\Settings.ini, UserSettings, Pikachu, 0
 IniRead, Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, Charizard, 0
@@ -67,7 +68,7 @@ IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
 
-pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus"]
+pokemonList := ["Palkia", "Dialga", "Mew", "Pikachu", "Charizard", "Mewtwo", "Arceus", "Shining"]
 
 packArray := []  ; Initialize an empty array
 
@@ -2628,6 +2629,8 @@ SelectPack(HG := false) {
 	packy := 196
 	if(openPack = "Mew") {
 		packx := 80
+	} else if(openPack = "Shining") {
+		packx := 145
 	} else if(openPack = "Arceus") {
 		packx := 145
 	} else {
