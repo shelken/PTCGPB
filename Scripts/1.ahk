@@ -2641,6 +2641,7 @@ SelectPack(HG := false) {
 	FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
 	if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard") { ;TODO remove
 	;if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard" || openPack = "Mew") { ;TODO uncomment
+		FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 245, 475)
 		packy := 442
 		if(openPack = "Pikachu" || openPack = "Mewtwo" || openPack = "Charizard"){
 			; adbSwipeUp() ; TODO uncomment 
@@ -2658,7 +2659,6 @@ SelectPack(HG := false) {
         } else if(openPack = "Mew"){
             packx := 205 ;TODO verify that mew went to where mewtwo was
         }
-		FindImageAndClick(115, 140, 160, 155, , "SelectExpansion", 245, 475)
 		FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
 	} else if(openPack = "Palkia") {
 		Delay(2)
