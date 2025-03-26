@@ -16,7 +16,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS
 global DeadCheck
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
@@ -51,6 +51,7 @@ IniRead, packMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, packMethod, 0
 IniRead, TrainerCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, TrainerCheck, 0
 IniRead, FullArtCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, FullArtCheck, 0
 IniRead, RainbowCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, RainbowCheck, 0
+IniRead, ShinyCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, ShinyCheck, 0
 IniRead, CrownCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, CrownCheck, 0
 IniRead, ImmersiveCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, ImmersiveCheck, 0
 IniRead, PseudoGodPack, %A_ScriptDir%\..\Settings.ini, UserSettings, PseudoGodPack, 0
@@ -1225,6 +1226,7 @@ CheckPack() {
 	foundTrainer := false
 	foundRainbow := false
 	foundFullArt := false
+	foundShiny := false
 	foundCrown := false
 	foundImmersive := false
 	foundTS := false
@@ -1245,6 +1247,11 @@ CheckPack() {
 		if(foundFullArt)
 			foundTS := "Full Art"
 	}
+	if(ShinyCheck && !foundTS) {
+		foundShiny := FindBorders("shiny2star")
+		if(ShinyCheck)
+			foundTS := "Shiny"
+	}
 	if(ImmersiveCheck && !foundTS) {
 		foundImmersive := FindBorders("immersive")
 		if(foundImmersive)
@@ -1256,11 +1263,11 @@ CheckPack() {
 			foundTS := "Crown"
 	}
 	If(PseudoGodPack && !foundTS) {
-		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
+		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart") + FindBorders("shiny2star")
 		if(2starCount > 1)
 			foundTS := "Double two star"
 	}
-	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundImmersive || foundCrown || 2starCount > 1) {
+	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundShiny || foundImmersive || foundCrown || 2starCount > 1) {
 		if(loadedAccount) {
 			FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
 			IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -1323,6 +1330,14 @@ FindBorders(prefix) {
 		,[196, 284, 249, 286]
 		,[70, 399, 123, 401]
 		,[155, 399, 208, 401]]
+	if (prefix = "shiny1star" || prefix = "shiny2star") {
+		; TODO: Need references images for these coordinates (right side, bottom corner)
+		borderCoords := [[90, 261, 93, 283]
+		,[173, 261, 176, 283]
+		,[255, 261, 258, 283]
+		,[130, 376, 133, 398]
+		,[215, 376, 218, 398]]
+	}
 	pBitmap := from_window(WinExist(winTitle))
 	; imagePath := "C:\Users\Arturo\Desktop\PTCGP\GPs\" . Clipboard . ".png"
 	; pBitmap := Gdip_CreateBitmapFromFile(imagePath)
@@ -1389,7 +1404,7 @@ FindGodPack() {
 				invalidGP := true
 			}
 			if(!invalidGP && minStars > 0) {
-				starCount := 5 - FindBorders("1star")
+				starCount := 5 - FindBorders("1star") - FindBorders("shiny1star")
 				if(starCount < minStars) {
 					CreateStatusMessage("Does not meet minimum 2 star threshold.")
 					invalidGP := true
@@ -1426,7 +1441,7 @@ GodPackFound(validity) {
 	Randmax := Praise.Length()
 	Random, rand, 1, Randmax
 	Interjection := Praise[rand]
-	starCount := 5 - FindBorders("1star")
+	starCount := 5 - FindBorders("1star") - FindBorders("shiny1star")
 	screenShot := Screenshot(validity)
 	accountFile := saveAccount(validity)
 	logMessage := "\n" . username . "\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGetting friend code then sendind discord message."
