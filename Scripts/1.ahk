@@ -16,7 +16,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
 global DeadCheck
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
@@ -54,6 +54,7 @@ IniRead, RainbowCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, RainbowCheck
 IniRead, ShinyCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, ShinyCheck, 0
 IniRead, CrownCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, CrownCheck, 0
 IniRead, ImmersiveCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, ImmersiveCheck, 0
+IniRead, InvalidCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, InvalidCheck, 0
 IniRead, PseudoGodPack, %A_ScriptDir%\..\Settings.ini, UserSettings, PseudoGodPack, 0
 IniRead, minStars, %A_ScriptDir%\..\Settings.ini, UserSettings, minStars, 0
 IniRead, Palkia, %A_ScriptDir%\..\Settings.ini, UserSettings, Palkia, 0
@@ -1242,51 +1243,53 @@ CheckPack() {
 	foundTS := false
 	foundGP := FindGodPack()
 	;msgbox 1 foundGP:%foundGP%, TC:%TrainerCheck%, RC:%RainbowCheck%, FAC:%FullArtCheck%, FTS:%foundTS%
-	if(TrainerCheck && !foundTS) {
+	if(TrainerCheck) {
 		foundTrainer := FindBorders("trainer")
 		if(foundTrainer)
 			foundTS := "Trainer"
 	}
-	if(RainbowCheck && !foundTS) {
+	if(RainbowCheck) {
 		foundRainbow := FindBorders("rainbow")
 		if(foundRainbow)
 			foundTS := "Rainbow"
 	}
-	if(FullArtCheck && !foundTS) {
+	if(FullArtCheck) {
 		foundFullArt := FindBorders("fullart")
 		if(foundFullArt)
 			foundTS := "Full Art"
 	}
-	if(ShinyCheck && !foundTS) {
+	if(ShinyCheck || InvalidCheck) {
 		foundShiny := FindBorders("shiny2star") + FindBorders("shiny1star")
 		if(ShinyCheck)
 			foundTS := "Shiny"
 	}
-	if(ImmersiveCheck && !foundTS) {
+	if(ImmersiveCheck || InvalidCheck) {
 		foundImmersive := FindBorders("immersive")
 		if(foundImmersive)
 			foundTS := "Immersive"
 	}
-	If(CrownCheck && !foundTS) {
+	If(CrownCheck || InvalidCheck) {
 		foundCrown := FindBorders("crown")
 		if(foundCrown)
 			foundTS := "Crown"
 	}
-	If(PseudoGodPack && !foundTS) {
+	If(PseudoGodPack) {
 		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart") + FindBorders("shiny2star")
 		if(2starCount > 1)
 			foundTS := "Double two star"
 	}
 	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundShiny || foundImmersive || foundCrown || 2starCount > 1) {
-		if(loadedAccount) {
-			FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
-			IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
-		}
-		if(foundGP)
-			restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
-		else {
-			FoundStars(foundTS)
-			restartGameInstance(foundTS . " found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
+		if(!(InvalidCheck && (foundShiny || foundImmersive || foundCrown) || foundGP)) {
+			if(loadedAccount) {
+				FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
+				IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+			}
+			if(foundGP)
+				restartGameInstance("God Pack found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
+			else {
+				FoundStars(foundTS)
+				restartGameInstance(foundTS . " found. Continuing...", "GodPack") ; restarts to backup and delete xml file with account info.
+			}
 		}
 	}
 }

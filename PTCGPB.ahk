@@ -72,6 +72,7 @@ IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, 0
 IniRead, ShinyCheck, Settings.ini, UserSettings, ShinyCheck, 0
 IniRead, CrownCheck, Settings.ini, UserSettings, CrownCheck, 0
 IniRead, ImmersiveCheck, Settings.ini, UserSettings, ImmersiveCheck, 0
+IniRead, InvalidCheck, Settings.ini, UserSettings, InvalidCheck, 0
 IniRead, PseudoGodPack, Settings.ini, UserSettings, PseudoGodPack, 0
 IniRead, minStars, Settings.ini, UserSettings, minStars, 0
 IniRead, Palkia, Settings.ini, UserSettings, Palkia, 0
@@ -239,10 +240,11 @@ Gui, Add, GroupBox, x255 y230 w240 h155 cFF4500, Card Detection ; Orange Red
 Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x270 y255 cFF4500", Single Full Art
 Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x385 y255 cFF4500", Single Trainer
 Gui, Add, Checkbox, % (RainbowCheck ? "Checked" : "") " vRainbowCheck x270 y275 cFF4500", Single Rainbow
-Gui, Add, Checkbox, % (ShinyCheck ? "Checked" : "") " vShinyCheck x385 y275 cFF4500", Single Shiny
 Gui, Add, Checkbox, % (PseudoGodPack ? "Checked" : "") " vPseudoGodPack x270 y305 cFF4500", Double 2 Star
+Gui, Add, Checkbox, % (InvalidCheck ? "Checked" : "") " vInvalidCheck x385 y305 cFF4500", Delete Invalid
 Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x270 y335 cFF4500", Save Crowns
 Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x270 y355 cFF4500", Save Immersives
+Gui, Add, Checkbox, % (ShinyCheck ? "Checked" : "") " vShinyCheck x385 y335 cFF4500", Save Shiny
 
 
 
@@ -445,6 +447,7 @@ Start:
 	IniWrite, %RainbowCheck%, Settings.ini, UserSettings, RainbowCheck
 	IniWrite, %ShinyCheck%, Settings.ini, UserSettings, ShinyCheck
 	IniWrite, %CrownCheck%, Settings.ini, UserSettings, CrownCheck
+	IniWrite, %InvalidCheck%, Settings.ini, UserSettings, InvalidCheck
 	IniWrite, %ImmersiveCheck%, Settings.ini, UserSettings, ImmersiveCheck
 	IniWrite, %PseudoGodPack%, Settings.ini, UserSettings, PseudoGodPack
 	IniWrite, %minStars%, Settings.ini, UserSettings, minStars
