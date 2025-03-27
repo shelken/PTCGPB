@@ -90,6 +90,15 @@ IniRead, mainIdsURL, Settings.ini, UserSettings, mainIdsURL, ""
 IniRead, vipIdsURL, Settings.ini, UserSettings, vipIdsURL, ""
 IniRead, instanceLaunchDelay, Settings.ini, UserSettings, instanceLaunchDelay, 5
 
+IniRead, minStarsA1Charizard, Settings.ini, UserSettings, minStarsA1Charizard, 0
+IniRead, minStarsA1Mewtwo, Settings.ini, UserSettings, minStarsA1Mewtwo, 0
+IniRead, minStarsA1Pikachu, Settings.ini, UserSettings, minStarsA1Pikachu, 0
+IniRead, minStarsA1a, Settings.ini, UserSettings, minStarsA1a, 0
+IniRead, minStarsA2Dialga, Settings.ini, UserSettings, minStarsA2Dialga, 0
+IniRead, minStarsA2Palkia, Settings.ini, UserSettings, minStarsA2Palkia, 0
+IniRead, minStarsA2a, Settings.ini, UserSettings, minStarsA2a, 0
+IniRead, minStarsA2b, Settings.ini, UserSettings, minStarsA2b, 0
+
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
 Gui, Font, s10 cWhite, Segoe UI ; Modern font
@@ -196,7 +205,10 @@ Gui, Add, Checkbox, % (slowMotion ? "Checked" : "") " vslowMotion x35 y470 c4169
 ; ========== God Pack Settings Section ==========
 Gui, Add, GroupBox, x255 y0 w240 h120 c39FF14, God Pack Settings ; Neon green
 Gui, Add, Text, x270 y25 c39FF14, Min. 2 Stars:
-Gui, Add, Edit, vminStars w50 x350 y23 h20 -E0x200 Background2A2A2A cWhite Center, %minStars%
+Gui, Add, Edit, vminStars w25 x350 y23 h20 -E0x200 Background2A2A2A cWhite Center, %minStars%
+Gui, Add, Text, x390 y25 c39FF14, 2* for SR:
+Gui, Add, Edit, vminStarsA2b w25 x450 y23 h20 -E0x200 Background2A2A2A cWhite Center, %minStarsA2b%
+
 Gui, Add, Text, x270 y53 c39FF14, Method:
 if (deleteMethod = "5 Pack")
     defaultDelete := 1
@@ -453,6 +465,23 @@ Start:
 	IniWrite, %autoLaunchMonitor%, Settings.ini, UserSettings, autoLaunchMonitor
 	IniWrite, %instanceLaunchDelay%, Settings.ini, UserSettings, instanceLaunchDelay
 
+	minStarsA1Charizard := minStars
+	minStarsA1Mewtwo := minStars
+	minStarsA1Pikachu := minStars
+	minStarsA1a := minStars
+	minStarsA2Dialga := minStars
+	minStarsA2Palkia := minStars
+	minStarsA2a := minStars
+
+	IniWrite, %minStarsA1Charizard%, Settings.ini, UserSettings, minStarsA1Charizard
+	IniWrite, %minStarsA1Mewtwo%, Settings.ini, UserSettings, minStarsA1Mewtwo
+	IniWrite, %minStarsA1Pikachu%, Settings.ini, UserSettings, minStarsA1Pikachu
+	IniWrite, %minStarsA1a%, Settings.ini, UserSettings, minStarsA1a
+	IniWrite, %minStarsA2Dialga%, Settings.ini, UserSettings, minStarsA2Dialga
+	IniWrite, %minStarsA2Palkia%, Settings.ini, UserSettings, minStarsA2Palkia
+	IniWrite, %minStarsA2a%, Settings.ini, UserSettings, minStarsA2a
+	IniWrite, %minStarsA2b%, Settings.ini, UserSettings, minStarsA2b
+	
 
 	; Using FriendID field to provide a URL to download ids.txt is deprecated.
     if (inStr(FriendID, "http")) {
