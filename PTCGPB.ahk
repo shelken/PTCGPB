@@ -66,6 +66,7 @@ IniRead, heartBeatWebhookURL, Settings.ini, UserSettings, heartBeatWebhookURL, "
 IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
 IniRead, nukeAccount, Settings.ini, UserSettings, nukeAccount, 0
 IniRead, packMethod, Settings.ini, UserSettings, packMethod, 0
+IniRead, CheckShiningPackOnly, Settings.ini, UserSettings, CheckShiningPackOnly, 0
 IniRead, TrainerCheck, Settings.ini, UserSettings, TrainerCheck, 0
 IniRead, FullArtCheck, Settings.ini, UserSettings, FullArtCheck, 0
 IniRead, RainbowCheck, Settings.ini, UserSettings, RainbowCheck, 0
@@ -240,6 +241,7 @@ Gui, Add, GroupBox, x255 y230 w240 h155 cFF4500, Card Detection ; Orange Red
 Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x270 y255 cFF4500", Single Full Art
 Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x385 y255 cFF4500", Single Trainer
 Gui, Add, Checkbox, % (RainbowCheck ? "Checked" : "") " vRainbowCheck x270 y275 cFF4500", Single Rainbow
+Gui, Add, Checkbox, % (CheckShiningPackOnly ? "Checked" : "") " vCheckShiningPackOnly x385 y275 cFF4500", only for Shining
 Gui, Add, Checkbox, % (PseudoGodPack ? "Checked" : "") " vPseudoGodPack x270 y305 cFF4500", Double 2 Star
 Gui, Add, Checkbox, % (InvalidCheck ? "Checked" : "") " vInvalidCheck x385 y305 cFF4500", Delete Invalid
 Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x270 y335 cFF4500", Save Crowns
@@ -442,6 +444,7 @@ Start:
 	IniWrite, %heartBeatName%, Settings.ini, UserSettings, heartBeatName
 	IniWrite, %nukeAccount%, Settings.ini, UserSettings, nukeAccount
 	IniWrite, %packMethod%, Settings.ini, UserSettings, packMethod
+	IniWrite, %CheckShiningPackOnly%, Settings.ini, UserSettings, CheckShiningPackOnly
 	IniWrite, %TrainerCheck%, Settings.ini, UserSettings, TrainerCheck
 	IniWrite, %FullArtCheck%, Settings.ini, UserSettings, FullArtCheck
 	IniWrite, %RainbowCheck%, Settings.ini, UserSettings, RainbowCheck

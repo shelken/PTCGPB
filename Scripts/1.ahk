@@ -16,7 +16,7 @@ CoordMode, Pixel, Screen
 DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
-global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
+global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, CheckShiningPackOnly, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
 global DeadCheck
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
@@ -48,6 +48,7 @@ IniRead, heartBeatWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, heart
 IniRead, heartBeatName, %A_ScriptDir%\..\Settings.ini, UserSettings, heartBeatName, ""
 IniRead, nukeAccount, %A_ScriptDir%\..\Settings.ini, UserSettings, nukeAccount, 0
 IniRead, packMethod, %A_ScriptDir%\..\Settings.ini, UserSettings, packMethod, 0
+IniRead, CheckShiningPackOnly, %A_ScriptDir%\..\Settings.ini, UserSettings, CheckShiningPackOnly, 0
 IniRead, TrainerCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, TrainerCheck, 0
 IniRead, FullArtCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, FullArtCheck, 0
 IniRead, RainbowCheck, %A_ScriptDir%\..\Settings.ini, UserSettings, RainbowCheck, 0
@@ -1232,7 +1233,7 @@ SetTextAndResize(controlHwnd, newText) {
 }
 
 CheckPack() {
-	global scriptName, DeadCheck
+	global scriptName, DeadCheck, CheckShiningPackOnly
 	foundGP := false ;check card border to find godpacks
 	foundTrainer := false
 	foundRainbow := false
@@ -1243,40 +1244,42 @@ CheckPack() {
 	foundTS := false
 	foundGP := FindGodPack()
 	;msgbox 1 foundGP:%foundGP%, TC:%TrainerCheck%, RC:%RainbowCheck%, FAC:%FullArtCheck%, FTS:%foundTS%
-	if(TrainerCheck && !foundTS) {
-		foundTrainer := FindBorders("trainer")
-		if(foundTrainer)
-			foundTS := "Trainer"
-	}
-	if(RainbowCheck && !foundTS) {
-		foundRainbow := FindBorders("rainbow")
-		if(foundRainbow)
-			foundTS := "Rainbow"
-	}
-	if(FullArtCheck && !foundTS) {
-		foundFullArt := FindBorders("fullart")
-		if(foundFullArt)
-			foundTS := "Full Art"
-	}
-	if((ShinyCheck && !foundTS) || InvalidCheck) {
-		foundShiny := FindBorders("shiny2star") + FindBorders("shiny1star")
-		if(foundShiny)
-			foundTS := "Shiny"
-	}
-	if((ImmersiveCheck && !foundTS) || InvalidCheck) {
-		foundImmersive := FindBorders("immersive")
-		if(foundImmersive)
-			foundTS := "Immersive"
-	}
-	If((CrownCheck && !foundTS) || InvalidCheck) {
-		foundCrown := FindBorders("crown")
-		if(foundCrown)
-			foundTS := "Crown"
-	}
-	If(PseudoGodPack && !foundTS) {
-		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
-		if(2starCount > 1)
-			foundTS := "Double two star"
+	if(!CheckShiningPackOnly || openPack = "Shining") {
+		if(TrainerCheck && !foundTS) {
+			foundTrainer := FindBorders("trainer")
+			if(foundTrainer)
+				foundTS := "Trainer"
+		}
+		if(RainbowCheck && !foundTS) {
+			foundRainbow := FindBorders("rainbow")
+			if(foundRainbow)
+				foundTS := "Rainbow"
+		}
+		if(FullArtCheck && !foundTS) {
+			foundFullArt := FindBorders("fullart")
+			if(foundFullArt)
+				foundTS := "Full Art"
+		}
+		if((ShinyCheck && !foundTS) || InvalidCheck) {
+			foundShiny := FindBorders("shiny2star") + FindBorders("shiny1star")
+			if(foundShiny)
+				foundTS := "Shiny"
+		}
+		if((ImmersiveCheck && !foundTS) || InvalidCheck) {
+			foundImmersive := FindBorders("immersive")
+			if(foundImmersive)
+				foundTS := "Immersive"
+		}
+		If((CrownCheck && !foundTS) || InvalidCheck) {
+			foundCrown := FindBorders("crown")
+			if(foundCrown)
+				foundTS := "Crown"
+		}
+		If(PseudoGodPack && !foundTS) {
+			2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
+			if(2starCount > 1)
+				foundTS := "Double two star"
+		}
 	}
 	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundShiny || foundImmersive || foundCrown || 2starCount > 1) {
 		if(!(InvalidCheck && (foundShiny || foundImmersive || foundCrown) || foundGP)) {
