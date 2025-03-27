@@ -1249,7 +1249,7 @@ CheckPack() {
 			foundTS := "Full Art"
 	}
 	if(ShinyCheck && !foundTS) {
-		foundShiny := FindBorders("shiny2star")
+		foundShiny := FindBorders("shiny2star") + FindBorders("shiny1star")
 		if(ShinyCheck)
 			foundTS := "Shiny"
 	}
@@ -1399,13 +1399,14 @@ FindGodPack() {
 			packs += 1
 			if(packMethod)
 				packs := 1
+			foundShiny := FindBorders("shiny2star") + FindBorders("shiny1star")
 			foundImmersive := FindBorders("immersive")
 			foundCrown := FindBorders("crown")
-			if(foundImmersive || foundCrown) {
+			if(foundImmersive || foundCrown || foundShiny) {
 				invalidGP := true
 			}
 			if(!invalidGP && minStars > 0) {
-				starCount := 5 - FindBorders("1star") - FindBorders("shiny1star")
+				starCount := 5 - FindBorders("1star")
 				if(starCount < minStars) {
 					CreateStatusMessage("Does not meet minimum 2 star threshold.")
 					invalidGP := true
