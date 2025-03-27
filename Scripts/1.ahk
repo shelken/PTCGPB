@@ -1243,38 +1243,38 @@ CheckPack() {
 	foundTS := false
 	foundGP := FindGodPack()
 	;msgbox 1 foundGP:%foundGP%, TC:%TrainerCheck%, RC:%RainbowCheck%, FAC:%FullArtCheck%, FTS:%foundTS%
-	if(TrainerCheck) {
+	if(TrainerCheck && !foundTS) {
 		foundTrainer := FindBorders("trainer")
 		if(foundTrainer)
 			foundTS := "Trainer"
 	}
-	if(RainbowCheck) {
+	if(RainbowCheck && !foundTS) {
 		foundRainbow := FindBorders("rainbow")
 		if(foundRainbow)
 			foundTS := "Rainbow"
 	}
-	if(FullArtCheck) {
+	if(FullArtCheck && !foundTS) {
 		foundFullArt := FindBorders("fullart")
 		if(foundFullArt)
 			foundTS := "Full Art"
 	}
-	if(ShinyCheck || InvalidCheck) {
+	if((ShinyCheck && !foundTS) || InvalidCheck) {
 		foundShiny := FindBorders("shiny2star") + FindBorders("shiny1star")
-		if(ShinyCheck)
+		if(foundShiny)
 			foundTS := "Shiny"
 	}
-	if(ImmersiveCheck || InvalidCheck) {
+	if((ImmersiveCheck && !foundTS) || InvalidCheck) {
 		foundImmersive := FindBorders("immersive")
 		if(foundImmersive)
 			foundTS := "Immersive"
 	}
-	If(CrownCheck || InvalidCheck) {
+	If((CrownCheck && !foundTS) || InvalidCheck) {
 		foundCrown := FindBorders("crown")
 		if(foundCrown)
 			foundTS := "Crown"
 	}
-	If(PseudoGodPack) {
-		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart") + FindBorders("shiny2star")
+	If(PseudoGodPack && !foundTS) {
+		2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
 		if(2starCount > 1)
 			foundTS := "Double two star"
 	}
