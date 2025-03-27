@@ -1367,14 +1367,30 @@ FindBorders(prefix) {
 FindGodPack() {
 	global winTitle, discordUserId, Delay, username, packs, minStars, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b, openPack, scriptName, DeadCheck, deleteMethod
 	packMinStars := minStars
-	if (openPack == "Shining") { packMinStars := minStarsA2b }
-	if (openPack == "Arceus") { packMinStars := minStarsA2a }
-	if (openPack == "Palkia") { packMinStars := minStarsA2Palkia }
-	if (openPack == "Dialga") { packMinStars := minStarsA2Dialga }
-	if (openPack == "Mew") { packMinStars := minStarsA1a }
-	if (openPack == "Pikachu") { packMinStars := minStarsA1Pikachu }
-	if (openPack == "Charizard") { packMinStars := minStarsA1Charizard }
-	if (openPack == "Mewtwo") { packMinStars := minStarsA1Mewtwo }
+	if(openPack = "Shining") { 
+		packMinStars := minStarsA2b 
+	}
+	if (openPack = "Arceus") { 
+		packMinStars := minStarsA2a 
+	}
+	if (openPack = "Palkia") { 
+		packMinStars := minStarsA2Palkia 
+	}
+	if (openPack = "Dialga") { 
+		packMinStars := minStarsA2Dialga 
+	}
+	if (openPack = "Mew") { 
+		packMinStars := minStarsA1a 
+	}
+	if (openPack = "Pikachu") { 
+		packMinStars := minStarsA1Pikachu 
+	}
+	if (openPack = "Charizard") { 
+		packMinStars := minStarsA1Charizard 
+	}
+	if (openPack = "Mewtwo") { 
+		packMinStars := minStarsA1Mewtwo 
+	}
 	
 	gpFound := false
 	invalidGP := false
