@@ -2654,9 +2654,9 @@ SelectPack(HG := false) {
         }
 		FindImageAndClick(233, 400, 264, 428, , "Points", packx, packy)
 	} else if(openPack = "Palkia") {
-		Delay(2)
+		Sleep, 500 
 		adbClick(245, 245) ;temp
-		Delay(2)
+		Sleep, 500 
 	}
 	if(HG = "Tutorial") {
 		FindImageAndClick(236, 198, 266, 226, , "Hourglass2", 180, 436, 500) ;stop at hourglasses tutorial 2 180 to 203?
