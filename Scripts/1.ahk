@@ -17,7 +17,7 @@ DllCall("AllocConsole")
 WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
 global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, adbPort, scriptName, adbShell, adbPath, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, discordUserId, discordWebhookURL, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, CheckShiningPackOnly, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, foundTS, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, gpFound, foundTS, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
-global DeadCheck
+global DeadCheck, sendAccountXml
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
 winTitle := scriptName
@@ -69,6 +69,7 @@ IniRead, Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, Mewtwo, 0
 IniRead, slowMotion, %A_ScriptDir%\..\Settings.ini, UserSettings, slowMotion, 0
 IniRead, DeadCheck, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck, 0
 IniRead, ocrLanguage, %A_ScriptDir%\..\Settings.ini, UserSettings, ocrLanguage, en
+IniRead, sendAccountXml, %A_ScriptDir%\..\Settings.ini, UserSettings, sendAccountXml, 0
 
 IniRead, minStarsA1Charizard, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA1Charizard, 0
 IniRead, minStarsA1Mewtwo, %A_ScriptDir%\..\Settings.ini, UserSettings, minStarsA1Mewtwo, 0
@@ -1053,7 +1054,7 @@ waitadb() {
 }
 
 restartGameInstance(reason, RL := true){
-	global Delay, scriptName, adbShell, adbPath, adbPort, friended, loadedAccount, DeadCheck
+	global Delay, scriptName, adbShell, adbPath, adbPort, friended, loadedAccount, DeadCheck, openPack
 	;initializeAdbShell()
 	CreateStatusMessage("Restarting game reason: `n" reason)
 
@@ -1076,9 +1077,9 @@ restartGameInstance(reason, RL := true){
 	} else if(RL) {
 		if(menuDeleteStart()) {
 			IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
-			logMessage := "\n" . username . "\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGot stuck getting friend code."
+			logMessage := "\n" . username . "\n[" . starCount . "/5][" . packs . "P][" . openPack . " Booster] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGot stuck getting friend code."
 			LogToFile(logMessage, "GPlog.txt")
-			LogToDiscord(logMessage, screenShot, discordUserId)
+			LogToDiscord(logMessage, screenShot, discordUserId, accountFullPath, fcScreenshot)
 		}
 		LogToFile("Restarted game for instance " scriptName " Reason: " reason, "Restart.txt")
 
@@ -1366,9 +1367,9 @@ CheckPack() {
 }
 
 FoundStars(star) {
-	global scriptName, DeadCheck, ocrLanguage, injectMethod
+	global scriptName, DeadCheck, ocrLanguage, injectMethod, openPack
 	screenShot := Screenshot(star)
-	accountFile := saveAccount(star)
+	accountFile := saveAccount(star, accountFullPath)
 	friendCode := getFriendCode()
 	IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
@@ -1398,10 +1399,10 @@ FoundStars(star) {
 		}
 	}
 
-	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
+	logMessage := star . " found by " . username . " (" . friendCode . ") in instance: " . scriptName . " (" . packs . " packs, " . openPack . " booster)\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
-	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
+	LogToDiscord(logMessage, screenShot, discordUserId, accountFullPath, fcScreenshot)
 	if(star != "Crown" && star != "Immersive" && star != "Shiny")
 		ChooseTag()
 }
@@ -1553,7 +1554,7 @@ FindGodPack() {
 }
 
 GodPackFound(validity) {
-	global scriptName, DeadCheck, ocrLanguage, injectMethod
+	global scriptName, DeadCheck, ocrLanguage, injectMethod, openPack
 
 	if(validity = "Valid") {
 		IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -1568,7 +1569,7 @@ GodPackFound(validity) {
 	Interjection := Praise[rand]
 	starCount := 5 - FindBorders("1star") - FindBorders("shiny1star")
 	screenShot := Screenshot(validity)
-	accountFile := saveAccount(validity)
+	accountFile := saveAccount(validity, accountFullPath)
 	logMessage := "\n" . username . "\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGetting friend code then sendind discord message."
 	godPackLog = GPlog.txt
 	LogToFile(logMessage, godPackLog)
@@ -1598,16 +1599,16 @@ GodPackFound(validity) {
 		LogToFile("Failed to OCR the friend code: " . e.message, "BC.txt")
 	}
 
-	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
+	logMessage := Interjection . "\n" . username . " (" . friendCode . ")\n[" . starCount . "/5][" . packs . "P][" . openPack . " Booster] " . invalid . " God pack found in instance: " . scriptName . "\nFile name: " . accountFile . "\nBacking up to the Accounts\\GodPacks folder and continuing..."
 	LogToFile(logMessage, godPackLog)
 	;Run, http://google.com, , Hide ;Remove the ; at the start of the line and replace your url if you want to trigger a link when finding a god pack.
 
 	; Adjust the below to only send a 'ping' to Discord friends on Valid packs
 	if(validity = "Valid") {
-		LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
+		LogToDiscord(logMessage, screenShot, discordUserId, accountFullPath, fcScreenshot)
 		ChooseTag()
 	} else {
-		LogToDiscord(logMessage, screenShot)
+		LogToDiscord(logMessage, screenShot, false, accountFullPath, fcScreenshot)
 	}
 }
 
@@ -1681,7 +1682,7 @@ loadAccount() {
 	return loadDir
 }
 
-saveAccount(file := "Valid") {
+saveAccount(file := "Valid", ByRef filePath := "") {
 	global adbShell, adbPath, adbPort
 	;initializeAdbShell()
 	currentDate := A_Now
@@ -1694,6 +1695,8 @@ saveAccount(file := "Valid") {
 	daysSinceBase += day
 
 	remainder := Mod(daysSinceBase, 3)
+
+	filePath := ""
 
 	if (file = "All") {
 		saveDir := A_ScriptDir "\..\Accounts\Saved\" . remainder . "\" . winTitle
@@ -1872,7 +1875,7 @@ Screenshot(filename := "Valid") {
 }
 
 LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screenshotFile2 := "") {
-	global discordUserId, discordWebhookURL, friendCode
+	global discordUserId, discordWebhookURL, friendCode, sendAccountXml
 	discordPing := "<@" . discordUserId . "> "
 	discordFriends := ReadFile("discord")
 
@@ -1885,35 +1888,47 @@ LogToDiscord(message, screenshotFile := "", ping := false, xmlFile := "", screen
 	}
 
 	if (discordWebhookURL != "") {
+		if (!sendAccountXml)
+			xmlFile := ""
 		MaxRetries := 10
 		RetryCount := 0
 		Loop {
 			try {
-				if(screenshotFile != "" && screenshotFile2 != "" && FileExist(screenshotFile) && FileExist(screenshotFile2))
-				{
-					; Send the image using curl
-					curlCommand := "curl -k "
-						. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
-						. "-F ""file1=@" . screenshotFile . """ "
-						. "-F ""file2=@" . screenshotFile2 . """ "
-						. discordWebhookURL
-					RunWait, %curlCommand%,, Hide
-				} else if (screenshotFile != "") {
-					; Check if the file exists
-					if (FileExist(screenshotFile)) {
-						; Send the image using curl
-						curlCommand := "curl -k "
-							. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
-							. "-F ""file=@" . screenshotFile . """ "
-							. discordWebhookURL
-						RunWait, %curlCommand%,, Hide
+				; Base command
+				curlCommand := "curl -k "
+					. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" "
+				
+				; If an screenshot or xml file is provided, send it
+				sendScreenshot1 := screenshotFile != "" && FileExist(screenshotFile)
+				sendScreenshot2 := screenshotFile2 != "" && FileExist(screenshotFile2)
+				sendAccountXml := xmlFile != "" && FileExist(xmlFile)
+				if (sendScreenshot1 + sendScreenshot2 + sendAccountXml > 1) {
+					fileIndex := 0
+					if (sendScreenshot1) {
+						fileIndex++
+						curlCommand := curlCommand . "-F ""file" . fileIndex . "=@" . screenshotFile . """ "
+					}
+					if (sendScreenshot2) {
+						fileIndex++
+						curlCommand := curlCommand . "-F ""file" . fileIndex . "=@" . screenshotFile2 . """ "
+					}
+					if (sendAccountXml) {
+						fileIndex++
+						curlCommand := curlCommand . "-F ""file" . fileIndex . "=@" . xmlFile . """ "
 					}
 				}
-				else {
-					curlCommand := "curl -k "
-						. "-F ""payload_json={\""content\"":\""" . discordPing . message . "\""};type=application/json;charset=UTF-8"" " . discordWebhookURL
-					RunWait, %curlCommand%,, Hide
+				else if (sendScreenshot1 + sendScreenshot2 + sendAccountXml == 1) {
+					if (sendScreenshot1)
+						curlCommand := curlCommand . "-F ""file=@" . screenshotFile . """ "
+					if (sendScreenshot2)
+						curlCommand := curlCommand . "-F ""file=@" . screenshotFile2 . """ "
+					if (sendAccountXml)
+						curlCommand := curlCommand . "-F ""file=@" . xmlFile . """ "
 				}
+				; Add the webhook
+				curlCommand := curlCommand . discordWebhookURL
+				; Send the message using curl
+				RunWait, %curlCommand%,, Hide
 				break
 			}
 			catch {
