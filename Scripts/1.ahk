@@ -1233,7 +1233,7 @@ SetTextAndResize(controlHwnd, newText) {
 }
 
 CheckPack() {
-	global scriptName, DeadCheck, CheckShiningPackOnly
+	global scriptName, DeadCheck, CheckShiningPackOnly, InvalidCheck
 	foundGP := false ;check card border to find godpacks
 	foundTrainer := false
 	foundRainbow := false
@@ -1282,7 +1282,7 @@ CheckPack() {
 		}
 	}
 	if(foundGP || foundTrainer || foundRainbow || foundFullArt || foundShiny || foundImmersive || foundCrown || 2starCount > 1) {
-		if(!(InvalidCheck && (foundShiny || foundImmersive || foundCrown) || foundGP)) {
+		if(!(InvalidCheck && (foundShiny || foundImmersive || foundCrown)) || foundGP) {
 			if(loadedAccount) {
 				FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
 				IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
@@ -1308,7 +1308,7 @@ FoundStars(star) {
 	Sleep, 8000
 	fcScreenshot := Screenshot("FRIENDCODE")
 
-	if(star = "Crown" || star = "Immersive")
+	if(star = "Crown" || star = "Immersive" || star = "Shiny")
 		RemoveFriends()
 	else {
 		; If we're doing the inject method, try to OCR our Username
@@ -1334,7 +1334,7 @@ FoundStars(star) {
 	CreateStatusMessage(logMessage)
 	LogToFile(logMessage, "GPlog.txt")
 	LogToDiscord(logMessage, screenShot, discordUserId, "", fcScreenshot)
-	if(star != "Crown" && star != "Immersive")
+	if(star != "Crown" && star != "Immersive" && star != "Shiny")
 		ChooseTag()
 }
 
