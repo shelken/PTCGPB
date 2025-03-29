@@ -1401,7 +1401,10 @@ ParseFriendAccounts(filePath, ByRef includesIdsAndNames) {
 		}
 
 		; Trim spaces and create a FriendAccount object
-		if (twoStarCount == "" || twoStarCount >= minStars || packName == "" || (packName=="Shining" && twoStarCount >= minStarsA2b)) {
+		if (twoStarCount == "" 
+			|| (packName != "Shining" && twoStarCount >= minStars) 
+			|| (packName == "Shining" && twoStarCount >= minStarsA2b)  
+			|| (packName == "" && (twoStarCount >= minStars || twoStarCount >= minStarsA2b)) ) {
 			friend := new FriendAccount(friendCode, friendName)
 			friendList.Push(friend)  ; Add to array
 		}
