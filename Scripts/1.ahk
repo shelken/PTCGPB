@@ -1387,9 +1387,9 @@ FoundStars(star) {
 	else {
 		; If we're doing the inject method, try to OCR our Username
 		try {
-			if(injectMethod && IsFunc("ocr_from_file"))
+			if(injectMethod && IsFunc("ocr"))
 			{
-					ocrText := Func("ocr_from_file").Call(fcScreenshot, ocrLanguage)
+					ocrText := Func("ocr").Call(fcScreenshot, ocrLanguage)
 					ocrLines := StrSplit(ocrText, "`n")
 					len := ocrLines.MaxIndex()
 					if(len > 1) {
