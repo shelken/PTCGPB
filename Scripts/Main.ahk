@@ -1309,6 +1309,7 @@ class FriendAccount {
 GetFriendAccountsFromFile(filePath, ByRef includesIdsAndNames) {
 	; ------------------------------------------------------------------------------
 	; The function also determines if the file includes both IDs and names for each friend account.
+	; Friend accounts are only added to the output list if star and pack requirements are met.
 	;
 	; Parameters:
 	;   filePath (String)           - The path to the file to read.
@@ -1317,7 +1318,7 @@ GetFriendAccountsFromFile(filePath, ByRef includesIdsAndNames) {
 	; Returns:
 	;   (Array) - An array of FriendAccount objects, parsed from the file.
 	; ------------------------------------------------------------------------------
-	global minStars
+	global minStars, minStarsA2b
 	friendList := []  ; Create an empty array
 	includesIdsAndNames := false
 
@@ -1344,12 +1345,13 @@ GetFriendAccountsFromFile(filePath, ByRef includesIdsAndNames) {
 			; Check for ID and Name parts
 			friendCode := Trim(parts[1])
 			friendName := Trim(parts[2])
-			packName := Trim(parts[4])
 			if (friendCode != "" && friendName != "")
 				includesIdsAndNames := true
 
 			; Extract the number before "/" in TwoStarCount
 			twoStarCount := RegExReplace(parts[3], "\D.*", "")  ; Remove everything after the first non-digit
+
+			packName := Trim(parts[4])
 		} else {
 			friendCode := Trim(line)
 		}
@@ -1525,7 +1527,6 @@ CropAndFormatForOcr(inputFile, x := 0, y := 0, width := 200, height := 200, scal
 	;   (Ptr) - Pointer to the processed GDI+ bitmap. Caller must dispose of it.
 	; ------------------------------------------------------------------------------
 	; Get bitmap from file
-	Gdip_ResizeBitmap()
 	pBitmapOrignal := Gdip_CreateBitmapFromFile(inputFile)
 	; Crop to region, Scale up the image, Convert to greyscale, Increase contrast
 	pBitmapFormatted := Gdip_CropResizeGreyscaleContrast(pBitmapOrignal, x, y, width, height, scaleUpPercent, 25)
