@@ -114,6 +114,7 @@ IniRead, s4tSilent, Settings.ini, UserSettings, s4tSilent, 1
 IniRead, s4t3Dmnd, Settings.ini, UserSettings, s4t3Dmnd, 0
 IniRead, s4t4Dmnd, Settings.ini, UserSettings, s4t4Dmnd, 0
 IniRead, s4t1Star, Settings.ini, UserSettings, s4t1Star, 0
+IniRead, s4tGholdengo, Settings.ini, UserSettings, s4tGholdengo, 0
 IniRead, s4tWP, Settings.ini, UserSettings, s4tWP, 0
 IniRead, s4tWPMinCards, Settings.ini, UserSettings, s4tWPMinCards, 1
 IniRead, s4tDiscordWebhookURL, Settings.ini, UserSettings, s4tDiscordWebhookURL
@@ -239,7 +240,7 @@ Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor 
 ; ========== Pack Selection Section ==========
 sectionColor := "cFFD700" ; Gold
 Gui, Add, GroupBox, x255 y0 w240 h130 %sectionColor%, Pack Selection
-Gui, Add, Checkbox, % (Shining ? "Checked" : "") " vShining x270 y25 " . sectionColor, Shining
+Gui, Add, Checkbox, % (Shining ? "Checked" : "") " vShining gShiningToggled x270 y25 " . sectionColor, Shining
 Gui, Add, Checkbox, % (Arceus ? "Checked" : "") " vArceus x270 y45 " . sectionColor, Arceus
 Gui, Add, Checkbox, % (Palkia ? "Checked" : "") " vPalkia x270 y65 " . sectionColor, Palkia
 Gui, Add, Checkbox, % (Dialga ? "Checked" : "") " vDialga x270 y85 " . sectionColor, Dialga
@@ -301,7 +302,10 @@ Gui, Add, Checkbox, % "vs4t3Dmnd x520 y+5 " . (!s4tEnabled ? "Hidden " : "") . (
 Gui, Add, Checkbox, % "vs4t4Dmnd y+5 " . (!s4tEnabled ? "Hidden " : "") . (s4t4Dmnd ? "Checked " : "") . sectionColor, 4 ◆◆◆◆
 Gui, Add, Checkbox, % "vs4t1Star y+5 " . (!s4tEnabled ? "Hidden " : "") . (s4t1Star ? "Checked " : "") . sectionColor, 1 ★
 
-Gui, Add, Text, y+10 w210 h2 +0x10 ; Creates a horizontal line
+Gui, Add, Checkbox, % ((!s4tEnabled || !Shining) ? "Hidden " : "") . "vs4tGholdengo x+95 " . (s4tGholdengo ? "Checked " : "") . sectionColor, % "→"
+Gui, Add, Picture, % ((!s4tEnabled || !Shining) ? "Hidden " : "") . "vs4tGholdengoEmblem w35 h-1 x695 y215", % A_ScriptDir . "\Scripts\Scale125\GholdengoEmblem.png"
+
+Gui, Add, Text, x520 y255 w210 h2 +0x10 ; Creates a horizontal line
 
 Gui, Add, Checkbox, % "vs4tWP gs4tWPSettings y+10 " . (!s4tEnabled ? "Hidden " : "") . (s4tWP ? "Checked " : "") . sectionColor, Wonder Pick
 
@@ -435,6 +439,12 @@ s4tSettings:
         GuiControl, Show, s4t3Dmnd
         GuiControl, Show, s4t4Dmnd
         GuiControl, Show, s4t1Star
+
+        if (Shining) {
+            GuiControl, Show, s4tGholdengo
+            GuiControl, Show, s4tGholdengoEmblem
+        }
+
         GuiControl, Show, s4tWP
 
         if (s4tWP) {
@@ -446,6 +456,8 @@ s4tSettings:
         GuiControl, Hide, s4t3Dmnd
         GuiControl, Hide, s4t4Dmnd
         GuiControl, Hide, s4t1Star
+        GuiControl, Hide, s4tGholdengo
+        GuiControl, Hide, s4tGholdengoEmblem
         GuiControl, Hide, s4tWP
         GuiControl, Hide, s4tWPMinCardsLabel
         GuiControl, Hide, s4tWPMinCards
@@ -461,6 +473,18 @@ s4tWPSettings:
     } else {
         GuiControl, Hide, s4tWPMinCardsLabel
         GuiControl, Hide, s4tWPMinCards
+    }
+return
+
+ShiningToggled:
+    Gui, Submit, NoHide
+
+    if (Shining && s4tEnabled) {
+        GuiControl, Show, s4tGholdengo
+        GuiControl, Show, s4tGholdengoEmblem
+    } else {
+        GuiControl, Hide, s4tGholdengo
+        GuiControl, Hide, s4tGholdengoEmblem
     }
 return
 
@@ -615,6 +639,7 @@ SaveReload:
     IniWrite, %s4tDiscordUserId%, Settings.ini, UserSettings, s4tDiscordUserId
     IniWrite, %s4tDiscordWebhookURL%, Settings.ini, UserSettings, s4tDiscordWebhookURL
     IniWrite, %s4tSendAccountXML%, Settings.ini, UserSettings, s4tSendAccountXML
+    IniWrite, %s4tGholdengo%, Settings.ini, UserSettings, s4tGholdengo
 
     Reload
 return
@@ -706,6 +731,7 @@ Start:
     IniWrite, %s4tDiscordUserId%, Settings.ini, UserSettings, s4tDiscordUserId
     IniWrite, %s4tDiscordWebhookURL%, Settings.ini, UserSettings, s4tDiscordWebhookURL
     IniWrite, %s4tSendAccountXML%, Settings.ini, UserSettings, s4tSendAccountXML
+    IniWrite, %s4tGholdengo%, Settings.ini, UserSettings, s4tGholdengo
 
     ; Using FriendID field to provide a URL to download ids.txt is deprecated.
     if (inStr(FriendID, "http")) {

@@ -20,7 +20,7 @@ WinHide % "ahk_id " DllCall("GetConsoleWindow", "ptr")
 
 global winTitle, changeDate, failSafe, openPack, Delay, failSafeTime, StartSkipTime, Columns, failSafe, scriptName, GPTest, StatusText, defaultLanguage, setSpeed, jsonFileName, pauseToggle, SelectedMonitorIndex, swipeSpeed, godPack, scaleParam, deleteMethod, packs, FriendID, friendIDs, Instances, username, friendCode, stopToggle, friended, runMain, Mains, showStatus, injectMethod, packMethod, loadDir, loadedAccount, nukeAccount, CheckShiningPackOnly, TrainerCheck, FullArtCheck, RainbowCheck, ShinyCheck, dateChange, foundGP, friendsAdded, minStars, PseudoGodPack, Palkia, Dialga, Mew, Pikachu, Charizard, Mewtwo, packArray, CrownCheck, ImmersiveCheck, InvalidCheck, slowMotion, screenShot, accountFile, invalid, starCount, keepAccount, minStarsA1Charizard, minStarsA1Mewtwo, minStarsA1Pikachu, minStarsA1a, minStarsA2Dialga, minStarsA2Palkia, minStarsA2a, minStarsA2b
 global DeadCheck
-global s4tEnabled, s4tSilent, s4t3Dmnd, s4t4Dmnd, s4t1Star, s4tWP, s4tWPMinCards, s4tDiscordWebhookURL, s4tDiscordUserId, s4tSendAccountXml
+global s4tEnabled, s4tSilent, s4t3Dmnd, s4t4Dmnd, s4t1Star, s4tGholdengo, s4tWP, s4tWPMinCards, s4tDiscordWebhookURL, s4tDiscordUserId, s4tSendAccountXml
 
 scriptName := StrReplace(A_ScriptName, ".ahk")
 winTitle := scriptName
@@ -82,6 +82,7 @@ IniRead, s4tSilent, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tSilent, 1
 IniRead, s4t3Dmnd, %A_ScriptDir%\..\Settings.ini, UserSettings, s4t3Dmnd, 0
 IniRead, s4t4Dmnd, %A_ScriptDir%\..\Settings.ini, UserSettings, s4t4Dmnd, 0
 IniRead, s4t1Star, %A_ScriptDir%\..\Settings.ini, UserSettings, s4t1Star, 0
+IniRead, s4tGholdengo, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tGholdengo, 0
 IniRead, s4tWP, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tWP, 0
 IniRead, s4tWPMinCards, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tWPMinCards, 1
 IniRead, s4tDiscordWebhookURL, %A_ScriptDir%\..\Settings.ini, UserSettings, s4tDiscordWebhookURL
@@ -1342,6 +1343,7 @@ CheckPack() {
         found3Dmnd := 0
         found4Dmnd := 0
         found1Star := 0
+        foundGimmighoul := 0
 
         if (s4t3Dmnd) {
             found3Dmnd += FindBorders("3diamond")
@@ -1392,21 +1394,25 @@ CheckPack() {
             }
         }
 
-        foundTradeable := found3Dmnd + found4Dmnd + found1Star
+        if (s4tGholdengo && openPack = "Shining") {
+            foundGimmighoul += FindCard("gimmighoul")
+        }
+
+        foundTradeable := found3Dmnd + found4Dmnd + found1Star + foundGimmighoul
 
         if (foundTradeable > 0)
-            FoundTradeable(found3Dmnd, found4Dmnd, found1Star)
+            FoundTradeable(found3Dmnd, found4Dmnd, found1Star, foundGimmighoul)
     }
 }
 
-FoundTradeable(found3Dmnd := 0, found4Dmnd := 0, found1Star := 0) {
+FoundTradeable(found3Dmnd := 0, found4Dmnd := 0, found1Star := 0, foundGimmighoul := 0) {
     ; Not dead.
     IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
     ; Keep account.
     keepAccount := true
 
-    foundTradeable := found3Dmnd + found4Dmnd + found1Star
+    foundTradeable := found3Dmnd + found4Dmnd + found1Star + foundGimmighoul
 
     packDetailsFile := ""
     packDetailsMessage := ""
@@ -1422,6 +1428,10 @@ FoundTradeable(found3Dmnd := 0, found4Dmnd := 0, found1Star := 0) {
     if (found1Star > 0) {
         packDetailsFile .= "1StarX" . found1Star . "_"
         packDetailsMessage .= "One Star (x" . found1Star . "), "
+    }
+    if (foundGimmighoul > 0) {
+        packDetailsFile .= "GimmighoulX" . foundGimmighoul . "_"
+        packDetailsMessage .= "Gimmighoul (x" . foundGimmighoul . "), "
     }
 
     packDetailsFile := RTrim(packDetailsFile, "_")
@@ -1578,6 +1588,30 @@ FindBorders(prefix) {
         vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, coords[1], coords[2], coords[3], coords[4], searchVariation)
         if (vRet = 1) {
             count += 1
+        }
+    }
+    Gdip_DisposeImage(pBitmap)
+    return count
+}
+
+FindCard(prefix) {
+    count := 0
+    searchVariation := 40
+    borderCoords := [[23, 191, 76, 193]
+        ,[106, 191, 159, 193]
+        ,[189, 191, 242, 193]
+        ,[63, 306, 116, 308]
+        ,[146, 306, 199, 308]]
+    pBitmap := from_window(WinExist(winTitle))
+    for index, value in borderCoords {
+        coords := borderCoords[A_Index]
+        Path = %A_ScriptDir%\%defaultLanguage%\%prefix%%A_Index%.png
+        if (FileExist(Path)) {
+            pNeedle := GetNeedle(Path)
+            vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, coords[1], coords[2], coords[3], coords[4], searchVariation)
+            if (vRet = 1) {
+                count += 1
+            }
         }
     }
     Gdip_DisposeImage(pBitmap)
