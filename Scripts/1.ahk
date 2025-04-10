@@ -1619,8 +1619,6 @@ FindCard(prefix) {
 }
 
 FindGodPack(invalidPack := false) {
-    searchVariation := 5
-
     ; Check for normal borders.
     normalBorders := FindBorders("normal")
     if (normalBorders) {
