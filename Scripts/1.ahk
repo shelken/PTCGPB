@@ -1571,11 +1571,11 @@ FindBorders(prefix) {
             ,[132, 370, 136, 395]
             ,[218, 371, 222, 394]]
         } else {
-            borderCoords := [[30, 277, 85, 281]
-            ,[112, 277, 167, 281]
-            ,[195, 277, 250, 281]
-            ,[70, 394, 125, 398]
-            ,[156, 394, 211, 398]]
+            borderCoords := [[26, 278, 84, 280]
+            ,[110, 278, 168, 280]
+            ,[194, 278, 252, 280]
+            ,[67, 395, 125, 397]
+            ,[153, 395, 211, 397]]
         }
     }
     pBitmap := from_window(WinExist(winTitle))
@@ -1584,10 +1584,12 @@ FindBorders(prefix) {
     for index, value in borderCoords {
         coords := borderCoords[A_Index]
         Path = %A_ScriptDir%\%defaultLanguage%\%prefix%%A_Index%.png
-        pNeedle := GetNeedle(Path)
-        vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, coords[1], coords[2], coords[3], coords[4], searchVariation)
-        if (vRet = 1) {
-            count += 1
+        if (FileExist(Path)) {
+            pNeedle := GetNeedle(Path)
+            vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, coords[1], coords[2], coords[3], coords[4], searchVariation)
+            if (vRet = 1) {
+                count += 1
+            }
         }
     }
     Gdip_DisposeImage(pBitmap)
@@ -1602,6 +1604,14 @@ FindCard(prefix) {
         ,[189, 191, 242, 193]
         ,[63, 306, 116, 308]
         ,[146, 306, 199, 308]]
+    ; 100% scale changes
+    if (scaleParam = 287) {
+        borderCoords := [[23, 184, 81, 186]
+            ,[107, 184, 165, 186]
+            ,[191, 184, 249, 186]
+            ,[64, 301, 122, 303]
+            ,[148, 301, 206, 303]]
+    }
     pBitmap := from_window(WinExist(winTitle))
     for index, value in borderCoords {
         coords := borderCoords[A_Index]
