@@ -687,7 +687,6 @@ EraseInput(num := 0, total := 0) {
     }
     failSafeTime := (A_TickCount - failSafe) // 1000
     CreateStatusMessage("Waiting for EraseInput`n(" . failSafeTime . "/45 seconds)")
-    LogToFile("Waiting for EraseInput (" . failSafeTime . "/45 seconds)")
 }
 
 FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", EL := 1, safeTime := 0) {
@@ -748,7 +747,6 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
     ; ImageSearch within the region
     vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 225, 300, 242, 314, searchVariation)
     if (vRet = 1) {
-        LogToFile("At the home page while looking for " . imageName . "...")
         restartGameInstance("Stuck at " . imageName . "...")
     }
     if(imageName = "Social" || imageName = "Add") {
@@ -782,7 +780,6 @@ FindOrLoseImage(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT", E
     else
         FSTime := 45
     if (safeTime >= FSTime) {
-        LogToFile("Instance " . scriptName . " has been stuck at " . imageName . " for 90s. (EL: " . EL . ", sT: " . safeTime . ") Killing it...")
         restartGameInstance("Stuck at " . imageName . "...")
         failSafe := A_TickCount
     }
@@ -927,7 +924,6 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
         vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 15, 155, 270, 420, searchVariation)
         if (vRet = 1) {
             CreateStatusMessage("Error message in " . scriptName . ". Clicking retry...")
-            LogToFile("Error message in " . scriptName . ". Clicking retry...")
             adbClick(82, 389)
             Delay(1)
             adbClick(139, 386)
@@ -938,7 +934,6 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
         ; ImageSearch within the region
         vRet := Gdip_ImageSearch(pBitmap, pNeedle, vPosXY, 225, 300, 242, 314, searchVariation)
         if (vRet = 1) {
-            LogToFile("At the home page while looking for " . imageName . "...")
             restartGameInstance("Stuck at " . imageName . "...")
         }
         if(imageName = "Social" || imageName = "Country" || imageName = "Account2" || imageName = "Account") { ;only look for deleted account on start up.
@@ -1104,7 +1099,6 @@ menuDelete() {
         adbClick(50, 100)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Settings`n(" . failSafeTime . " seconds)")
-        LogToFile("Waiting for Settings for " . failSafeTime " seconds")
     }
     Sleep,%Delay%
     FindImageAndClick(24, 158, 57, 189, , "Account", 140, 440, 2000) ;wait for other menu
@@ -1135,7 +1129,6 @@ menuDelete() {
                 Delay(1)
                 failSafeTime := (A_TickCount - failSafe) // 1000
                 CreateStatusMessage("Waiting to click delete`n(" . failSafeTime . "/45 seconds)")
-                LogToFile("Waiting to click delete (" . failSafeTime . "/45 seconds)")
             }
             else {
                 break
@@ -1150,7 +1143,6 @@ menuDelete() {
         break
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting to click delete`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting to click delete (" . failSafeTime . "/45 seconds)")
     }
 
     Sleep, 2500
@@ -1203,7 +1195,6 @@ menuDeleteStart() {
                     Delay(1)
                     failSafeTime := (A_TickCount - failSafe) // 1000
                     CreateStatusMessage("Waiting to click delete`n(" . failSafeTime . "/45 seconds)")
-                    LogToFile("Waiting to click delete (" . failSafeTime . "/45 seconds)")
                 }
                 else {
                     break
@@ -1218,13 +1209,11 @@ menuDeleteStart() {
             break
             failSafeTime := (A_TickCount - failSafe) // 1000
             CreateStatusMessage("Waiting to click delete`n(" . failSafeTime . "/45 seconds)")
-            LogToFile("Waiting to click delete (" . failSafeTime . "/45 seconds)")
         }
         CreateStatusMessage("Looking for Country/Menu")
         Delay(1)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Country/Menu`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Country/Menu (" . failSafeTime . "/45 seconds)")
     }
     if(loadedAccount) {
         FileDelete, %loadedAccount%
@@ -1478,7 +1467,7 @@ FoundTradeable(found3Dmnd := 0, found4Dmnd := 0, found1Star := 0, foundGimmighou
             }
         }
     } catch e {
-        LogToFile("Failed to OCR the friend code: " . e.message, "BC.txt")
+        LogToFile("Failed to OCR the friend code: " . e.message, "OCR.txt")
     }
 
     statusMessage := "Tradeable cards found"
@@ -1533,7 +1522,7 @@ FoundStars(star) {
                 }
             }
         } catch e {
-            LogToFile("Failed to OCR the friend code: " . e.message, "BC.txt")
+            LogToFile("Failed to OCR the friend code: " . e.message, "OCR.txt")
         }
     }
 
@@ -1718,7 +1707,7 @@ GodPackFound(validity) {
             }
         }
     } catch e {
-        LogToFile("Failed to OCR the friend code: " . e.message, "BC.txt")
+        LogToFile("Failed to OCR the friend code: " . e.message, "OCR.txt")
     }
 
     CreateStatusMessage(Interjection . (invalid ? " " . invalid : "") . " God Pack found!")
@@ -2164,7 +2153,6 @@ DoTutorial() {
         adbClick(82, 422)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Month`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Month (" . failSafeTime . "/45 seconds)")
     } ;select month and year and click
 
     adbClick(200, 400)
@@ -2191,7 +2179,6 @@ DoTutorial() {
         Delay(1)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Year`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Year (" . failSafeTime . "/45 seconds)")
     } ;select month and year and click
 
     Delay(1)
@@ -2211,7 +2198,6 @@ DoTutorial() {
             Delay(2)
             failSafeTime := (A_TickCount - failSafe) // 1000
             CreateStatusMessage("Waiting for country select for " . failSafeTime . "/45 seconds")
-            LogToFile("Waiting for country select for " . failSafeTime . "/45 seconds")
         }
     } else {
         FindImageAndClick(116, 352, 138, 389, , "Birth", 140, 474, 1000)
@@ -2251,7 +2237,6 @@ DoTutorial() {
         adbClick(261, 374)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Save`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Save (" . failSafeTime . "/45 seconds)")
     }
 
     Delay(1)
@@ -2339,7 +2324,6 @@ DoTutorial() {
         Delay(1)
         EraseInput() ; incase the random pokemon is not accepted
         failSafeTime := (A_TickCount - failSafe) // 1000
-        CreateStatusMessage("Waiting for Trace`n(" . failSafeTime . "/45 seconds)")
         CreateStatusMessage("Waiting for Trace`n(" . failSafeTime . "/45 seconds)")
         if(failSafeTime > 45)
             restartGameInstance("Stuck at name")
@@ -2543,7 +2527,6 @@ DoTutorial() {
         ; adbClick(187, 345)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for End`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for End (" . failSafeTime . "/45 seconds)")
     }
 
     FindImageAndClick(120, 316, 143, 335, , "Main", 192, 449) ;click until at main menu
@@ -2689,7 +2672,6 @@ PackOpening() {
         }
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Home`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Home (" . failSafeTime . "/45 seconds)")
         if(failSafeTime > 45)
             restartGameInstance("Stuck at Home")
     }
@@ -2809,7 +2791,6 @@ HourglassOpening(HG := false) {
         }
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for ConfirmPack`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for ConfirmPack (" . failSafeTime . "/45 seconds)")
         if(failSafeTime > 45)
             restartGameInstance("Stuck at ConfirmPack")
     }
@@ -2838,7 +2819,6 @@ getFriendCode() {
         }
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Home`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Home (" . failSafeTime . "/45 seconds)")
         if(failSafeTime > 45)
             restartGameInstance("Stuck at Home")
     }
@@ -2904,7 +2884,6 @@ DoWonderPick() {
         Delay(1)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for WonderPick`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for WonderPick (" . failSafeTime . "/45 seconds)")
     }
     Sleep, 300
     if(slowMotion)
@@ -2919,7 +2898,6 @@ DoWonderPick() {
         Delay(1)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Card`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Card (" . failSafeTime . "/45 seconds)")
     }
     failSafe := A_TickCount
     failSafeTime := 0
@@ -2933,7 +2911,6 @@ DoWonderPick() {
         delay(1)
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Shop`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Shop (" . failSafeTime . "/45 seconds)")
     }
     failSafe := A_TickCount
     failSafeTime := 0
@@ -2947,7 +2924,6 @@ DoWonderPick() {
             adbInputEvent("111") ;send ESC
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for Shop`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for Shop (" . failSafeTime . "/45 seconds)")
     }
     FindImageAndClick(2, 85, 34, 120, , "Missions", 261, 478, 500)
     ;FindImageAndClick(130, 170, 170, 205, , "WPMission", 150, 286, 1000)
@@ -2968,7 +2944,6 @@ DoWonderPick() {
             break
         failSafeTime := (A_TickCount - failSafe) // 1000
         CreateStatusMessage("Waiting for WonderPick`n(" . failSafeTime . "/45 seconds)")
-        LogToFile("Waiting for WonderPick (" . failSafeTime . "/45 seconds)")
     }
     return true
 }
