@@ -1035,20 +1035,6 @@ resetWindows(){
     return true
 }
 
-killGodPackInstance(){
-    global winTitle, godPack
-    if(godPack = 2) {
-        CreateStatusMessage("Pausing script. Found GP.")
-        LogToFile("Paused God Pack instance.")
-        Pause, On
-    } else if(godPack = 1) {
-        CreateStatusMessage("Closing script. Found GP.")
-        LogToFile("Closing God Pack instance.")
-        WinClose, %winTitle%
-        ExitApp
-    }
-}
-
 restartGameInstance(reason, RL := true){
     AppendToJsonFile(packs)
 
