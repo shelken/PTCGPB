@@ -302,10 +302,20 @@ if(DeadCheck = 1){
             }
         }
 
-        if(nukeAccount && !keepAccount && !injectMethod)
+        if (nukeAccount && !keepAccount && !injectMethod) {
+            CreateStatusMessage("Deleting account...",,,, false)
             menuDelete()
-        else
+        } else if (friended) {
+            CreateStatusMessage("Unfriending...",,,, false)
             RemoveFriends()
+        }
+
+        if (injectMethod)
+            loadedAccount := loadAccount()
+
+        if (!loadedAccount)
+            if (deleteMethod = "5 Pack" || packMethod)
+                packs := 5
 
         IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
@@ -326,30 +336,40 @@ if(DeadCheck = 1){
         CreateStatusMessage("Avg: " . minutes . "m " . seconds . "s | Runs: " . rerolls, "AvgRuns", 0, 510, false, true)
         LogToFile("Packs: " . packs . " | Total time: " . mminutes . "m " . sseconds . "s | Avg: " . minutes . "m " . seconds . "s | Runs: " . rerolls)
 
-        if (injectMethod)
-            loadedAccount := loadAccount()
-
-        if (!loadedAccount)
-            if(deleteMethod = "5 Pack" || packMethod)
-                packs := 5
-
-        if ((!injectMethod || !loadedAccount) && !nukeAccount)
+        if ((!injectMethod || !loadedAccount) && (!nukeAccount || keepAccount)) {
+            ; Doing the following because:
+            ; - not using the inject method
+            ; - or using the inject method but an hasn't been loaded
+            ; - and...
+            ; - not using menu delete account
+            ; - or the current account opened a desirable pack and shouldn't be deleted
             saveAccount("All")
 
-        if (stopToggle) {
-            AppendToJsonFile(packs)
-            ExitApp
-        }
+            if (stopToggle) {
+                CreateStatusMessage("Stopping...",,,, false)
+                ExitApp
+            }
 
-        if (!injectMethod || !loadedAccount) {
             restartGameInstance("New Run", false)
+        } else {
+            ; Reached here because:
+            ; - using the inject method
+            ; - or the account was deleted because no desirable packs were found during the last run
+            AppendToJsonFile(packs)
+
+            if (stopToggle) {
+                CreateStatusMessage("Stopping...",,,, false)
+                ExitApp
+            }
+
+            CreateStatusMessage("New Run",,,, false)
         }
     }
 }
 return
 
 RemoveFriends() {
-    global friendIDs, stopToggle, friended
+    global friendIDs, friended
     failSafe := A_TickCount
     failSafeTime := 0
     Loop {
@@ -466,11 +486,6 @@ RemoveFriends() {
                 EraseInput(index, n)
             }
         }
-    }
-    if(stopToggle)
-    {
-        IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
-        ExitApp
     }
     friended := false
 }
