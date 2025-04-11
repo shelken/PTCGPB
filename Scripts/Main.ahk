@@ -100,18 +100,19 @@ Loop {
     catch {
         RetryCount++
         if (RetryCount >= MaxRetries) {
-            LogToFile("Failed to create button GUI.")
+            CreateStatusMessage("Failed to create button GUI.",,,, false)
             break
         }
         Sleep, 1000
     }
     Sleep, %Delay%
-    CreateStatusMessage("Creating button GUI...")
+    CreateStatusMessage("Creating button GUI...",,,, false)
 }
 
 rerollTime := A_TickCount
 
 initializeAdbShell()
+CreateStatusMessage("Initializing bot...",,,, false)
 restartGameInstance("Initializing bot...", false)
 pToken := Gdip_Startup()
 
@@ -430,7 +431,7 @@ resetWindows(){
         }
         catch {
             if (RetryCount > MaxRetries)
-                CreateStatusMessage("Pausing. Can't find window " . winTitle)
+                CreateStatusMessage("Pausing. Can't find window " . winTitle . ".",,,, false)
             Pause
         }
         Sleep, 1000
@@ -441,7 +442,11 @@ resetWindows(){
 restartGameInstance(reason, RL := true){
     global Delay, scriptName, adbShell, adbPath, adbPort
     initializeAdbShell()
-    CreateStatusMessage("Restarting game: " . reason)
+
+    if (Debug)
+        CreateStatusMessage("Restarting game reason:`n" . reason)
+    else
+        CreateStatusMessage("Restarting game...",,,, false)
 
     adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
     ;adbShell.StdIn.WriteLine("rm -rf /data/data/jp.pokemon.pokemontcgp/cache/*") ; clear cache
@@ -492,13 +497,13 @@ Screenshot(filename := "Valid") {
 
 ; Pause Script
 PauseScript:
-    CreateStatusMessage("Pausing...")
+    CreateStatusMessage("Pausing...",,,, false)
     Pause, On
 return
 
 ; Resume Script
 ResumeScript:
-    CreateStatusMessage("Resuming...")
+    CreateStatusMessage("Resuming...",,,, false)
     Pause, Off
     StartSkipTime := A_TickCount ;reset stuck timers
     failSafe := A_TickCount
@@ -506,7 +511,7 @@ return
 
 ; Stop Script
 StopScript:
-    CreateStatusMessage("Stopping script...")
+    CreateStatusMessage("Stopping script...",,,, false)
 ExitApp
 return
 
@@ -522,14 +527,13 @@ TestScript:
     ToggleTestScript()
 return
 
-ToggleTestScript()
-{
+ToggleTestScript() {
     global GPTest, triggerTestNeeded, testStartTime, firstRun
     if(!GPTest) {
         GPTest := true
         triggerTestNeeded := true
         testStartTime := A_TickCount
-        CreateStatusMessage("In GP Test Mode")
+        CreateStatusMessage("In GP Test Mode",,,, false)
         StartSkipTime := A_TickCount ;reset stuck timers
         failSafe := A_TickCount
     }
@@ -542,12 +546,11 @@ ToggleTestScript()
             firstRun := True
             testStartTime := ""
         }
-        CreateStatusMessage("Exiting GP Test Mode")
+        CreateStatusMessage("Exiting GP Test Mode",,,, false)
     }
 }
 
-FriendAdded()
-{
+FriendAdded() {
     global AddFriend
     AddFriend++
 }
@@ -783,16 +786,16 @@ RemoveNonVipFriends() {
     FindImageAndClick(226, 100, 270, 135, , "Add", 38, 460, 500)
     Delay(3)
 
-    CreateStatusMessage("Downloading vip_ids.txt.")
+    CreateStatusMessage("Downloading vip_ids.txt.",,,, false)
     if (vipIdsURL != "" && !DownloadFile(vipIdsURL, "vip_ids.txt")) {
-        CreateStatusMessage("Failed to download vip_ids.txt. Aborting test...")
+        CreateStatusMessage("Failed to download vip_ids.txt. Aborting test...",,,, false)
         return
     }
 
     includesIdsAndNames := false
     vipFriendsArray :=  GetFriendAccountsFromFile(A_ScriptDir . "\..\vip_ids.txt", includesIdsAndNames)
     if (!vipFriendsArray.MaxIndex()) {
-        CreateStatusMessage("No accounts found in vip_ids.txt. Aborting test...")
+        CreateStatusMessage("No accounts found in vip_ids.txt. Aborting test...",,,, false)
         return
     }
 
@@ -816,7 +819,10 @@ RemoveNonVipFriends() {
                 repeatFriendAccounts := 0
             }
             if (repeatFriendAccounts > 2) {
-                CreateStatusMessage("End of list - parsed the same friend codes multiple times.`nReady to test.")
+                if (Debug)
+                    CreateStatusMessage("End of list - parsed the same friend codes multiple times.`nReady to test.")
+                else
+                    CreateStatusMessage("Ready to test.",,,, false)
                 adbClick(143, 507)
                 return
             }
@@ -825,12 +831,12 @@ RemoveNonVipFriends() {
             if (isVipResult || !parseFriendResult) {
                 ; If we couldn't parse the friend, skip removal
                 if (!parseFriendResult) {
-                    CreateStatusMessage("Couldn't parse friend. Skipping friend...`nParsed friend: " . friendAccount.ToString())
+                    CreateStatusMessage("Couldn't parse friend. Skipping friend...`nParsed friend: " . friendAccount.ToString(),,,, false)
                     LogToFile("Friend skipped: " . friendAccount.ToString() . ". Couldn't parse identifiers.", "GPTestLog.txt")
                 }
                 ; If it's a VIP friend, skip removal
                 if (isVipResult)
-                    CreateStatusMessage("Parsed friend: " . friendAccount.ToString() . "`nMatched VIP: " . matchedFriend.ToString() . "`nSkipping VIP...")
+                    CreateStatusMessage("Parsed friend: " . friendAccount.ToString() . "`nMatched VIP: " . matchedFriend.ToString() . "`nSkipping VIP...",,,, false)
                 Sleep, 1500 ; Time to read
                 FindImageAndClick(226, 100, 270, 135, , "Add", 143, 507, 500)
                 Delay(2)
@@ -852,7 +858,7 @@ RemoveNonVipFriends() {
             }
             else {
                 ; If NOT a VIP remove the friend
-                CreateStatusMessage("Parsed friend: " . friendAccount.ToString() . "`nNo VIP match found.`nRemoving friend...")
+                CreateStatusMessage("Parsed friend: " . friendAccount.ToString() . "`nNo VIP match found.`nRemoving friend...",,,, false)
                 LogToFile("Friend removed: " . friendAccount.ToString() . ". No VIP match found.", "GPTestLog.txt")
                 Sleep, 1500 ; Time to read
                 FindImageAndClick(135, 355, 160, 385, , "Remove", 145, 407, 500)

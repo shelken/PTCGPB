@@ -1,5 +1,8 @@
 global ScriptDir := RegExReplace(A_LineFile, "\\[^\\]+$"), LogsDir := ScriptDir . "\..\..\Logs"
-global discordWebhookURL, discordUserId, sendAccountXml
+global Debug, discordWebhookURL, discordUserId, sendAccountXml
+
+; Enable debugging to get more status messages and logging.
+Debug := false
 
 sSettingsPath := ScriptDir . "\..\..\Settings.ini"
 
@@ -7,10 +10,14 @@ IniRead, discordWebhookURL, %sSettingsPath%, UserSettings, discordWebhookURL
 IniRead, discordUserId, %sSettingsPath%, UserSettings, discordUserId
 IniRead, sendAccountXml, %sSettingsPath%, UserSettings, sendAccountXml, 0
 
-CreateStatusMessage(Message, GuiName := "StatusMessage", X := 0, Y := 80) {
+CreateStatusMessage(Message, GuiName := "StatusMessage", X := 0, Y := 80, debugOnly := true, Persist := false) {
     static hwnds := {}
-    if (!showStatus)
+    if (!showStatus || (!Debug && debugOnly))
         return
+
+    if (Debug)
+        LogToFile(GuiName . ": " . Message)
+
     try {
         ; Check if GUI with this name already exists
         GuiName := GuiName . scriptName
@@ -37,6 +44,13 @@ CreateStatusMessage(Message, GuiName := "StatusMessage", X := 0, Y := 80) {
         }
         SetTextAndResize(hwnds[GuiName], Message)
         Gui, %GuiName%:Show, NoActivate AutoSize
+
+        if (!Debug && !Persist) {
+            ; Only show messages for a maximum of 2 seconds
+            Sleep, 2000
+            SetTextAndResize(hwnds[GuiName], "...")
+            Gui, %GuiName%:Show, NoActivate AutoSize
+        }
     }
 }
 

@@ -76,7 +76,7 @@ ConnectAdb(folderPath := "C:\Program Files\Netease") {
     connected := false
     ip := "127.0.0.1:" . adbPort ; Specify the connection IP:port
 
-    CreateStatusMessage("Connecting to ADB...")
+    CreateStatusMessage("Connecting to ADB...",,,, false)
 
     Loop %MaxRetries% {
         ; Attempt to connect using CmdRet
@@ -85,17 +85,20 @@ ConnectAdb(folderPath := "C:\Program Files\Netease") {
         ; Check for successful connection in the output
         if InStr(connectionResult, "connected to " . ip) {
             connected := true
-            CreateStatusMessage("ADB connected successfully.")
+            CreateStatusMessage("ADB connected successfully.",,,, false)
             return true
         } else {
             RetryCount++
-            CreateStatusMessage("ADB connection failed. Retrying (" . RetryCount . "/" . MaxRetries . ").")
+            CreateStatusMessage("ADB connection failed.`nRetrying (" . RetryCount . "/" . MaxRetries . ")...",,,, false)
             Sleep, 2000
         }
     }
 
     if !connected {
-        CreateStatusMessage("Failed to connect to ADB after multiple retries. Please check your emulator and port settings.")
+        if (Debug)
+            CreateStatusMessage("Failed to connect to ADB after multiple retries. Please check your emulator and port settings.")
+        else
+            CreateStatusMessage("Failed to connect to ADB.",,,, false)
         Reload
     }
 }
@@ -175,7 +178,10 @@ initializeAdbShell() {
             LogToFile("ADB Shell Error: " . e.message, "ADB.txt")
 
             if (RetryCount >= MaxRetries) {
-                CreateStatusMessage("Failed to connect to shell after multiple attempts: " . e.message)
+                if (Debug)
+                    CreateStatusMessage("Failed to connect to shell after multiple attempts: " . e.message)
+                else
+                    CreateStatusMessage("Failed to connect to shell. Pausing.",,,, false)
                 Pause
             }
         }
