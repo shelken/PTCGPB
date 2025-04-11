@@ -1038,34 +1038,40 @@ resetWindows(){
 restartGameInstance(reason, RL := true){
     AppendToJsonFile(packs)
 
-    CreateStatusMessage("Restarting game reason:`n" . reason)
+    if (Debug)
+        CreateStatusMessage("Restarting game reason:`n" . reason)
+    else if (InStr(reason, "Stuck"))
+        CreateStatusMessage("Stuck! Restarting game...",,,, false)
+    else
+        CreateStatusMessage("Restarting game...",,,, false)
 
-    if(!RL || RL != "GodPack") {
-        adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
-        waitadb()
-        if(!RL && DeadCheck==0)
-            adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
-        waitadb()
-        adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
-        waitadb()
-    }
-    Sleep, 4500
-
-    if(RL = "GodPack") {
+    if (RL = "GodPack") {
         LogToFile("Restarted game for instance " . scriptName . ". Reason: " reason, "Restart.txt")
         IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
 
         Reload
-    } else if(RL) {
-        if(menuDeleteStart()) {
-            IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
-            logMessage := "\n" . username . "\n[" . (starCount ? starCount : "0") . "/5][" . (packs ? packs : 0) . "P][" . openPack . "] " . (invalid ? invalid . " God Pack" : "Some sort of pack") . " found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGot stuck doing something. Check Logs\Log_" . scriptName . ".txt."
-            LogToFile(logMessage)
-            LogToDiscord(logMessage,, true)
+    } else {
+        adbShell.StdIn.WriteLine("am force-stop jp.pokemon.pokemontcgp")
+        waitadb()
+        if (!RL && DeadCheck = 0) {
+            adbShell.StdIn.WriteLine("rm /data/data/jp.pokemon.pokemontcgp/shared_prefs/deviceAccount:.xml") ; delete account data
         }
-        LogToFile("Restarted game for instance " . scriptName . ". Reason: " reason, "Restart.txt")
+        waitadb()
+        adbShell.StdIn.WriteLine("am start -n jp.pokemon.pokemontcgp/com.unity3d.player.UnityPlayerActivity")
+        waitadb()
+        Sleep, 5000
 
-        Reload
+        if (RL) {
+            if (menuDeleteStart()) {
+                IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+                logMessage := "\n" . username . "\n[" . (starCount ? starCount : "0") . "/5][" . (packs ? packs : 0) . "P][" . openPack . "] " . (invalid ? invalid . " God Pack" : "Some sort of pack") . " found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGot stuck doing something. Check Log_" . scriptName . ".txt."
+                LogToFile(StrReplace(logMessage, "\n", " "))
+                LogToDiscord(logMessage,, true)
+            }
+            LogToFile("Restarted game for instance " . scriptName . ". Reason: " reason, "Restart.txt")
+
+            Reload
+        }
     }
 }
 
