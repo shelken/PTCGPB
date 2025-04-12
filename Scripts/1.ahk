@@ -1533,8 +1533,14 @@ FoundStars(star) {
         }
     }
 
-    statusMessage := star . " found!"
-    CreateStatusMessage(statusMessage,,,, false)
+    CreateStatusMessage(star . " found!",,,, false)
+
+    statusMessage := star . " found"
+    if (username)
+        statusMessage .= " by " . username
+    if (friendCode)
+        statusMessage .= " (" . friendCode . ")"
+
     logMessage := statusMessage . " in instance: " . scriptName . " (" . packs . " packs, " . openPack . ")\nFile name: " . accountFile . "\nBacking up to the Accounts\\SpecificCards folder and continuing..."
     LogToDiscord(logMessage, screenShot, true, (sendAccountXml ? accountFullPath : ""), fcScreenshot)
     LogToFile(StrReplace(logMessage, "\n", " "), "GPlog.txt")
