@@ -1,25 +1,33 @@
 global ScriptDir := RegExReplace(A_LineFile, "\\[^\\]+$"), LogsDir := ScriptDir . "\..\..\Logs"
 global Debug, discordWebhookURL, discordUserId, sendAccountXml
+global DEFAULT_STATUS_MESSAGE := "..."
+
+; Read settings.
+settingsPath := ScriptDir . "\..\..\Settings.ini"
+
+IniRead, discordWebhookURL, %settingsPath%, UserSettings, discordWebhookURL
+IniRead, discordUserId, %settingsPath%, UserSettings, discordUserId
+IniRead, sendAccountXml, %settingsPath%, UserSettings, sendAccountXml, 0
 
 ; Enable debugging to get more status messages and logging.
 Debug := false
 
-sSettingsPath := ScriptDir . "\..\..\Settings.ini"
-
-IniRead, discordWebhookURL, %sSettingsPath%, UserSettings, discordWebhookURL
-IniRead, discordUserId, %sSettingsPath%, UserSettings, discordUserId
-IniRead, sendAccountXml, %sSettingsPath%, UserSettings, sendAccountXml, 0
+ResetStatusMessage() {
+    CreateStatusMessage(DEFAULT_STATUS_MESSAGE,,,, false, true)
+}
 
 CreateStatusMessage(Message, GuiName := "StatusMessage", X := 0, Y := 80, debugOnly := true, Persist := false) {
     static hwnds := {}
+    static resetStatusFunc := Func("ResetStatusMessage")
+
     if (!showStatus || (!Debug && debugOnly))
         return
 
-    if (Debug)
+    if (Debug && Message != DEFAULT_STATUS_MESSAGE)
         LogToFile(GuiName . ": " . Message)
 
     try {
-        ; Check if GUI with this name already exists
+        ; Check if GUI with this name already exists.
         GuiName := GuiName . scriptName
         if !hwnds.HasKey(GuiName) {
             WinGetPos, xpos, ypos, Width, Height, %winTitle%
@@ -45,11 +53,12 @@ CreateStatusMessage(Message, GuiName := "StatusMessage", X := 0, Y := 80, debugO
         SetTextAndResize(hwnds[GuiName], Message)
         Gui, %GuiName%:Show, NoActivate AutoSize
 
+        ; Clear any previous timers.
+        SetTimer, % resetStatusFunc, Off
+
         if (!Debug && !Persist) {
-            ; Only show messages for a maximum of 2 seconds
-            Sleep, 2000
-            SetTextAndResize(hwnds[GuiName], "...")
-            Gui, %GuiName%:Show, NoActivate AutoSize
+            ; Reset status message to default after 2 seconds.
+            SetTimer, % resetStatusFunc, -2000
         }
     }
 }
