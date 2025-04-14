@@ -1080,8 +1080,9 @@ restartGameInstance(reason, RL := true){
             if (menuDeleteStart()) {
                 IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
                 logMessage := "\n" . username . "\n[" . (starCount ? starCount : "0") . "/5][" . (packs ? packs : 0) . "P][" . openPack . "] " . (invalid ? invalid . " God Pack" : "Some sort of pack") . " found in instance: " . scriptName . "\nFile name: " . accountFile . "\nGot stuck doing something. Check Log_" . scriptName . ".txt."
-                LogToFile(StrReplace(logMessage, "\n", " "))
-                LogToDiscord(logMessage,, true)
+                LogToFile(Trim(StrReplace(logMessage, "\n", " ")))
+                ; Logging to Discord is temporarily disabled until all of the scenarios which could cause the script to end up here are fully understood.
+                ;LogToDiscord(logMessage,, true)
             }
             LogToFile("Restarted game for instance " . scriptName . ". Reason: " reason, "Restart.txt")
 
