@@ -1304,40 +1304,42 @@ CheckPack() {
     }
 
     ; Check for 2-star cards.
-    foundTrainer := false
-    foundRainbow := false
-    foundFullArt := false
-    2starCount := false
+    if (!CheckShiningPackOnly || openPack = "Shining") {
+        foundTrainer := false
+        foundRainbow := false
+        foundFullArt := false
+        2starCount := false
 
-    if (TrainerCheck && !foundLabel) {
-        foundTrainer := FindBorders("trainer")
-        if (foundTrainer)
-            foundLabel := "Trainer"
-    }
-    if (RainbowCheck && !foundLabel) {
-        foundRainbow := FindBorders("rainbow")
-        if (foundRainbow)
-            foundLabel := "Rainbow"
-    }
-    if (FullArtCheck && !foundLabel) {
-        foundFullArt := FindBorders("fullart")
-        if (foundFullArt)
-            foundLabel := "Full Art"
-    }
-    if (PseudoGodPack && !foundLabel) {
-        2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
-        if (2starCount > 1)
-            foundLabel := "Double two star"
-    }
-
-    if (foundLabel) {
-        if (loadedAccount) {
-            FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
-            IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+        if (TrainerCheck && !foundLabel) {
+            foundTrainer := FindBorders("trainer")
+            if (foundTrainer)
+                foundLabel := "Trainer"
+        }
+        if (RainbowCheck && !foundLabel) {
+            foundRainbow := FindBorders("rainbow")
+            if (foundRainbow)
+                foundLabel := "Rainbow"
+        }
+        if (FullArtCheck && !foundLabel) {
+            foundFullArt := FindBorders("fullart")
+            if (foundFullArt)
+                foundLabel := "Full Art"
+        }
+        if (PseudoGodPack && !foundLabel) {
+            2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
+            if (2starCount > 1)
+                foundLabel := "Double two star"
         }
 
-        FoundStars(foundLabel)
-        restartGameInstance(foundLabel . " found. Continuing...", "GodPack")
+        if (foundLabel) {
+            if (loadedAccount) {
+                FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
+                IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+            }
+
+            FoundStars(foundLabel)
+            restartGameInstance(foundLabel . " found. Continuing...", "GodPack")
+        }
     }
 
     ; Check for tradeable cards.
