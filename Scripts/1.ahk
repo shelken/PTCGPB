@@ -856,6 +856,11 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
             Y1 := 130
             X2 := 174
             Y2 := 155
+        } else if (imageName = "Profile") { ; ChangeTag GP found
+            X1 := 213
+            Y1 := 273
+            X2 := 226
+            Y2 := 286
         } else if (imageName = "ChosenTag") { ; ChangeTag GP found
             X1 := 218
             Y1 := 307
