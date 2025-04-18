@@ -42,12 +42,21 @@ global System_Divider1, System_Divider2, System_Divider3, System_Divider4
 global Pack_Divider1, Pack_Divider2, Pack_Divider3
 global SaveForTradeDivider_1, SaveForTradeDivider_2
 global Discord_Divider3
+global tesseractPath, applyRoleFilters, debugMode
 
 if not A_IsAdmin
 {
     ; Relaunch script with admin rights
     Run *RunAs "%A_ScriptFullPath%"
     ExitApp
+}
+
+; Check for debugMode and display license notification if not in debug mode
+IniRead, debugMode, Settings.ini, UserSettings, debugMode, 0
+if (!debugMode)
+{
+    MsgBox, 64, The project is now licensed under CC BY-NC 4.0, The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community. `nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases.
+    CheckForUpdate()
 }
 
 ; Define refined global color variables for consistent theming
@@ -325,6 +334,12 @@ SetAllTextColors(textColor) {
     GuiControl, +c%textColor%, SaveForTradeLabel
     GuiControl, +c%textColor%, DiscordSettingsLabel
     GuiControl, +c%textColor%, DownloadSettingsLabel
+    
+    ; Extra Settings
+    GuiControl, +c%textColor%, ExtraSettingsHeading
+    GuiControl, +c%textColor%, Txt_TesseractPath
+    GuiControl, +c%textColor%, applyRoleFilters
+    GuiControl, +c%textColor%, debugMode
 }
 
 ; Function to update all button colors
@@ -487,6 +502,7 @@ SetInputBackgrounds(bgColor, textColor) {
     GuiControl, +Background%bgColor% +c%textColor%, ocrLanguage
     GuiControl, +Background%bgColor% +c%textColor%, clientLanguage
     GuiControl, +Background%bgColor% +c%textColor%, deleteMethod
+    GuiControl, +Background%bgColor% +c%textColor%, tesseractPath
 }
 
 ; Add this function near other GUI helper functions
@@ -618,7 +634,10 @@ HideAllSections() {
     GuiControl, Hide, autoLaunchMonitor
     GuiControl, Hide, SystemSettingsSeparator
 
-    ; hide Pack Settings section (merged God Pack, Pack Selection and Card Detection)
+    ; Extra Settings Section
+    GuiControl, Hide, ExtraSettingsHeading
+
+; hide Pack Settings section (merged God Pack, Pack Selection and Card Detection)
     GuiControl, Hide, PackSettingsHeading
     GuiControl, Hide, PackSettingsSubHeading1
 
@@ -713,7 +732,14 @@ HideAllSections() {
 
     ; hide Reroll Settings separator
     GuiControl, Hide, RerollSettingsSeparator
-
+    
+    ; hide Extra Settings section
+    GuiControl, Hide, ExtraSettingsHeading
+    GuiControl, Hide, Txt_TesseractPath
+    GuiControl, Hide, tesseractPath
+    GuiControl, Hide, applyRoleFilters
+    GuiControl, Hide, debugMode
+    
     ; Hide ALL divider elements - this is the key part that was missing!
     GuiControl, Hide, FriendID_Divider
     GuiControl, Hide, Instance_Divider3
@@ -728,7 +754,6 @@ HideAllSections() {
     GuiControl, Hide, SaveForTrade_Divider1
     GuiControl, Hide, SaveForTrade_Divider2
 }
-
 
 ; ========== show Reroll Settings section (Updated) ==========
 ShowRerollSettingsSection() {
@@ -863,6 +888,9 @@ ShowSystemSettingsSection() {
     ; First, make sure all other sections are hidden
     HideAllSections()
 
+    ; Get the section color
+    sectionColor := isDarkTheme ? DARK_SECTION_COLORS["SystemSettings"] : LIGHT_SECTION_COLORS["SystemSettings"]
+
     GuiControl, Show, SystemSettingsHeading
     GuiControl, +c%sectionColor%, SystemSettingsHeading
 
@@ -887,7 +915,6 @@ ShowSystemSettingsSection() {
 
     ; Apply proper text coloring to labels and checkboxes
     if (isDarkTheme) {
-        sectionColor := DARK_SECTION_COLORS["SystemSettings"]
         GuiControl, +c%sectionColor%, Txt_Monitor
         GuiControl, +c%DARK_TEXT%, Txt_Scale
         GuiControl, +c%DARK_TEXT%, Txt_FolderPath
@@ -898,7 +925,6 @@ ShowSystemSettingsSection() {
         GuiControl, +Background%DARK_INPUT_BG% +c%DARK_INPUT_TEXT%, folderPath
         GuiControl, +Background%DARK_INPUT_BG% +c%DARK_INPUT_TEXT%, instanceLaunchDelay
     } else {
-        sectionColor := LIGHT_SECTION_COLORS["SystemSettings"]
         GuiControl, +c%sectionColor%, Txt_Monitor
         GuiControl, +c%LIGHT_TEXT%, Txt_Scale
         GuiControl, +c%LIGHT_TEXT%, Txt_FolderPath
@@ -908,6 +934,32 @@ ShowSystemSettingsSection() {
         GuiControl, +c%LIGHT_TEXT%, autoLaunchMonitor
         GuiControl, +Background%LIGHT_INPUT_BG% +c%LIGHT_INPUT_TEXT%, folderPath
         GuiControl, +Background%LIGHT_INPUT_BG% +c%LIGHT_INPUT_TEXT%, instanceLaunchDelay
+    }
+    
+    SetHeaderFont()
+    GuiControl, Show, ExtraSettingsHeading
+    if (isDarkTheme) {
+        GuiControl, +c%sectionColor%, ExtraSettingsHeading
+    } else {
+        GuiControl, +c%sectionColor%, ExtraSettingsHeading
+    }
+
+    SetNormalFont()
+    GuiControl, Show, Txt_TesseractPath
+    GuiControl, Show, tesseractPath
+    GuiControl, Show, applyRoleFilters
+    GuiControl, Show, debugMode
+
+    if (isDarkTheme) {
+        GuiControl, +c%DARK_TEXT%, Txt_TesseractPath
+        GuiControl, +c%DARK_TEXT%, applyRoleFilters
+        GuiControl, +c%DARK_TEXT%, debugMode
+        GuiControl, +Background%DARK_INPUT_BG% +c%DARK_INPUT_TEXT%, tesseractPath
+    } else {
+        GuiControl, +c%LIGHT_TEXT%, Txt_TesseractPath
+        GuiControl, +c%LIGHT_TEXT%, applyRoleFilters
+        GuiControl, +c%LIGHT_TEXT%, debugMode
+        GuiControl, +Background%LIGHT_INPUT_BG% +c%LIGHT_INPUT_TEXT%, tesseractPath
     }
 
     ; Update section headers with appropriate colors
@@ -1095,18 +1147,16 @@ ShowSaveForTradeSection() {
     GuiControl, Show, s4tEnabled
     GuiControl, +c%sectionColor%, s4tEnabled
 
-	
-
     ; Check if s4tEnabled is checked to show related controls
-	; And replace the existing divider visibility logic with this clearer approach:
-	GuiControl, Show, SaveForTradeHeading
-	GuiControl, +c%sectionColor%, SaveForTradeHeading
-	GuiControl, Show, s4tEnabled
-	GuiControl, +c%sectionColor%, s4tEnabled
-	
-	; Always hide the dividers initially
-	GuiControl, Hide, SaveForTradeDivider_1
-	GuiControl, Hide, SaveForTradeDivider_2
+    ; And replace the existing divider visibility logic with this clearer approach:
+    GuiControl, Show, SaveForTradeHeading
+    GuiControl, +c%sectionColor%, SaveForTradeHeading
+    GuiControl, Show, s4tEnabled
+    GuiControl, +c%sectionColor%, s4tEnabled
+    
+    ; Always hide the dividers initially
+    GuiControl, Hide, SaveForTradeDivider_1
+    GuiControl, Hide, SaveForTradeDivider_2
 
     GuiControlGet, s4tEnabled
     if (s4tEnabled) {
@@ -1385,7 +1435,7 @@ HandleFunctionKeyShortcut(functionIndex) {
     else if (functionIndex = 2)
         gosub, ArrangeWindows    ; F2: Arrange Windows
     else if (functionIndex = 3)
-        gosub, Start             ; F3: Start Bot
+        gosub, StartBot          ; F3: Start Bot
 }
 
 ; Function to show help menu with keyboard shortcuts
@@ -1403,7 +1453,8 @@ ShowHelpMenu() {
     helpText .= "F1: Launch All Mumu`n"
     helpText .= "F2: Arrange Windows`n"
     helpText .= "F3: Start Bot`n"
-    helpText .= "F4: Show This Help Menu`n`n"
+    helpText .= "F4: Show This Help Menu`n"
+    helpText .= "Shift+F7: Send All Offline Status & Exit`n`n"
     helpText .= "Interface Settings:`n"
     helpText .= "Current Theme: " . (isDarkTheme ? "Dark" : "Light") . "`n"
     helpText .= "Background Image: " . (useBackgroundImage ? "Enabled" : "Disabled") . "`n"
@@ -1515,6 +1566,11 @@ LoadSettingsFromIni() {
 
         ; Background image setting
         IniRead, useBackgroundImage, Settings.ini, UserSettings, useBackgroundImage, 1
+        
+        ; Extra Settings
+        IniRead, tesseractPath, Settings.ini, UserSettings, tesseractPath, C:\Program Files\Tesseract-OCR\tesseract.exe
+        IniRead, applyRoleFilters, Settings.ini, UserSettings, applyRoleFilters, 0
+        IniRead, debugMode, Settings.ini, UserSettings, debugMode, 0
 
         ; Validate numeric values
         if (!IsNumeric(Instances) || Instances < 1)
@@ -1554,6 +1610,9 @@ CreateDefaultSettingsFile() {
         IniWrite, 0, Settings.ini, UserSettings, heartBeat
         IniWrite, "", Settings.ini, UserSettings, heartBeatWebhookURL
         IniWrite, "", Settings.ini, UserSettings, heartBeatName
+        IniWrite, C:\Program Files\Tesseract-OCR\tesseract.exe, Settings.ini, UserSettings, tesseractPath
+        IniWrite, 0, Settings.ini, UserSettings, applyRoleFilters
+        IniWrite, 0, Settings.ini, UserSettings, debugMode
 
         ; Add the rest of default settings here
         IniWrite, 1, Settings.ini, UserSettings, isDarkTheme
@@ -1562,6 +1621,48 @@ CreateDefaultSettingsFile() {
         return true
     }
     return false
+}
+
+; Function to handle window positioning with enhanced error handling
+resetWindows(Title, SelectedMonitorIndex, silent := true) {
+    global Columns, runMain, Mains, scaleParam, debugMode
+    RetryCount := 0
+    MaxRetries := 10
+    Loop
+    {
+        try {
+            ; Get monitor origin from index
+            SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
+            SysGet, Monitor, Monitor, %SelectedMonitorIndex%
+            if (runMain) {
+                if (InStr(Title, "Main") = 1) {
+                    instanceIndex := StrReplace(Title, "Main", "")
+                    if (instanceIndex = "")
+                        instanceIndex := 1
+                } else {
+                    instanceIndex := (Mains - 1) + Title + 1
+                }
+            } else {
+                instanceIndex := Title
+            }
+            rowHeight := 533  ; Adjust the height of each row
+            currentRow := Floor((instanceIndex - 1) / Columns)
+            y := currentRow * rowHeight
+            x := Mod((instanceIndex - 1), Columns) * scapeParam
+            WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 533
+            break
+        }
+        catch {
+            RetryCount++
+            if (RetryCount > MaxRetries) {
+                if (!silent && debugMode)
+                    MsgBox, Failed to position window %Title% after %MaxRetries% attempts
+                return false
+            }
+        }
+        Sleep, 1000
+    }
+    return true
 }
 
 ; First, try to load existing settings
@@ -1786,6 +1887,14 @@ Gui, Add, Edit, vinstanceLaunchDelay x285 y+-17 w55 h25 Center Hidden, %instance
 
 Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor x170 y+17 Hidden", Auto Launch Monitor
 
+SetHeaderFont()
+Gui, Add, Text, x170 y+30 Hidden vExtraSettingsHeading, Extra Settings
+SetNormalFont()
+Gui, Add, Text, x170 y+20 Hidden vTxt_TesseractPath, Tesseract Path:
+Gui, Add, Edit, vtesseractPath w290 x170 y+5 h25 Hidden, %tesseractPath%
+Gui, Add, Checkbox, % (applyRoleFilters ? "Checked" : "") " vapplyRoleFilters x170 y+10 Hidden", Use Role-Based Filters
+Gui, Add, Checkbox, % (debugMode ? "Checked" : "") " vdebugMode x170 y+10 Hidden", Debug Mode
+
 ; ========== Pack Settings Section (Merged God Pack, Pack Selection and Card Detection) ==========
 SetHeaderFont()
 Gui, Add, Text, x170 y100 Hidden vPackSettingsSubHeading1, God Pack Settings
@@ -1852,15 +1961,14 @@ Gui, Add, Checkbox, % (PseudoGodPack ? "Checked" : "") " vPseudoGodPack y+10 Hid
 ; Show the divider between columns
 Gui, Add, Text, x260 y450 w2 h140 Hidden vTxt_vector +0x10  ; Creates a vertical line
 
-; Right Column with section header
-Gui, Add, Text, x320 y450 Hidden vTxt_Save, Save:
-Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x320 y480 Hidden", Save Crowns
-Gui, Add, Checkbox, % (ShinyCheck ? "Checked" : "") " vShinyCheck x320 y510 Hidden", Save Shiny
-Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x320 y540 Hidden", Save Immersives
+; Right Column
+Gui, Add, Checkbox, % (CrownCheck ? "Checked" : "") " vCrownCheck x320 y+-86 Hidden", Save Crowns
+Gui, Add, Checkbox, % (ShinyCheck ? "Checked" : "") " vShinyCheck y+10 Hidden", Save Shiny
+Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck y+10 Hidden", Save Immersives
 
 ; Bottom options
 Gui, Add, Checkbox, % (CheckShiningPackOnly ? "Checked" : "") " vCheckShiningPackOnly x170 y+44 Hidden", Only Shining Boost
-Gui, Add, Checkbox, % (InvalidCheck ? "Checked" : "") " vInvalidCheck x320 y570 Hidden", Ignore Invalid Packs
+Gui, Add, Checkbox, % (InvalidCheck ? "Checked" : "") " vInvalidCheck x320 y+-16 Hidden", Ignore Invalid Packs
 
 ; Add divider for Card Detection section
 AddSectionDivider(170, "+41", 290, "Pack_Divider3")
@@ -1978,7 +2086,7 @@ Gui, Add, Button, gSaveReload x+15 y655 w140 h25 vReloadBtn hwndhReloadBtn, Relo
 SetButtonColor(hReloadBtn, BTN_RELOAD)
 
 ; Row 2 - Full width button for Start Bot - adjusted position and size
-Gui, Add, Button, gStart x15 y+10 w450 h30 vStartBot hwndhStartBtn, Start Bot
+Gui, Add, Button, gStartBot x15 y+10 w450 h30 vStartBot hwndhStartBtn, Start Bot
 SetButtonColor(hStartBtn, BTN_START)
 
 ; Version info moved to the bottom - adjusted position
@@ -2267,7 +2375,7 @@ s4tSettings:
             GuiControl, +Background%LIGHT_INPUT_BG% +c%LIGHT_INPUT_TEXT%, s4tDiscordWebhookURL
         }
 
-        ; Check if Shining is enabled to show Gholdengo - Important logic from PTCGPB_New.ahk
+        ; Check if Shining is enabled to show Gholdengo - Important logic from PTCGPB.ahk
         GuiControlGet, Shining
         if (Shining) {
             GuiControl, Show, s4tGholdengo
@@ -2320,10 +2428,8 @@ s4tSettings:
         GuiControl, Hide, Txt_S4T_DiscordWebhook
         GuiControl, Hide, s4tDiscordWebhookURL
         GuiControl, Hide, s4tSendAccountXml
-	GuiControl, Hide, SaveForTradeDivider_1
-	GuiControl, Hide, SaveForTradeDivider_2
-        
-
+        GuiControl, Hide, SaveForTradeDivider_1
+        GuiControl, Hide, SaveForTradeDivider_2
     }
 return
 
@@ -2382,16 +2488,34 @@ ArrangeWindows:
     GuiControlGet, Instances,, Instances
     GuiControlGet, Columns,, Columns
     GuiControlGet, SelectedMonitorIndex,, SelectedMonitorIndex
-    if (runMain) {
+    
+    windowsPositioned := 0
+    
+    if (runMain && Mains > 0) {
         Loop %Mains% {
             mainInstanceName := "Main" . (A_Index > 1 ? A_Index : "")
-            resetWindows(mainInstanceName, SelectedMonitorIndex)
-            sleep, 10
+            if (WinExist(mainInstanceName)) {
+                resetWindows(mainInstanceName, SelectedMonitorIndex, false)
+                windowsPositioned++
+                sleep, 10
+            }
         }
     }
-    Loop %Instances% {
-        resetWindows(A_Index, SelectedMonitorIndex)
-        sleep, 10
+    
+    if (Instances > 0) {
+        Loop %Instances% {
+            if (WinExist(A_Index)) {
+                resetWindows(A_Index, SelectedMonitorIndex, false)
+                windowsPositioned++
+                sleep, 10
+            }
+        }
+    }
+    
+    if (debugMode && windowsPositioned == 0) {
+        MsgBox, No windows found to arrange
+    } else {
+        MsgBox, Arranged %windowsPositioned% windows
     }
 return
 
@@ -2505,6 +2629,11 @@ SaveReload:
     IniWrite, %s4tDiscordUserId%, Settings.ini, UserSettings, s4tDiscordUserId
     IniWrite, %s4tDiscordWebhookURL%, Settings.ini, UserSettings, s4tDiscordWebhookURL
     IniWrite, %s4tSendAccountXml%, Settings.ini, UserSettings, s4tSendAccountXml
+    
+    ; Extra Settings
+    IniWrite, %tesseractPath%, Settings.ini, UserSettings, tesseractPath
+    IniWrite, %applyRoleFilters%, Settings.ini, UserSettings, applyRoleFilters
+    IniWrite, %debugMode%, Settings.ini, UserSettings, debugMode
 
     ; Save theme setting
     IniWrite, %isDarkTheme%, Settings.ini, UserSettings, isDarkTheme
@@ -2515,7 +2644,7 @@ SaveReload:
     Reload
 return
 
-Start:
+StartBot:
     Gui, Submit  ; Collect the input values from the first page
     Instances := Instances  ; Directly reference the "Instances" variable
 
@@ -2586,7 +2715,7 @@ Start:
     IniWrite, %minStarsA2Palkia%, Settings.ini, UserSettings, minStarsA2Palkia
     IniWrite, %minStarsA2a%, Settings.ini, UserSettings, minStarsA2a
     IniWrite, %minStarsA2b%, Settings.ini, UserSettings, minStarsA2b
-
+    
     IniWrite, %heartBeatDelay%, Settings.ini, UserSettings, heartBeatDelay
     IniWrite, %sendAccountXml%, Settings.ini, UserSettings, sendAccountXml
 
@@ -2601,6 +2730,12 @@ Start:
     IniWrite, %s4tDiscordWebhookURL%, Settings.ini, UserSettings, s4tDiscordWebhookURL
     IniWrite, %s4tSendAccountXML%, Settings.ini, UserSettings, s4tSendAccountXML
     IniWrite, %s4tGholdengo%, Settings.ini, UserSettings, s4tGholdengo
+    
+    ; Extra Settings
+    IniWrite, %tesseractPath%, Settings.ini, UserSettings, tesseractPath
+    IniWrite, %applyRoleFilters%, Settings.ini, UserSettings, applyRoleFilters
+    IniWrite, %debugMode%, Settings.ini, UserSettings, debugMode
+    
     IniWrite, %isDarkTheme%, Settings.ini, UserSettings, isDarkTheme
     IniWrite, %useBackgroundImage%, Settings.ini, UserSettings, useBackgroundImage
 
@@ -2730,10 +2865,91 @@ SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
             selectMsg .= value . commaSeparate
     }
 
- Loop {
+Loop {
         Sleep, 30000
 
-        ; Every 5 minutes, pull down the main ID list
+        ; Check if Main toggled GP Test Mode and send notification if needed
+        IniRead, mainTestMode, HeartBeat.ini, TestMode, Main, -1
+        if (mainTestMode != -1) {
+            ; Main has toggled test mode, get status and send notification
+            IniRead, mainStatus, HeartBeat.ini, HeartBeat, Main, 0
+            
+            onlineAHK := ""
+            offlineAHK := ""
+            Online := []
+
+            Loop %Instances% {
+                IniRead, value, HeartBeat.ini, HeartBeat, Instance%A_Index%
+                if(value)
+                    Online.Push(1)
+                else
+                    Online.Push(0)
+                IniWrite, 0, HeartBeat.ini, HeartBeat, Instance%A_Index%
+            }
+
+            for index, value in Online {
+                if(index = Online.MaxIndex())
+                    commaSeparate := ""
+                else
+                    commaSeparate := ", "
+                if(value)
+                    onlineAHK .= A_Index . commaSeparate
+                else
+                    offlineAHK .= A_Index . commaSeparate
+            }
+
+            if (runMain) {
+                if(mainStatus) {
+                    if (onlineAHK)
+                        onlineAHK := "Main, " . onlineAHK
+                    else
+                        onlineAHK := "Main"
+                }
+                else {
+                    if (offlineAHK)
+                        offlineAHK := "Main, " . offlineAHK
+                    else
+                        offlineAHK := "Main"
+                }
+            }
+
+            if(offlineAHK = "")
+                offlineAHK := "Offline: none"
+            else
+                offlineAHK := "Offline: " . RTrim(offlineAHK, ", ")
+            if(onlineAHK = "")
+                onlineAHK := "Online: none"
+            else
+                onlineAHK := "Online: " . RTrim(onlineAHK, ", ")
+
+            ; Create status message with all regular heartbeat info
+            discMessage := heartBeatName ? "\n" . heartBeatName : ""
+            discMessage .= "\n" . onlineAHK . "\n" . offlineAHK
+            
+            total := SumVariablesInJsonFile()
+            totalSeconds := Round((A_TickCount - rerollTime) / 1000)
+            mminutes := Floor(totalSeconds / 60)
+            packStatus := "Time: " . mminutes . "m | Packs: " . total
+            packStatus .= " | Avg: " . Round(total / mminutes, 2) . " packs/min"
+            
+            discMessage .= "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-.*$") . "-" . localVersion
+            discMessage .= typeMsg
+            discMessage .= selectMsg
+            
+            ; Add special note about Main's test mode status
+            if (mainTestMode == "1")
+                discMessage .= "\n\nMain entered GP Test Mode ✕" ;We can change this later
+            else
+                discMessage .= "\n\nMain exited GP Test Mode ✓" ;We can change this later
+                
+            ; Send the message
+            LogToDiscord(discMessage,, false,,, heartBeatWebhookURL)
+            
+            ; Clear the flag
+            IniDelete, HeartBeat.ini, TestMode, Main
+        }
+
+; Every 5 minutes, pull down the main ID list
         if(mainIdsURL != "" && Mod(A_Index, 10) = 0) {
             DownloadFile(mainIdsURL, "ids.txt")
         }
@@ -2746,6 +2962,7 @@ SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
         packStatus := "Time: " . mminutes . "m Packs: " . total
         packStatus .= "   |   Avg: " . Round(total / mminutes, 2) . " packs/min"
 
+        ; Display pack status at the bottom of the first reroll instance
         DisplayPackStatus(packStatus, ((runMain ? Mains * scaleParam : 0) + 5), 490)
 
         if(heartBeat)
@@ -2805,7 +3022,7 @@ SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
                 discMessage .= typeMsg
                 discMessage .= selectMsg
 
-                LogToDiscord(discMessage, , false, , , heartBeatWebhookURL)
+                LogToDiscord(discMessage,, false,,, heartBeatWebhookURL)
             }
     }
 Return
@@ -2813,70 +3030,6 @@ Return
 GuiClose:
 ExitApp
 return
-
-MonthToDays(year, month) {
-    static DaysInMonths := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    days := 0
-    Loop, % month - 1 {
-        days += DaysInMonths[A_Index]
-    }
-    if (month > 2 && IsLeapYear(year))
-        days += 1
-    return days
-}
-
-IsLeapYear(year) {
-    return (Mod(year, 4) = 0 && Mod(year, 100) != 0) || Mod(year, 400) = 0
-}
-
-DownloadFile(url, filename) {
-    url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
-    localPath = %A_ScriptDir%\%filename% ; Change to the folder you want to save the file
-
-    URLDownloadToFile, %url%, %localPath%
-
-    ; if ErrorLevel
-    ; MsgBox, Download failed!
-    ; else
-    ; MsgBox, File downloaded successfully!
-}
-
-resetWindows(Title, SelectedMonitorIndex) {
-    global Columns, runMain, Mains, scaleParam
-    RetryCount := 0
-    MaxRetries := 10
-    Loop
-    {
-        try {
-            ; Get monitor origin from index
-            SelectedMonitorIndex := RegExReplace(SelectedMonitorIndex, ":.*$")
-            SysGet, Monitor, Monitor, %SelectedMonitorIndex%
-            if (runMain) {
-                if (InStr(Title, "Main") = 1) {
-                    instanceIndex := StrReplace(Title, "Main", "")
-                    if (instanceIndex = "")
-                        instanceIndex := 1
-                } else {
-                    instanceIndex := (Mains - 1) + Title + 1
-                }
-            } else {
-                instanceIndex := Title
-            }
-            rowHeight := 533  ; Adjust the height of each row
-            currentRow := Floor((instanceIndex - 1) / Columns)
-            y := currentRow * rowHeight
-            x := Mod((instanceIndex - 1), Columns) * scapeParam
-            WinMove, %Title%, , % (MonitorLeft + x), % (MonitorTop + y), scaleParam, 533
-            break
-        }
-        catch {
-            if (RetryCount > MaxRetries)
-                Pause
-        }
-        Sleep, 1000
-    }
-    return true
-}
 
 ; Improved status display function
 DisplayPackStatus(Message, X := 0, Y := 80) {
@@ -2921,6 +3074,62 @@ DisplayPackStatus(Message, X := 0, Y := 80) {
     } catch e {
         ; Silent error handling
     }
+}
+
+; New hotkey for sending "All Offline" status message
+~+F7::
+    SendAllInstancesOfflineStatus()
+ExitApp
+return
+
+; Function to send a Discord message with all instances marked as offline
+SendAllInstancesOfflineStatus() {
+    global heartBeatName, heartBeatWebhookURL, localVersion, githubUser, Instances, runMain, Mains
+    global typeMsg, selectMsg, rerollTime, scaleParam
+    
+    ; Display visual feedback that the hotkey was triggered
+    DisplayPackStatus("Shift+F7 pressed - Sending offline heartbeat to Discord...", ((runMain ? Mains * scaleParam : 0) + 5), 490)
+    
+    ; Create message showing all instances as offline
+    offlineInstances := ""
+    if (runMain) {
+        offlineInstances := "Main"
+        if (Mains > 1) {
+            Loop, % Mains - 1
+                offlineInstances .= ", Main" . (A_Index + 1)
+        }
+        if (Instances > 0)
+            offlineInstances .= ", "
+    }
+    
+    Loop, %Instances% {
+        offlineInstances .= A_Index
+        if (A_Index < Instances)
+            offlineInstances .= ", "
+    }
+    
+    ; Create status message with heartbeat info
+    discMessage := heartBeatName ? "\n" . heartBeatName : ""
+    discMessage .= "\nOnline: none"
+    discMessage .= "\nOffline: " . offlineInstances
+    
+    ; Add pack statistics
+    total := SumVariablesInJsonFile()
+    totalSeconds := Round((A_TickCount - rerollTime) / 1000)
+    mminutes := Floor(totalSeconds / 60)
+    packStatus := "Time: " . mminutes . "m | Packs: " . total
+    packStatus .= " | Avg: " . Round(total / mminutes, 2) . " packs/min"
+    
+    discMessage .= "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-.*$") . "-" . localVersion
+    discMessage .= typeMsg
+    discMessage .= selectMsg
+    discMessage .= "\n\n All instances marked as OFFLINE"
+    
+    ; Send the message
+    LogToDiscord(discMessage,, false,,, heartBeatWebhookURL)
+    
+    ; Display confirmation in the status bar
+    DisplayPackStatus("Discord notification sent: All instances marked as OFFLINE", ((runMain ? Mains * scaleParam : 0) + 5), 490)
 }
 
 ; Global variable to track the current JSON file
@@ -3006,7 +3215,43 @@ SumVariablesInJsonFile() {
     return sum
 }
 
+MonthToDays(year, month) {
+    static DaysInMonths := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    days := 0
+    Loop, % month - 1 {
+        days += DaysInMonths[A_Index]
+    }
+    if (month > 2 && IsLeapYear(year))
+        days += 1
+    return days
+}
+
+IsLeapYear(year) {
+    return (Mod(year, 4) = 0 && Mod(year, 100) != 0) || Mod(year, 400) = 0
+}
+
+DownloadFile(url, filename) {
+    url := url  ; Change to your hosted .txt URL "https://pastebin.com/raw/vYxsiqSs"
+    localPath = %A_ScriptDir%\%filename% ; Change to the folder you want to save the file
+
+    URLDownloadToFile, %url%, %localPath%
+
+    ; if ErrorLevel
+    ; MsgBox, Download failed!
+    ; else
+    ; MsgBox, File downloaded successfully!
+}
+
 CheckForUpdate() {
+
+global updateCheckPerformed, githubUser, repoName, localVersion, zipPath, extractPath, scriptFolder
+    
+    ; Skip if already performed
+    if (updateCheckPerformed)
+        return
+    
+    updateCheckPerformed := true
+
     global githubUser, repoName, localVersion, zipPath, extractPath, scriptFolder
     url := "https://api.github.com/repos/" githubUser "/" repoName "/releases/latest"
 
@@ -3226,6 +3471,3 @@ ReadFile(filename, numbers := false) {
 
     return values.MaxIndex() ? values : false
 }
-
-~+F7::ExitApp
-return
