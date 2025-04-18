@@ -856,6 +856,11 @@ FindImageAndClick(X1, Y1, X2, Y2, searchVariation := "", imageName := "DEFAULT",
             Y1 := 130
             X2 := 174
             Y2 := 155
+        } else if (imageName = "Profile") { ; ChangeTag GP found
+            X1 := 213
+            Y1 := 273
+            X2 := 226
+            Y2 := 286
         } else if (imageName = "ChosenTag") { ; ChangeTag GP found
             X1 := 218
             Y1 := 307
@@ -1299,40 +1304,42 @@ CheckPack() {
     }
 
     ; Check for 2-star cards.
-    foundTrainer := false
-    foundRainbow := false
-    foundFullArt := false
-    2starCount := false
+    if (!CheckShiningPackOnly || openPack = "Shining") {
+        foundTrainer := false
+        foundRainbow := false
+        foundFullArt := false
+        2starCount := false
 
-    if (TrainerCheck && !foundLabel) {
-        foundTrainer := FindBorders("trainer")
-        if (foundTrainer)
-            foundLabel := "Trainer"
-    }
-    if (RainbowCheck && !foundLabel) {
-        foundRainbow := FindBorders("rainbow")
-        if (foundRainbow)
-            foundLabel := "Rainbow"
-    }
-    if (FullArtCheck && !foundLabel) {
-        foundFullArt := FindBorders("fullart")
-        if (foundFullArt)
-            foundLabel := "Full Art"
-    }
-    if (PseudoGodPack && !foundLabel) {
-        2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
-        if (2starCount > 1)
-            foundLabel := "Double two star"
-    }
-
-    if (foundLabel) {
-        if (loadedAccount) {
-            FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
-            IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+        if (TrainerCheck && !foundLabel) {
+            foundTrainer := FindBorders("trainer")
+            if (foundTrainer)
+                foundLabel := "Trainer"
+        }
+        if (RainbowCheck && !foundLabel) {
+            foundRainbow := FindBorders("rainbow")
+            if (foundRainbow)
+                foundLabel := "Rainbow"
+        }
+        if (FullArtCheck && !foundLabel) {
+            foundFullArt := FindBorders("fullart")
+            if (foundFullArt)
+                foundLabel := "Full Art"
+        }
+        if (PseudoGodPack && !foundLabel) {
+            2starCount := FindBorders("trainer") + FindBorders("rainbow") + FindBorders("fullart")
+            if (2starCount > 1)
+                foundLabel := "Double two star"
         }
 
-        FoundStars(foundLabel)
-        restartGameInstance(foundLabel . " found. Continuing...", "GodPack")
+        if (foundLabel) {
+            if (loadedAccount) {
+                FileDelete, %loadedAccount% ;delete xml file from folder if using inject method
+                IniWrite, 0, %A_ScriptDir%\%scriptName%.ini, UserSettings, DeadCheck
+            }
+
+            FoundStars(foundLabel)
+            restartGameInstance(foundLabel . " found. Continuing...", "GodPack")
+        }
     }
 
     ; Check for tradeable cards.
